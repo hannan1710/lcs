@@ -5,7 +5,9 @@ const PORT = 3001;
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+// Increase body size limit to allow base64 images for multi-photo uploads
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Mock data storage
 let appointments = [
@@ -659,10 +661,10 @@ app.post('/api/auth/register', (req, res) => {
 });
 
 app.post('/api/auth/admin-login', (req, res) => {
-  const { username, password } = req.body;
+  const { username, password, email } = req.body;
   
-  // Find admin by username
-  const admin = admins.find(a => a.username === username);
+  // Find admin by username OR email (supports passing email in the username field)
+  const admin = admins.find(a => a.username === username || a.email === username || a.email === email);
   
   if (admin && admin.password === password) {
     // Update last login time
@@ -681,6 +683,15 @@ app.post('/api/auth/admin-login', (req, res) => {
   } else {
     res.status(401).json({ success: false, message: 'Invalid admin credentials' });
   }
+});
+
+app.post('/api/auth/logout', (req, res) => {
+  // In a real application, you would invalidate the JWT token
+  // For this mock server, we just return success
+  res.json({
+    success: true,
+    message: 'Logged out successfully'
+  });
 });
 
 // Admin management endpoints
@@ -1059,7 +1070,17 @@ app.get('/api/products/:id', (req, res) => {
 app.post('/api/products', (req, res) => {
   const newProduct = {
     id: Date.now(),
-    ...req.body,
+    name: req.body.name,
+    description: req.body.description || '',
+    image: req.body.image || (Array.isArray(req.body.images) ? req.body.images[0] : undefined),
+    images: Array.isArray(req.body.images) ? req.body.images : [],
+    price: req.body.price,
+    originalPrice: req.body.originalPrice || req.body.price,
+    category: req.body.category || 'uncategorized',
+    size: req.body.size || '',
+    inStock: req.body.inStock !== false,
+    featured: !!req.body.featured,
+    bestSeller: !!req.body.bestSeller,
     createdAt: new Date().toISOString()
   };
   products.push(newProduct);
@@ -1069,7 +1090,14 @@ app.post('/api/products', (req, res) => {
 app.put('/api/products/:id', (req, res) => {
   const index = products.findIndex(p => p.id === parseInt(req.params.id));
   if (index !== -1) {
-    products[index] = { ...products[index], ...req.body };
+    const updates = { ...req.body };
+    if (Array.isArray(req.body.images)) {
+      // Merge images to avoid dropping existing unless explicitly replaced
+      const merged = Array.from(new Set([...(products[index].images || []), ...req.body.images]));
+      updates.images = merged;
+      updates.image = req.body.image || merged[0] || products[index].image;
+    }
+    products[index] = { ...products[index], ...updates };
     res.json(products[index]);
   } else {
     res.status(404).json({ message: 'Product not found' });

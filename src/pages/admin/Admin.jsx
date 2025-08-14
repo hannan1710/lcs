@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../../components/ui/Header';
 import Button from '../../components/ui/Button';
 import Icon from '../../components/AppIcon';
-import { appointmentsAPI, servicesAPI, stylistsAPI, clientsAPI, analyticsAPI, settingsAPI } from '../../services/api';
+import { appointmentsAPI, servicesAPI, stylistsAPI, clientsAPI, analyticsAPI, settingsAPI, productsAPI } from '../../services/api';
 import PaymentManagement from './components/PaymentManagement';
 import AdminManagement from './components/AdminManagement';
 
@@ -12,17 +12,23 @@ const Admin = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isLoading, setIsLoading] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [adminRole, setAdminRole] = useState('admin');
   const [data, setData] = useState({
     appointments: [],
     services: [],
     stylists: [],
     clients: [],
     stats: [],
-    settings: {}
+    settings: {},
+    products: []
   });
   const [selectedItem, setSelectedItem] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState('');
+  const [editContext, setEditContext] = useState(''); // 'appointment' | 'service' | 'stylist'
+  const [editData, setEditData] = useState({});
+  const defaultProductCategories = ['shampoo','conditioner','treatment','styling','accessories'];
+  const [productCategories, setProductCategories] = useState(defaultProductCategories);
 
   // Check admin authentication
   useEffect(() => {
@@ -30,6 +36,10 @@ const Admin = () => {
     if (!admin) {
       navigate('/login');
     } else {
+      try {
+        const parsed = JSON.parse(admin);
+        setAdminRole(parsed?.role || 'admin');
+      } catch {}
       setIsAuthenticated(true);
     }
   }, [navigate]);
@@ -44,13 +54,14 @@ const Admin = () => {
   const loadData = async () => {
     setIsLoading(true);
     try {
-      const [appointments, services, stylists, clients, analytics, settings] = await Promise.all([
+      const [appointments, services, stylists, clients, analytics, settings, products] = await Promise.all([
         appointmentsAPI.getAll(),
         servicesAPI.getAll(),
         stylistsAPI.getAll(),
         clientsAPI.getAll(),
         analyticsAPI.getDashboardStats(),
-        settingsAPI.get()
+        settingsAPI.get(),
+        productsAPI.getAll()
       ]);
 
       setData({
@@ -59,8 +70,12 @@ const Admin = () => {
         stylists,
         clients,
         stats: analytics.stats,
-        settings
+        settings,
+        products
       });
+      // Merge categories discovered from products with defaults
+      const discovered = Array.from(new Set((products || []).map(p => p.category).filter(Boolean)));
+      setProductCategories(prev => Array.from(new Set([...(prev || []), ...discovered])));
     } catch (error) {
       console.error('Error loading data:', error);
     } finally {
@@ -79,13 +94,80 @@ const Admin = () => {
   const handleAdd = (type) => {
     setModalType('add');
     setSelectedItem(null);
+    setEditContext(type);
+    // sensible defaults per context
+    if (type === 'appointment') {
+      setEditData({ client: '', service: '', date: '', time: '', status: 'pending' });
+    } else if (type === 'service') {
+      setEditData({ name: '', price: '', duration: '', category: '', status: 'active' });
+    } else if (type === 'stylist') {
+      setEditData({ name: '', specialty: '', experience: '', status: 'active' });
+    } else if (type === 'product') {
+      setEditData({ name: '', description: '', image: '', images: [], price: 0, originalPrice: 0, category: '', size: '', inStock: true, featured: false, bestSeller: false });
+    }
     setShowModal(true);
   };
 
   const handleEdit = (item, type) => {
     setModalType('edit');
     setSelectedItem(item);
+    setEditContext(type);
+    if (type === 'appointment') {
+      setEditData({ client: item.client, service: item.service, date: item.date, time: item.time, status: item.status });
+    } else if (type === 'service') {
+      setEditData({ name: item.name, price: item.price, duration: item.duration, category: item.category, status: item.status });
+    } else if (type === 'stylist') {
+      setEditData({ name: item.name, specialty: item.specialty, experience: item.experience, status: item.status });
+    } else if (type === 'product') {
+      setEditData({ name: item.name, description: item.description, image: item.image, images: item.images || (item.image ? [item.image] : []), price: item.price, originalPrice: item.originalPrice, category: item.category, size: item.size, inStock: item.inStock, featured: item.featured, bestSeller: item.bestSeller });
+    }
     setShowModal(true);
+  };
+
+  const submitEdit = async (e) => {
+    e.preventDefault();
+    try {
+      if (editContext === 'appointment') {
+        if (modalType === 'add') {
+          await appointmentsAPI.create(editData);
+        } else {
+          await appointmentsAPI.update(selectedItem.id, editData);
+        }
+      } else if (editContext === 'service') {
+        if (modalType === 'add') {
+          await servicesAPI.create(editData);
+        } else {
+          await servicesAPI.update(selectedItem.id, editData);
+        }
+      } else if (editContext === 'stylist') {
+        if (modalType === 'add') {
+          await stylistsAPI.create(editData);
+        } else {
+          await stylistsAPI.update(selectedItem.id, editData);
+        }
+      } else if (editContext === 'product') {
+        // Merge existing images with new ones on edit
+        let images = Array.isArray(editData.images) ? editData.images : [];
+        if (modalType === 'edit' && selectedItem && Array.isArray(selectedItem.images)) {
+          // Preserve existing images that are not overwritten
+          images = Array.from(new Set([...(selectedItem.images || []), ...images]));
+        }
+        const payload = { ...editData, images };
+        if (images.length > 0) payload.image = images[0];
+        if (modalType === 'add') {
+          await productsAPI.create(payload);
+        } else {
+          await productsAPI.update(selectedItem.id, payload);
+        }
+      }
+      setShowModal(false);
+      setSelectedItem(null);
+      setEditData({});
+      await loadData();
+    } catch (error) {
+      console.error('Save failed:', error);
+      alert('Save failed');
+    }
   };
 
   const handleDelete = async (id, type) => {
@@ -124,7 +206,7 @@ const Admin = () => {
   };
 
   // Use data from API instead of mock data
-  const { stats, appointments: recentAppointments, services, stylists } = data;
+  const { stats, appointments: recentAppointments, services, stylists, products } = data;
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -152,12 +234,15 @@ const Admin = () => {
     { id: 'dashboard', label: 'Dashboard', icon: 'Layout' },
     { id: 'appointments', label: 'Appointments', icon: 'Calendar' },
     { id: 'services', label: 'Services', icon: 'Scissors' },
+    { id: 'products', label: 'Products', icon: 'Package' },
     { id: 'stylists', label: 'Stylists', icon: 'Users' },
     { id: 'clients', label: 'Clients', icon: 'User' },
     { id: 'payments', label: 'Payments', icon: 'CreditCard' },
     { id: 'analytics', label: 'Analytics', icon: 'BarChart' },
-    { id: 'settings', label: 'Settings', icon: 'Settings' },
-    { id: 'admin', label: 'Admin', icon: 'Users' }
+    ...(adminRole === 'super_admin' ? [
+      { id: 'settings', label: 'Settings', icon: 'Settings' },
+      { id: 'admin', label: 'Admin', icon: 'Users' }
+    ] : [])
   ];
 
   if (!isAuthenticated) {
@@ -391,18 +476,60 @@ const Admin = () => {
                         {service.status}
                       </span>
                     </div>
-                    <div className="space-y-2 text-sm text-muted-foreground">
+                      <div className="space-y-2 text-sm text-muted-foreground">
                       <p>Price: {service.price}</p>
                       <p>Duration: {service.duration}</p>
                       <p>Category: {service.category}</p>
                     </div>
                     <div className="flex items-center space-x-2 mt-4">
-                      <Button size="xs" variant="outline">
+                      <Button size="xs" variant="outline" onClick={() => handleEdit(service, 'service')}>
                         <Icon name="Edit" size={12} />
                       </Button>
-                      <Button size="xs" variant="outline">
-                        <Icon name="Trash" size={12} />
+                      {adminRole === 'super_admin' && (
+                        <Button size="xs" variant="outline" onClick={() => handleDelete(service.id, 'service')}>
+                          <Icon name="Trash" size={12} />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Products Tab */}
+          {activeTab === 'products' && (
+            <div className="bg-card border border-border rounded-lg p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-semibold text-foreground">Products Management</h3>
+                <Button size="sm" onClick={() => handleAdd('product')}>
+                  <Icon name="Plus" size={16} className="mr-2" />
+                  Add Product
+                </Button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {products.map((p) => (
+                  <div key={p.id} className="border border-border rounded-lg p-4">
+                    <div className="flex items-start justify-between mb-3">
+                      <h4 className="font-medium text-foreground">{p.name}</h4>
+                      <span className={`text-xs px-2 py-1 rounded-full ${p.inStock ? 'text-success' : 'text-muted-foreground'}`}>
+                        {p.inStock ? 'in stock' : 'out of stock'}
+                      </span>
+                    </div>
+                    <div className="space-y-2 text-sm text-muted-foreground">
+                      <p>Price: ${p.price}</p>
+                      <p>Size: {p.size}</p>
+                      <p>Category: {p.category}</p>
+                    </div>
+                    <div className="flex items-center space-x-2 mt-4">
+                      <Button size="xs" variant="outline" onClick={() => handleEdit(p, 'product')}>
+                        <Icon name="Edit" size={12} />
                       </Button>
+                      {adminRole === 'super_admin' && (
+                        <Button size="xs" variant="outline" onClick={() => handleDelete(p.id, 'product')}>
+                          <Icon name="Trash" size={12} />
+                        </Button>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -441,6 +568,7 @@ const Admin = () => {
                       >
                         <Icon name="Edit" size={12} />
                       </Button>
+                      {adminRole === 'super_admin' && (
                       <Button 
                         size="xs" 
                         variant="outline"
@@ -448,9 +576,135 @@ const Admin = () => {
                       >
                         <Icon name="Trash" size={12} />
                       </Button>
+                      )}
                     </div>
                   </div>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {/* Add/Edit Modal for appointments/services/stylists/products */}
+          {showModal && (
+            <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50">
+              <div className="bg-card border border-border rounded-lg p-6 w-full max-w-md mx-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-foreground">
+                    {modalType === 'add' ? 'Add' : 'Edit'} {editContext.charAt(0).toUpperCase() + editContext.slice(1)}
+                  </h3>
+                  <Button variant="outline" size="sm" onClick={() => setShowModal(false)}>
+                    <Icon name="X" size={16} />
+                  </Button>
+                </div>
+                <form onSubmit={submitEdit} className="space-y-4">
+                  {editContext === 'appointment' && (
+                    <>
+                      <label className="block text-sm font-medium text-foreground">Client</label>
+                      <input className="w-full mt-1 p-2 border border-border rounded-md bg-background" value={editData.client} onChange={(e) => setEditData({ ...editData, client: e.target.value })} />
+                      <label className="block text-sm font-medium text-foreground">Service</label>
+                      <input className="w-full mt-1 p-2 border border-border rounded-md bg-background" value={editData.service} onChange={(e) => setEditData({ ...editData, service: e.target.value })} />
+                      <label className="block text-sm font-medium text-foreground">Date</label>
+                      <input type="date" className="w-full mt-1 p-2 border border-border rounded-md bg-background" value={editData.date} onChange={(e) => setEditData({ ...editData, date: e.target.value })} />
+                      <label className="block text-sm font-medium text-foreground">Time</label>
+                      <input type="text" className="w-full mt-1 p-2 border border-border rounded-md bg-background" value={editData.time} onChange={(e) => setEditData({ ...editData, time: e.target.value })} />
+                      <label className="block text-sm font-medium text-foreground">Status</label>
+                      <select className="w-full mt-1 p-2 border border-border rounded-md bg-background" value={editData.status} onChange={(e) => setEditData({ ...editData, status: e.target.value })}>
+                        <option value="pending">pending</option>
+                        <option value="confirmed">confirmed</option>
+                        <option value="cancelled">cancelled</option>
+                      </select>
+                    </>
+                  )}
+                  {editContext === 'service' && (
+                    <>
+                      <label className="block text-sm font-medium text-foreground">Name</label>
+                      <input className="w-full mt-1 p-2 border border-border rounded-md bg-background" value={editData.name} onChange={(e) => setEditData({ ...editData, name: e.target.value })} />
+                      <label className="block text-sm font-medium text-foreground">Price</label>
+                      <input type="number" className="w-full mt-1 p-2 border border-border rounded-md bg-background" value={editData.price} onChange={(e) => setEditData({ ...editData, price: Number(e.target.value) })} />
+                      <label className="block text-sm font-medium text-foreground">Duration</label>
+                      <input className="w-full mt-1 p-2 border border-border rounded-md bg-background" value={editData.duration} onChange={(e) => setEditData({ ...editData, duration: e.target.value })} />
+                      <label className="block text-sm font-medium text-foreground">Category</label>
+                      <input className="w-full mt-1 p-2 border border-border rounded-md bg-background" value={editData.category} onChange={(e) => setEditData({ ...editData, category: e.target.value })} />
+                      <label className="block text-sm font-medium text-foreground">Status</label>
+                      <select className="w-full mt-1 p-2 border border-border rounded-md bg-background" value={editData.status} onChange={(e) => setEditData({ ...editData, status: e.target.value })}>
+                        <option value="active">active</option>
+                        <option value="inactive">inactive</option>
+                      </select>
+                    </>
+                  )}
+                  {editContext === 'stylist' && (
+                    <>
+                      <label className="block text-sm font-medium text-foreground">Name</label>
+                      <input className="w-full mt-1 p-2 border border-border rounded-md bg-background" value={editData.name} onChange={(e) => setEditData({ ...editData, name: e.target.value })} />
+                      <label className="block text-sm font-medium text-foreground">Specialty</label>
+                      <input className="w-full mt-1 p-2 border border-border rounded-md bg-background" value={editData.specialty} onChange={(e) => setEditData({ ...editData, specialty: e.target.value })} />
+                      <label className="block text-sm font-medium text-foreground">Experience</label>
+                      <input className="w-full mt-1 p-2 border border-border rounded-md bg-background" value={editData.experience} onChange={(e) => setEditData({ ...editData, experience: e.target.value })} />
+                      <label className="block text-sm font-medium text-foreground">Status</label>
+                      <select className="w-full mt-1 p-2 border border-border rounded-md bg-background" value={editData.status} onChange={(e) => setEditData({ ...editData, status: e.target.value })}>
+                        <option value="active">active</option>
+                        <option value="inactive">inactive</option>
+                      </select>
+                    </>
+                  )}
+                  {editContext === 'product' && (
+                    <>
+                      <label className="block text-sm font-medium text-foreground">Name</label>
+                      <input className="w-full mt-1 p-2 border border-border rounded-md bg-background" value={editData.name} onChange={(e) => setEditData({ ...editData, name: e.target.value })} />
+                      <label className="block text-sm font-medium text-foreground">Description</label>
+                      <textarea className="w-full mt-1 p-2 border border-border rounded-md bg-background" value={editData.description} onChange={(e) => setEditData({ ...editData, description: e.target.value })} />
+                      <label className="block text-sm font-medium text-foreground">Images</label>
+                      <input type="file" multiple accept="image/*" className="w-full mt-1 p-2 border border-border rounded-md bg-background" onChange={(e) => {
+                        const files = Array.from(e.target.files || []);
+                        const readers = files.map(file => new Promise((resolve) => {
+                          const fr = new FileReader();
+                          fr.onload = () => resolve(fr.result);
+                          fr.readAsDataURL(file);
+                        }));
+                        Promise.all(readers).then(urls => setEditData(prev => ({ ...prev, images: urls })));
+                      }} />
+                      {Array.isArray(editData.images) && editData.images.length > 0 && (
+                        <div className="grid grid-cols-4 gap-2 mt-2">
+                          {editData.images.map((url, idx) => (
+                            <img key={idx} src={url} alt={`preview-${idx}`} className="w-full h-16 object-cover rounded" />
+                          ))}
+                        </div>
+                      )}
+                      <label className="block text-sm font-medium text-foreground">Price</label>
+                      <input type="number" className="w-full mt-1 p-2 border border-border rounded-md bg-background" value={editData.price} onChange={(e) => setEditData({ ...editData, price: Number(e.target.value) })} />
+                      <label className="block text-sm font-medium text-foreground">Original Price</label>
+                      <input type="number" className="w-full mt-1 p-2 border border-border rounded-md bg-background" value={editData.originalPrice} onChange={(e) => setEditData({ ...editData, originalPrice: Number(e.target.value) })} />
+                      <label className="block text-sm font-medium text-foreground">Category</label>
+                      <div className="flex items-center space-x-2">
+                        <select className="flex-1 p-2 border border-border rounded-md bg-background" value={editData.category || ''} onChange={(e) => setEditData({ ...editData, category: e.target.value })}>
+                          <option value="">Select category</option>
+                          {productCategories.map(cat => (
+                            <option key={cat} value={cat}>{cat.charAt(0).toUpperCase() + cat.slice(1)}</option>
+                          ))}
+                        </select>
+                        <Button size="xs" variant="outline" type="button" onClick={() => {
+                          const name = prompt('Enter new category name');
+                          if (name && name.trim()) {
+                            const normalized = name.trim().toLowerCase();
+                            setProductCategories(prev => Array.from(new Set([...(prev || []), normalized])));
+                            setEditData(prev => ({ ...prev, category: normalized }));
+                          }
+                        }}>New</Button>
+                      </div>
+                      <label className="block text-sm font-medium text-foreground">Size</label>
+                      <input className="w-full mt-1 p-2 border border-border rounded-md bg-background" value={editData.size} onChange={(e) => setEditData({ ...editData, size: e.target.value })} />
+                      <div className="grid grid-cols-2 gap-2">
+                        <label className="flex items-center space-x-2 text-sm"><input type="checkbox" checked={!!editData.inStock} onChange={(e) => setEditData({ ...editData, inStock: e.target.checked })} /> <span>In Stock</span></label>
+                        <label className="flex items-center space-x-2 text-sm"><input type="checkbox" checked={!!editData.featured} onChange={(e) => setEditData({ ...editData, featured: e.target.checked })} /> <span>Featured</span></label>
+                        <label className="flex items-center space-x-2 text-sm"><input type="checkbox" checked={!!editData.bestSeller} onChange={(e) => setEditData({ ...editData, bestSeller: e.target.checked })} /> <span>Best Seller</span></label>
+                      </div>
+                    </>
+                  )}
+                  <div className="flex items-center justify-end space-x-2 pt-4">
+                    <Button type="button" variant="outline" onClick={() => setShowModal(false)}>Cancel</Button>
+                    <Button type="submit">{modalType === 'add' ? 'Create' : 'Save Changes'}</Button>
+                  </div>
+                </form>
               </div>
             </div>
           )}

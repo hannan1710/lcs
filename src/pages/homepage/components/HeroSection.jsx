@@ -11,15 +11,10 @@ const HeroSection = () => {
   };
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Background */}
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20 sm:pt-24 lg:pt-28">
+      {/* Background (gradient only, removed broken image) */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-br from-background/80 via-background/60 to-background/40 z-10" />
-        <img
-          src="https://images.unsplash.com/photo-1560066984-138dadb4c035?w=1920&h=1080&fit=crop"
-          alt="Luxury Salon Interior"
-          className="w-full h-full object-cover"
-        />
       </div>
 
       {/* Video Background Option */}
@@ -40,12 +35,8 @@ const HeroSection = () => {
 
       {/* Content */}
       <div className="relative z-30 container mx-auto px-6 lg:px-8 text-center">
-        <div className="max-w-4xl mx-auto">
-          {/* Badge */}
-          <div className="inline-flex items-center space-x-2 bg-accent/10 text-accent px-4 py-2 rounded-full text-sm font-medium mb-6">
-            <Icon name="Star" size={16} />
-            <span>Voted Best Salon 2024</span>
-          </div>
+        <div className="max-w-4xl mx-auto pt-8 sm:pt-12 lg:pt-16">
+
 
           {/* Main Heading */}
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-heading font-bold text-foreground mb-6 leading-tight">
@@ -145,8 +136,8 @@ const HeroSection = () => {
               <Icon name="Award" size={20} color="white" />
             </div>
             <div>
-              <p className="font-medium text-foreground">Award Winning</p>
-              <p className="text-xs text-muted-foreground">Best Salon 2024</p>
+             
+              <p className="text-xs text-muted-foreground">Best Salon </p>
             </div>
           </div>
         </div>

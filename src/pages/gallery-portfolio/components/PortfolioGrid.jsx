@@ -22,7 +22,7 @@ const PortfolioGrid = ({ images, onImageClick }) => {
   return (
     <div className="px-6 lg:px-8">
       {/* Mobile: Masonry-style layout */}
-      <div className="grid grid-cols-2 gap-3 lg:hidden">
+      <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:hidden">
         {images?.map((image, index) => (
           <div
             key={image?.id}

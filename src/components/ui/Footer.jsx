@@ -66,7 +66,7 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-foreground text-background py-12 lg:py-16">
+    <footer className="bg-black text-white py-12 lg:py-16">
       <div className="container mx-auto px-6 lg:px-8">
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
@@ -77,11 +77,11 @@ const Footer = () => {
                 <Icon name="Scissors" size={20} className="text-accent-foreground" />
               </div>
               <div>
-                <h3 className="font-heading font-bold text-xl">La Coiffure</h3>
-                <p className="text-background/70 text-sm">Luxury Salon</p>
+                <h3 className="font-heading font-bold text-xl text-white">La Coiffure</h3>
+                <p className="text-white/70 text-sm">Luxury Salon</p>
               </div>
             </div>
-            <p className="text-background/80 mb-4 max-w-md">
+            <p className="text-white/80 mb-4 max-w-md">
               Creating beautiful transformations with artistry, expertise, and luxury service since 2010. 
               Experience the pinnacle of hair and beauty services at our exclusive salons.
             </p>
@@ -90,7 +90,7 @@ const Footer = () => {
                 <button
                   key={social.name}
                   onClick={() => handleSocialClick(social.url)}
-                  className="w-10 h-10 bg-background/10 hover:bg-accent hover:text-accent-foreground rounded-full flex items-center justify-center transition-luxury"
+                  className="w-10 h-10 bg-white/10 hover:bg-accent hover:text-accent-foreground rounded-full flex items-center justify-center transition-luxury"
                   aria-label={`Follow us on ${social.name}`}
                 >
                   <Icon name={social.icon} size={18} />
@@ -107,7 +107,7 @@ const Footer = () => {
                 <li key={link.path}>
                   <Link 
                     to={link.path}
-                    className={`text-background/80 hover:text-accent transition-luxury ${
+                    className={`text-white/80 hover:text-accent transition-luxury ${
                       location.pathname === link.path ? 'text-accent' : ''
                     }`}
                   >
@@ -121,7 +121,7 @@ const Footer = () => {
           {/* Services */}
           <div>
             <h4 className="font-semibold mb-4 text-lg">Services</h4>
-            <ul className="space-y-2 text-sm text-background/80">
+            <ul className="space-y-2 text-sm text-white/80">
               {services.map((service) => (
                 <li key={service}>{service}</li>
               ))}
@@ -131,12 +131,12 @@ const Footer = () => {
           {/* Contact Info */}
           <div>
             <h4 className="font-semibold mb-4 text-lg">Contact Info</h4>
-            <div className="space-y-2 text-sm text-background/80">
-              <p className="font-medium text-background">Main Office</p>
+            <div className="space-y-2 text-sm text-white/80">
+              <p className="font-medium text-white">Main Office</p>
               <p>La Coiffure Salon</p>
               <p>Thane & Powai Locations</p>
               <div className="pt-2">
-                <p className="font-medium text-background">General Inquiries</p>
+                <p className="font-medium text-white">General Inquiries</p>
                 <p>info@lacoiffure.com</p>
               </div>
             </div>
@@ -144,18 +144,18 @@ const Footer = () => {
         </div>
 
         {/* Salon Locations */}
-        <div className="border-t border-background/20 pt-8 mb-8">
-          <h4 className="font-semibold mb-6 text-lg text-center">Our Locations</h4>
+        <div className="border-t border-white/20 pt-8 mb-8">
+          <h4 className="font-semibold mb-6 text-lg text-center text-white">Our Locations</h4>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {salonLocations.map((location, index) => (
-              <div key={index} className="bg-background/5 rounded-lg p-6 border border-background/10">
+              <div key={index} className="bg-white/5 rounded-lg p-6 border border-white/10">
                 <h5 className="font-semibold text-lg mb-3 text-accent">{location.name}</h5>
                 <div className="space-y-2 text-sm">
                   <div className="flex items-start space-x-2">
                     <Icon name="MapPin" size={16} className="text-accent mt-0.5 flex-shrink-0" />
                     <button
                       onClick={() => handleLocationClick(location.address)}
-                      className="text-background/80 hover:text-accent transition-luxury text-left"
+                      className="text-white/80 hover:text-accent transition-luxury text-left"
                     >
                       {location.address}
                     </button>
@@ -164,7 +164,7 @@ const Footer = () => {
                     <Icon name="Phone" size={16} className="text-accent" />
                     <button
                       onClick={() => handlePhoneClick(location.phone)}
-                      className="text-background/80 hover:text-accent transition-luxury"
+                      className="text-white/80 hover:text-accent transition-luxury"
                     >
                       {location.phone}
                     </button>
@@ -173,14 +173,14 @@ const Footer = () => {
                     <Icon name="Mail" size={16} className="text-accent" />
                     <button
                       onClick={() => handleEmailClick(location.email)}
-                      className="text-background/80 hover:text-accent transition-luxury"
+                      className="text-white/80 hover:text-accent transition-luxury"
                     >
                       {location.email}
                     </button>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Icon name="Clock" size={16} className="text-accent" />
-                    <span className="text-background/80">{location.hours}</span>
+                    <span className="text-white/80">{location.hours}</span>
                   </div>
                 </div>
               </div>
@@ -189,17 +189,17 @@ const Footer = () => {
         </div>
 
         {/* Newsletter Signup */}
-        <div className="border-t border-background/20 pt-8 mb-8">
+        <div className="border-t border-white/20 pt-8 mb-8">
           <div className="text-center max-w-md mx-auto">
-            <h4 className="font-semibold mb-2 text-lg">Stay Updated</h4>
-            <p className="text-background/80 mb-4 text-sm">
+            <h4 className="font-semibold mb-2 text-lg text-white">Stay Updated</h4>
+            <p className="text-white/80 mb-4 text-sm">
               Subscribe to our newsletter for exclusive offers, styling tips, and salon updates.
             </p>
             <div className="flex flex-col sm:flex-row gap-2">
               <input
                 type="email"
                 placeholder="Enter your email"
-                className="flex-1 px-4 py-2 rounded-lg bg-background/10 border border-background/20 text-background placeholder:text-background/50 focus:outline-none focus:border-accent"
+                className="flex-1 px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/50 focus:outline-none focus:border-accent"
               />
               <button className="px-6 py-2 bg-accent text-accent-foreground rounded-lg hover:bg-accent/90 transition-luxury font-medium">
                 Subscribe
@@ -209,19 +209,19 @@ const Footer = () => {
         </div>
 
         {/* Bottom Footer */}
-        <div className="border-t border-background/20 pt-8">
+        <div className="border-t border-white/20 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="text-sm text-background/60">
+            <div className="text-sm text-white/60">
               © {currentYear} La Coiffure Salon. All rights reserved.
             </div>
             <div className="flex space-x-6 text-sm">
-              <Link to="/privacy-policy" className="text-background/60 hover:text-accent transition-luxury">
+              <Link to="/privacy-policy" className="text-white/60 hover:text-accent transition-luxury">
                 Privacy Policy
               </Link>
-              <Link to="/terms-of-service" className="text-background/60 hover:text-accent transition-luxury">
+              <Link to="/terms-of-service" className="text-white/60 hover:text-accent transition-luxury">
                 Terms of Service
               </Link>
-              <Link to="/cancellation-policy" className="text-background/60 hover:text-accent transition-luxury">
+              <Link to="/cancellation-policy" className="text-white/60 hover:text-accent transition-luxury">
                 Cancellation Policy
               </Link>
             </div>

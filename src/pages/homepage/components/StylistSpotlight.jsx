@@ -102,7 +102,7 @@ const StylistSpotlight = () => {
           <div className="bg-card rounded-3xl shadow-luxury overflow-hidden border border-border">
             <div className="grid lg:grid-cols-2 gap-0">
               {/* Image Section */}
-              <div className="relative h-64 lg:h-auto overflow-hidden">
+              <div className="relative h-48 sm:h-56 md:h-64 lg:h-auto overflow-hidden">
                 <Image
                   src={currentStylistData?.image}
                   alt={currentStylistData?.name}
@@ -127,12 +127,12 @@ const StylistSpotlight = () => {
               </div>
 
               {/* Content Section */}
-              <div className="p-8 lg:p-12 flex flex-col justify-center">
+              <div className="p-4 sm:p-6 md:p-8 lg:p-12 flex flex-col justify-center">
                 <div className="mb-6">
-                  <h3 className="font-heading text-2xl lg:text-3xl font-bold text-foreground mb-2">
+                  <h3 className="font-heading text-xl sm:text-2xl lg:text-3xl font-bold text-foreground mb-2">
                     {currentStylistData?.name}
                   </h3>
-                  <p className="text-accent font-medium text-lg mb-4">
+                  <p className="text-accent font-medium text-base sm:text-lg mb-4">
                     {currentStylistData?.title}
                   </p>
                   <p className="text-muted-foreground leading-relaxed mb-6">

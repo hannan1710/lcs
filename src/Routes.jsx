@@ -9,12 +9,14 @@ import ContactLocationPage from './pages/contact-location';
 import ServicesCatalog from './pages/services-catalog';
 import StylistProfiles from './pages/stylist-profiles';
 import Homepage from './pages/homepage';
+import Blog from './pages/blog';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import Dashboard from './pages/dashboard/Dashboard';
 import Products from './pages/products';
 import Payment from './pages/payment/Payment';
 import PaymentConfirmation from './pages/payment/PaymentConfirmation';
+import CartPage from './pages/payment/CartPage';
 import Admin from './pages/admin/Admin';
 
 
@@ -32,6 +34,7 @@ const Routes = () => {
         <Route path="/stylist-profiles" element={<StylistProfiles />} />
         <Route path="/gallery-portfolio" element={<GalleryPortfolio />} />
         <Route path="/contact-location" element={<ContactLocationPage />} />
+        <Route path="/blog" element={<Blog />} />
         
         {/* Authentication */}
         <Route path="/login" element={<Login />} />
@@ -45,6 +48,7 @@ const Routes = () => {
         <Route path="/products" element={<Products />} />
         
         {/* Payment */}
+        <Route path="/cart" element={<CartPage />} />
         <Route path="/payment" element={<Payment />} />
         <Route path="/payment-confirmation" element={<PaymentConfirmation />} />
         

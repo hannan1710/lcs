@@ -10,12 +10,37 @@ const Header = () => {
   const location = useLocation();
 
   // Mock authentication state - in real app this would come from context/state management
-  const isAuthenticated = false; // Set to true to see authenticated state
-  const user = {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState({
     name: 'Sarah Johnson',
     email: 'sarah.johnson@email.com',
     avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=200&h=200&fit=crop&crop=face'
-  };
+  });
+
+  // Check authentication state from localStorage
+  useEffect(() => {
+    const admin = localStorage.getItem('admin');
+    const regularUser = localStorage.getItem('user');
+    
+    if (admin || regularUser) {
+      setIsAuthenticated(true);
+      if (admin) {
+        const adminData = JSON.parse(admin);
+        setUser({
+          name: adminData.username || 'Admin User',
+          email: adminData.email || 'admin@lacoiffure.com',
+          avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face'
+        });
+      } else if (regularUser) {
+        const userData = JSON.parse(regularUser);
+        setUser({
+          name: `${userData.firstName || userData.name} ${userData.lastName || ''}`,
+          email: userData.email || 'user@lacoiffure.com',
+          avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=200&h=200&fit=crop&crop=face'
+        });
+      }
+    }
+  }, []);
 
   const navigationItems = [
     { label: 'Home', path: '/homepage', icon: 'Home' },
@@ -62,6 +87,20 @@ const Header = () => {
 
   const toggleUserMenu = () => {
     setIsUserMenuOpen(!isUserMenuOpen);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('admin');
+    localStorage.removeItem('adminToken');
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    setIsAuthenticated(false);
+    setUser({
+      name: 'Sarah Johnson',
+      email: 'sarah.johnson@email.com',
+      avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=200&h=200&fit=crop&crop=face'
+    });
+    setIsUserMenuOpen(false);
   };
 
   const isActivePath = (path) => {
@@ -117,6 +156,12 @@ const Header = () => {
 
             {/* Desktop Actions */}
             <div className="hidden lg:flex items-center space-x-4">
+              <Link to="/cart" className="relative">
+                <Button variant="outline" size="sm">
+                  <Icon name="ShoppingCart" size={16} className="mr-2" />
+                  Cart
+                </Button>
+              </Link>
               {isAuthenticated ? (
                 // Authenticated User Menu
                 <div className="relative">
@@ -174,7 +219,10 @@ const Header = () => {
                           <span>Admin Login</span>
                         </Link>
                         <div className="border-t border-border my-2"></div>
-                        <button className="flex items-center space-x-3 px-4 py-2 text-sm text-destructive hover:bg-muted transition-luxury w-full">
+                        <button 
+                          onClick={handleLogout}
+                          className="flex items-center space-x-3 px-4 py-2 text-sm text-destructive hover:bg-muted transition-luxury w-full"
+                        >
                           <Icon name="LogOut" size={16} />
                           <span>Sign Out</span>
                         </button>
@@ -241,7 +289,10 @@ const Header = () => {
                       <Icon name="Home" size={20} />
                       <span>Dashboard</span>
                     </Link>
-                    <button className="flex items-center space-x-3 px-4 py-3 rounded-lg text-destructive hover:bg-muted transition-luxury w-full">
+                    <button 
+                      onClick={handleLogout}
+                      className="flex items-center space-x-3 px-4 py-3 rounded-lg text-destructive hover:bg-muted transition-luxury w-full"
+                    >
                       <Icon name="LogOut" size={20} />
                       <span>Sign Out</span>
                     </button>

@@ -9,7 +9,6 @@ import { authAPI } from '../../services/api';
 const Login = () => {
   const navigate = useNavigate();
   const [isLoginMode, setIsLoginMode] = useState(true);
-  const [isAdminMode, setIsAdminMode] = useState(false);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -39,9 +38,9 @@ const Login = () => {
   const validateForm = () => {
     const newErrors = {};
     
-    console.log('Validating form:', { isAdminMode, isLoginMode, formData });
+    console.log('Validating form:', { isLoginMode, formData });
     
-    if (!isLoginMode && !isAdminMode) {
+    if (!isLoginMode) {
       if (!formData.firstName.trim()) {
         newErrors.firstName = 'First name is required';
       }
@@ -51,18 +50,18 @@ const Login = () => {
     }
     
     if (!formData.email.trim()) {
-      newErrors.email = isAdminMode ? 'Username is required' : 'Email is required';
-    } else if (!isAdminMode && !/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Please enter a valid email';
     }
     
     if (!formData.password.trim()) {
       newErrors.password = 'Password is required';
-    } else if (!isAdminMode && formData.password.length < 6) {
+    } else if (formData.password.length < 6) {
       newErrors.password = 'Password must be at least 6 characters';
     }
 
-    if (!isLoginMode && !isAdminMode && formData.password !== formData.confirmPassword) {
+    if (!isLoginMode && formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match';
     }
 
@@ -74,31 +73,31 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    console.log('Form submitted:', { isAdminMode, isLoginMode, formData });
+    console.log('Form submitted:', { isLoginMode, formData });
     
     if (!validateForm()) return;
 
     setIsLoading(true);
     
     try {
-      if (isAdminMode) {
-        // Admin login
-        console.log('Admin login attempt:', { username: formData.email, password: formData.password });
-        const response = await authAPI.adminLogin({
-          username: formData.email, // Use email field for username
-          password: formData.password
-        });
-        
-        console.log('Admin login response:', response);
-        
-        if (response.success) {
-          localStorage.setItem('admin', JSON.stringify(response.user));
-          localStorage.setItem('adminToken', response.token);
-          navigate('/admin');
-        } else {
-          setErrors({ email: 'Invalid admin credentials' });
+      if (isLoginMode) {
+        // First, try admin login if the email matches known admin domains/pattern or simply always attempt admin first
+        try {
+          const adminResponse = await authAPI.adminLogin({
+            username: formData.email,
+            email: formData.email,
+            password: formData.password
+          });
+          if (adminResponse?.success) {
+            localStorage.setItem('admin', JSON.stringify(adminResponse.user));
+            localStorage.setItem('adminToken', adminResponse.token);
+            navigate('/admin');
+            return;
+          }
+        } catch (e) {
+          // ignore and fall back to user login
         }
-      } else if (isLoginMode) {
+
         const response = await authAPI.login({
           email: formData.email,
           password: formData.password
@@ -136,14 +135,9 @@ const Login = () => {
   const toggleMode = (mode) => {
     console.log('Switching to mode:', mode);
     
-    if (mode === 'admin') {
-      setIsAdminMode(true);
-      setIsLoginMode(false);
-    } else if (mode === 'login') {
-      setIsAdminMode(false);
+    if (mode === 'login') {
       setIsLoginMode(true);
     } else {
-      setIsAdminMode(false);
       setIsLoginMode(false);
     }
     
@@ -157,7 +151,7 @@ const Login = () => {
     });
     setErrors({});
     
-    console.log('Form cleared, new state:', { isAdminMode: mode === 'admin', isLoginMode: mode === 'login' });
+    console.log('Form cleared, new state:', { isLoginMode: mode === 'login' });
   };
 
   const handleGoogleLogin = () => {
@@ -182,10 +176,10 @@ const Login = () => {
                 <Icon name="Scissors" size={32} color="white" />
               </div>
               <h1 className="text-3xl font-heading font-bold text-foreground mb-2">
-                {isAdminMode ? 'Admin Access' : isLoginMode ? 'Welcome Back' : 'Create Account'}
+                {isLoginMode ? 'Welcome Back' : 'Create Account'}
               </h1>
               <p className="text-muted-foreground">
-                {isAdminMode ? 'Sign in to La Coiffure admin panel' : isLoginMode ? 'Sign in to your La Coiffure account' : 'Join La Coiffure for exclusive benefits'}
+                {isLoginMode ? 'Sign in to your La Coiffure account' : 'Join La Coiffure for exclusive benefits'}
               </p>
             </div>
 
@@ -195,7 +189,7 @@ const Login = () => {
                 type="button"
                 onClick={() => toggleMode('login')}
                 className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-luxury ${
-                  isLoginMode && !isAdminMode
+                  isLoginMode
                     ? 'bg-background text-foreground shadow-sm' 
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
@@ -206,23 +200,12 @@ const Login = () => {
                 type="button"
                 onClick={() => toggleMode('register')}
                 className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-luxury ${
-                  !isLoginMode && !isAdminMode
+                  !isLoginMode
                     ? 'bg-background text-foreground shadow-sm' 
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 Sign Up
-              </button>
-              <button
-                type="button"
-                onClick={() => toggleMode('admin')}
-                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-luxury ${
-                  isAdminMode
-                    ? 'bg-background text-foreground shadow-sm' 
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                Admin
               </button>
             </div>
 
@@ -230,7 +213,7 @@ const Login = () => {
             <div className="bg-card border border-border rounded-lg p-6 lg:p-8">
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Name Fields (Register Mode Only) */}
-                {!isLoginMode && !isAdminMode && (
+                {!isLoginMode && (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <Input
@@ -257,15 +240,15 @@ const Login = () => {
                   </div>
                 )}
 
-                {/* Email/Username */}
+                {/* Email */}
                 <div>
                   <Input
-                    type={isAdminMode ? "text" : "email"}
-                    label={isAdminMode ? "Username" : "Email Address"}
+                    type="email"
+                    label="Email Address"
                     value={formData.email}
                     onChange={(e) => handleInputChange('email', e.target.value)}
                     error={errors.email}
-                    placeholder={isAdminMode ? "Enter your username" : "Enter your email"}
+                    placeholder="Enter your email"
                     required
                   />
                 </div>
@@ -293,7 +276,7 @@ const Login = () => {
                 </div>
 
                 {/* Confirm Password (Register Mode Only) */}
-                {!isLoginMode && !isAdminMode && (
+                {!isLoginMode && (
                   <div>
                     <div className="relative">
                       <Input
@@ -317,7 +300,7 @@ const Login = () => {
                 )}
 
                 {/* Remember Me & Forgot Password (Login Mode Only) */}
-                {isLoginMode && !isAdminMode && (
+                {isLoginMode && (
                   <div className="flex items-center justify-between">
                     <label className="flex items-center space-x-2 cursor-pointer">
                       <Input
@@ -345,16 +328,15 @@ const Login = () => {
                   {isLoading ? (
                     <div className="flex items-center space-x-2">
                       <Icon name="Loader" size={16} className="animate-spin" />
-                      <span>{isAdminMode ? 'Signing in...' : isLoginMode ? 'Signing in...' : 'Creating account...'}</span>
+                      <span>{isLoginMode ? 'Signing in...' : 'Creating account...'}</span>
                     </div>
                   ) : (
-                    isAdminMode ? 'Admin Sign In' : isLoginMode ? 'Sign In' : 'Create Account'
+                    isLoginMode ? 'Sign In' : 'Create Account'
                   )}
                 </Button>
               </form>
 
-              {/* Divider (Not for Admin Mode) */}
-              {!isAdminMode && (
+               {/* Divider */}
                 <div className="relative my-6">
                   <div className="absolute inset-0 flex items-center">
                     <div className="w-full border-t border-border" />
@@ -363,10 +345,8 @@ const Login = () => {
                     <span className="px-2 bg-card text-muted-foreground">Or continue with</span>
                   </div>
                 </div>
-              )}
 
-              {/* Social Login (Not for Admin Mode) */}
-              {!isAdminMode && (
+               {/* Social Login */}
                 <div className="space-y-3">
                   <Button
                     variant="outline"
@@ -386,24 +366,12 @@ const Login = () => {
                     Continue with Facebook
                   </Button>
                 </div>
-              )}
             </div>
 
             {/* Mode Switch Link */}
             <div className="text-center mt-6">
               <p className="text-muted-foreground">
-                {isAdminMode ? (
-                  <>
-                    Need regular access?{" "}
-                    <button
-                      type="button"
-                      onClick={() => toggleMode('login')}
-                      className="text-accent hover:text-accent/80 transition-luxury font-medium"
-                    >
-                      Sign in here
-                    </button>
-                  </>
-                ) : isLoginMode ? (
+                {isLoginMode ? (
                   <>
                     Don't have an account?{" "}
                     <button

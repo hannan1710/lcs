@@ -140,7 +140,7 @@ const SalonGallery = () => {
         </div>
 
         {/* Gallery Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-12">
           {displayedImages?.map((image, index) => (
             <div
               key={image?.id}
@@ -149,7 +149,7 @@ const SalonGallery = () => {
               }`}
             >
               <div className={`relative ${
-                index === 0 || index === 3 ? 'h-64 sm:h-96' : 'h-64'
+                index === 0 || index === 3 ? 'h-48 sm:h-64 md:h-96' : 'h-48 sm:h-64'
               }`}>
                 <Image
                   src={image?.src}
