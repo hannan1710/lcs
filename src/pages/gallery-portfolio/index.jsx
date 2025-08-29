@@ -173,16 +173,16 @@ const GalleryPortfolio = () => {
       </section>
 
       {/* Gallery Grid */}
-      <section className="py-12">
+      <section className="py-10">
         <div className="container mx-auto px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5 lg:gap-6">
             {filteredImages.map((item, index) => (
               <div
                 key={item.id}
                 className="group cursor-pointer overflow-hidden rounded-lg shadow-luxury hover:shadow-luxury-hover transition-luxury"
                 onClick={() => handleImageClick(index)}
               >
-                <div className="relative aspect-[3/4] overflow-hidden">
+                <div className="relative aspect-[4/5] overflow-hidden">
                   <Image
                     src={item.image}
                     alt={item.title}

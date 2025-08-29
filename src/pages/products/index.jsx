@@ -6,6 +6,105 @@ import Icon from '../../components/AppIcon';
 import Image from '../../components/AppImage';
 import { productsAPI } from '../../services/api';
 
+// Lightweight product detail modal to preview images and information
+const ProductDetailModal = ({ product, isOpen, onClose, onAddToCart, onBuyNow }) => {
+  const [activeImageIdx, setActiveImageIdx] = useState(0);
+  if (!isOpen || !product) return null;
+  const images = Array.isArray(product.images) && product.images.length
+    ? product.images
+    : [product.image];
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+      <div className="bg-card border border-border rounded-lg w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+        {/* Header */}
+        <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-border">
+          <div>
+            <h3 className="font-heading text-lg sm:text-xl font-semibold text-foreground">{product.name}</h3>
+            <p className="text-xs sm:text-sm text-muted-foreground">{product.category} • {product.size}</p>
+          </div>
+          <button onClick={onClose} className="px-2 py-1 rounded-md border border-border hover:bg-muted">
+            <span className="sr-only">Close</span>
+            ✕
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="overflow-y-auto p-4 sm:p-6 space-y-4">
+          {/* Image viewer */}
+          <div>
+            <div className="aspect-square w-full overflow-hidden rounded-lg bg-muted">
+              <img src={images[activeImageIdx]} alt={product.name} className="w-full h-full object-cover" />
+            </div>
+            {images.length > 1 && (
+              <div className="flex items-center gap-2 mt-3 overflow-x-auto">
+                {images.map((src, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setActiveImageIdx(idx)}
+                    className={`w-16 h-16 rounded-md overflow-hidden border ${idx === activeImageIdx ? 'border-accent' : 'border-border'}`}
+                  >
+                    <img src={src} alt={`thumb-${idx}`} className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Details */}
+          <div className="space-y-3">
+            <p className="text-sm text-muted-foreground">{product.description}</p>
+            {Array.isArray(product.benefits) && product.benefits.length > 0 && (
+              <div>
+                <h4 className="font-medium text-foreground mb-2 text-sm">Benefits</h4>
+                <div className="flex flex-wrap gap-1.5">
+                  {product.benefits.map((b, i) => (
+                    <span key={i} className="text-xs px-2 py-1 rounded-full bg-accent/10 text-accent">{b}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+            {Array.isArray(product.ingredients) && product.ingredients.length > 0 && (
+              <div>
+                <h4 className="font-medium text-foreground mb-2 text-sm">Ingredients</h4>
+                <div className="flex flex-wrap gap-1.5">
+                  {product.ingredients.map((ing, i) => (
+                    <span key={i} className="text-xs px-2 py-1 rounded bg-muted text-muted-foreground">{ing}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="px-4 sm:px-6 py-4 border-t border-border flex items-center justify-between">
+          <div className="space-x-2">
+            <span className="font-heading text-lg text-foreground">${product.price.toFixed(2)}</span>
+            {product.originalPrice > product.price && (
+              <span className="text-sm text-muted-foreground line-through">${product.originalPrice.toFixed(2)}</span>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => onAddToCart(product)}
+              className="px-3 py-2 rounded-md bg-accent text-accent-foreground hover:bg-accent/90 text-sm"
+            >
+              Add to Cart
+            </button>
+            <button
+              onClick={() => onBuyNow(product)}
+              className="px-3 py-2 rounded-md border border-accent text-accent hover:bg-accent hover:text-accent-foreground text-sm"
+            >
+              Buy Now
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const Products = () => {
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -15,6 +114,11 @@ const Products = () => {
   const [cart, setCart] = useState([]);
   const [justAdded, setJustAdded] = useState({});
   const [sortBy, setSortBy] = useState('featured');
+  // Navigate to detail page on card click
+  const openDetail = (product) => {
+    const idStr = product?.id ?? '';
+    navigate(`/products/${idStr}`);
+  };
 
   const categories = [
     { id: 'all', label: 'All', icon: 'Grid' },
@@ -403,7 +507,7 @@ const Products = () => {
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-6">
                 {sortedProducts.map(product => (
                   <div key={product.id} className="bg-card border border-border rounded-lg overflow-hidden hover:shadow-luxury transition-luxury group">
-                    <div className="relative">
+                    <div className="relative cursor-pointer" onClick={() => openDetail(product)}>
                       <div className="aspect-square overflow-hidden">
                         <Image
                           src={product.image || (product.images && product.images[0])}
@@ -446,7 +550,7 @@ const Products = () => {
                       </div>
                       
                       {/* Product Name */}
-                      <h3 className="text-sm sm:text-base font-semibold text-foreground mb-1 line-clamp-2">{product.name}</h3>
+                      <h3 className="text-sm sm:text-base font-semibold text-foreground mb-1 line-clamp-2 cursor-pointer" onClick={() => openDetail(product)}>{product.name}</h3>
                       
                       {/* Description */}
                       <p className="text-xs sm:text-sm text-muted-foreground mb-2 line-clamp-2">{product.description}</p>
@@ -465,7 +569,7 @@ const Products = () => {
                       {/* Action Buttons */}
                       <div className="space-y-2">
                         <Button
-                          onClick={() => addToCart({ ...product, image: product.image || (product.images && product.images[0]) })}
+                          onClick={(e) => { e.stopPropagation(); addToCart({ ...product, image: product.image || (product.images && product.images[0]) }); }}
                           className="w-full bg-accent text-accent-foreground hover:bg-accent/90 text-xs sm:text-sm"
                           disabled={!product.inStock}
                           size="sm"
@@ -474,7 +578,7 @@ const Products = () => {
                         </Button>
                         <Button
                           variant="outline"
-                          onClick={() => buyNow({ ...product, image: product.image || (product.images && product.images[0]) })}
+                          onClick={(e) => { e.stopPropagation(); buyNow({ ...product, image: product.image || (product.images && product.images[0]) }); }}
                           size="sm"
                           disabled={!product.inStock}
                           className="w-full text-xs sm:text-sm"
@@ -496,6 +600,7 @@ const Products = () => {
           </div>
         </div>
       </main>
+      {/* Detail modal removed in favor of dedicated route */}
     </div>
   );
 };

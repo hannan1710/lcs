@@ -22,7 +22,7 @@ const PortfolioGrid = ({ images, onImageClick }) => {
   return (
     <div className="px-6 lg:px-8">
       {/* Mobile: Masonry-style layout */}
-      <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:hidden">
+      <div className="grid grid-cols-2 gap-2 sm:gap-2 lg:hidden">
         {images?.map((image, index) => (
           <div
             key={image?.id}
@@ -31,7 +31,7 @@ const PortfolioGrid = ({ images, onImageClick }) => {
             }`}
             onClick={() => onImageClick(index)}
           >
-            <div className="relative overflow-hidden rounded-lg bg-muted aspect-square">
+            <div className="relative overflow-hidden rounded-lg bg-muted aspect-[4/5]">
               <Image
                 src={image?.image}
                 alt={image?.title}
@@ -68,14 +68,14 @@ const PortfolioGrid = ({ images, onImageClick }) => {
         ))}
       </div>
       {/* Desktop: Organized grid layout */}
-      <div className="hidden lg:grid lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="hidden lg:grid lg:grid-cols-4 xl:grid-cols-5 gap-5 xl:gap-6">
         {images?.map((image, index) => (
           <div
             key={image?.id}
             className="relative group cursor-pointer"
             onClick={() => onImageClick(index)}
           >
-            <div className="relative overflow-hidden rounded-lg bg-muted aspect-square">
+            <div className="relative overflow-hidden rounded-lg bg-muted aspect-[4/5]">
               <Image
                 src={image?.image}
                 alt={image?.title}

@@ -9,7 +9,7 @@ const StylistCard = ({ stylist, onViewDetails, onBookAppointment }) => {
   return (
     <div className="bg-card rounded-lg shadow-luxury hover:shadow-luxury-hover transition-luxury-slow overflow-hidden group">
       {/* Profile Image */}
-      <div className="relative h-24 sm:h-28 md:h-32 lg:h-36 overflow-hidden bg-muted">
+      <div className="relative h-20 sm:h-24 md:h-28 lg:h-32 overflow-hidden bg-muted">
         <Image
           src={stylist?.image}
           alt={`${stylist?.name} - Professional Stylist`}
@@ -31,13 +31,13 @@ const StylistCard = ({ stylist, onViewDetails, onBookAppointment }) => {
       </div>
       
       {/* Content */}
-      <div className="p-2 sm:p-3 md:p-4">
+      <div className="p-2 sm:p-2.5 md:p-3">
         {/* Name and Title */}
         <div className="mb-2">
-          <h3 className="font-heading text-sm sm:text-base font-semibold text-foreground mb-0.5">
+          <h3 className="font-heading text-xs sm:text-sm font-semibold text-foreground mb-0.5">
             {stylist?.name}
           </h3>
-          <p className="text-accent font-medium text-xs sm:text-sm">{stylist?.title}</p>
+          <p className="text-accent font-medium text-[11px] sm:text-xs">{stylist?.title}</p>
         </div>
 
         {/* Specialties */}
@@ -60,13 +60,13 @@ const StylistCard = ({ stylist, onViewDetails, onBookAppointment }) => {
         </div>
 
         {/* Rating */}
-        <div className="flex items-center mb-3">
+        <div className="flex items-center mb-2.5">
           <div className="flex items-center space-x-0.5">
             {[...Array(5)]?.map((_, i) => (
               <Icon
                 key={i}
                 name="Star"
-                size={10}
+                size={9}
                 className={`${
                   i < Math.floor(stylist?.rating)
                     ? 'text-accent fill-current' :'text-muted-foreground'
@@ -74,7 +74,7 @@ const StylistCard = ({ stylist, onViewDetails, onBookAppointment }) => {
               />
             ))}
           </div>
-          <span className="ml-1 text-xs text-muted-foreground">
+          <span className="ml-1 text-[11px] text-muted-foreground">
             {stylist?.rating}
           </span>
         </div>
@@ -84,7 +84,7 @@ const StylistCard = ({ stylist, onViewDetails, onBookAppointment }) => {
           <Button
             variant="outline"
             onClick={() => onViewDetails(stylist)}
-            className="w-full border-accent text-accent hover:bg-accent hover:text-accent-foreground text-xs"
+            className="w-full border-accent text-accent hover:bg-accent hover:text-accent-foreground text-[11px]"
             size="sm"
           >
             View Profile
@@ -92,7 +92,7 @@ const StylistCard = ({ stylist, onViewDetails, onBookAppointment }) => {
           <Button
             variant="default"
             onClick={() => onBookAppointment(stylist)}
-            className="w-full bg-primary text-primary-foreground hover:bg-primary/90 text-xs"
+            className="w-full bg-primary text-primary-foreground hover:bg-primary/90 text-[11px]"
             size="sm"
           >
             Book Now

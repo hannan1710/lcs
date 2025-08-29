@@ -85,7 +85,7 @@ const StylistSpotlight = () => {
   const currentStylistData = stylists?.[currentStylist];
 
   return (
-    <section className="py-16 lg:py-24 bg-muted/30">
+    <section className="py-12 lg:py-16 bg-muted/30">
       <div className="container mx-auto px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-12 lg:mb-16">
@@ -98,11 +98,11 @@ const StylistSpotlight = () => {
         </div>
 
         {/* Stylist Spotlight */}
-        <div className="max-w-6xl mx-auto">
-          <div className="bg-card rounded-3xl shadow-luxury overflow-hidden border border-border">
+        <div className="max-w-5xl mx-auto">
+          <div className="bg-card rounded-2xl shadow-luxury overflow-hidden border border-border">
             <div className="grid lg:grid-cols-2 gap-0">
               {/* Image Section */}
-              <div className="relative h-48 sm:h-56 md:h-64 lg:h-auto overflow-hidden">
+              <div className="relative h-48 sm:h-56 md:h-64 lg:h-80 xl:h-96 overflow-hidden">
                 <Image
                   src={currentStylistData?.image}
                   alt={currentStylistData?.name}
@@ -113,29 +113,29 @@ const StylistSpotlight = () => {
                 {/* Navigation Arrows */}
                 <button
                   onClick={prevStylist}
-                  className="absolute left-4 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center transition-luxury shadow-lg"
+                  className="absolute left-4 top-1/2 transform -translate-y-1/2 w-9 h-9 bg-white/90 hover:bg-white rounded-full flex items-center justify-center transition-luxury shadow-lg"
                 >
                   <Icon name="ChevronLeft" size={20} className="text-foreground" />
                 </button>
                 
                 <button
                   onClick={nextStylist}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center transition-luxury shadow-lg"
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 w-9 h-9 bg-white/90 hover:bg-white rounded-full flex items-center justify-center transition-luxury shadow-lg"
                 >
                   <Icon name="ChevronRight" size={20} className="text-foreground" />
                 </button>
               </div>
 
               {/* Content Section */}
-              <div className="p-4 sm:p-6 md:p-8 lg:p-12 flex flex-col justify-center">
+              <div className="p-4 sm:p-6 md:p-8 lg:p-10 flex flex-col justify-center">
                 <div className="mb-6">
-                  <h3 className="font-heading text-xl sm:text-2xl lg:text-3xl font-bold text-foreground mb-2">
+                  <h3 className="font-heading text-xl sm:text-2xl lg:text-2xl font-bold text-foreground mb-2">
                     {currentStylistData?.name}
                   </h3>
-                  <p className="text-accent font-medium text-base sm:text-lg mb-4">
+                  <p className="text-accent font-medium text-sm sm:text-base mb-4">
                     {currentStylistData?.title}
                   </p>
-                  <p className="text-muted-foreground leading-relaxed mb-6">
+                  <p className="text-muted-foreground leading-relaxed mb-6 text-sm sm:text-base">
                     {currentStylistData?.bio}
                   </p>
                 </div>

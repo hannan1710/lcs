@@ -14,6 +14,7 @@ import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import Dashboard from './pages/dashboard/Dashboard';
 import Products from './pages/products';
+import ProductDetail from './pages/products/ProductDetail';
 import Payment from './pages/payment/Payment';
 import PaymentConfirmation from './pages/payment/PaymentConfirmation';
 import CartPage from './pages/payment/CartPage';
@@ -46,6 +47,7 @@ const Routes = () => {
         
         {/* Products */}
         <Route path="/products" element={<Products />} />
+        <Route path="/products/:id" element={<ProductDetail />} />
         
         {/* Payment */}
         <Route path="/cart" element={<CartPage />} />

@@ -587,7 +587,7 @@ const Admin = () => {
           {/* Add/Edit Modal for appointments/services/stylists/products */}
           {showModal && (
             <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50">
-              <div className="bg-card border border-border rounded-lg p-6 w-full max-w-md mx-4">
+              <div className="bg-card border border-border rounded-lg p-4 sm:p-6 w-full max-w-sm sm:max-w-md mx-4 max-h-[85vh] flex flex-col">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold text-foreground">
                     {modalType === 'add' ? 'Add' : 'Edit'} {editContext.charAt(0).toUpperCase() + editContext.slice(1)}
@@ -596,7 +596,7 @@ const Admin = () => {
                     <Icon name="X" size={16} />
                   </Button>
                 </div>
-                <form onSubmit={submitEdit} className="space-y-4">
+                <form onSubmit={submitEdit} className="space-y-4 overflow-y-auto pr-1 min-h-0 flex-1">
                   {editContext === 'appointment' && (
                     <>
                       <label className="block text-sm font-medium text-foreground">Client</label>
