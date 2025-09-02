@@ -53,15 +53,15 @@ const HeroSection = () => {
           {/* Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 max-w-2xl mx-auto">
             <div className="text-center">
-              <div className="text-2xl font-bold text-accent mb-1">500+</div>
+              <div className="text-2xl font-bold text-accent mb-1">1000+</div>
               <div className="text-sm text-muted-foreground">Happy Clients</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-accent mb-1">15+</div>
+              <div className="text-2xl font-bold text-accent mb-1">20+</div>
               <div className="text-sm text-muted-foreground">Years Experience</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-accent mb-1">4.9★</div>
+              <div className="text-2xl font-bold text-accent mb-1">4.7★</div>
               <div className="text-sm text-muted-foreground">Average Rating</div>
             </div>
           </div>
@@ -71,7 +71,7 @@ const HeroSection = () => {
             <Link to="/appointment-booking">
               <Button size="lg" className="text-lg px-8 py-4">
                 <Icon name="Calendar" size={20} className="mr-2" />
-                Book Your Appointment
+                Book Appointment
               </Button>
             </Link>
             
@@ -90,7 +90,7 @@ const HeroSection = () => {
           <div className="flex flex-wrap justify-center items-center gap-6 text-sm text-muted-foreground">
             <div className="flex items-center space-x-2">
               <Icon name="Shield" size={16} className="text-success" />
-              <span>Licensed Professionals</span>
+              <span> Professionals</span>
             </div>
             <div className="flex items-center space-x-2">
               <Icon name="Clock" size={16} className="text-accent" />
@@ -104,7 +104,7 @@ const HeroSection = () => {
         </div>
       </div>
 
-      {/* Scroll Indicator */}
+      {/* Scroll Indicator
       <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-30">
         <div className="flex flex-col items-center space-y-2 text-muted-foreground">
           <span className="text-xs font-medium">Scroll to explore</span>
@@ -112,9 +112,9 @@ const HeroSection = () => {
             <div className="w-1 h-3 bg-muted-foreground rounded-full mt-2 animate-bounce" />
           </div>
         </div>
-      </div>
+      </div> */}
 
-      {/* Floating Elements */}
+      {/* Floating Elements
       <div className="absolute top-20 left-10 hidden lg:block">
         <div className="bg-card/80 backdrop-blur-sm border border-border rounded-lg p-4 shadow-luxury">
           <div className="flex items-center space-x-3">
@@ -127,9 +127,9 @@ const HeroSection = () => {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
 
-      <div className="absolute top-40 right-10 hidden lg:block">
+      {/* <div className="absolute top-40 right-10 hidden lg:block">
         <div className="bg-card/80 backdrop-blur-sm border border-border rounded-lg p-4 shadow-luxury">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-success rounded-full flex items-center justify-center">
@@ -141,7 +141,7 @@ const HeroSection = () => {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
     </section>
   );
 };

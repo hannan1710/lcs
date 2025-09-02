@@ -55,26 +55,35 @@ const FeaturedServices = () => {
     },
     {
       id: 6,
-      name: "Men\'s Grooming Service",
+      name: "Men's Grooming Service",
       description: "Complete men's grooming experience including precision cuts, beard styling, and premium skincare treatments.",
       startingPrice: "$85",
       image: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
       duration: "60 min",
-      category: "Men\'s"
+      category: "Men's"
+    },
+     {
+      id: 6,
+      name: "woMen's Grooming Service",
+      description: "Complete men's grooming experience including precision cuts, beard styling, and premium skincare treatments.",
+      startingPrice: "$85",
+      image: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+      duration: "60 min",
+      category: "Men's"
     }
   ];
 
   const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % Math.ceil(services?.length / 3));
+    setCurrentSlide((prev) => (prev + 1) % Math.ceil(services?.length / 4));
   };
 
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + Math.ceil(services?.length / 3)) % Math.ceil(services?.length / 3));
+    setCurrentSlide((prev) => (prev - 1 + Math.ceil(services?.length / 4)) % Math.ceil(services?.length / 3));
   };
 
   const getVisibleServices = () => {
-    const startIndex = currentSlide * 3;
-    return services?.slice(startIndex, startIndex + 3);
+    const startIndex = currentSlide * 4;
+    return services?.slice(startIndex, startIndex + 4);
   };
 
   return (
@@ -136,7 +145,7 @@ const FeaturedServices = () => {
                           fullWidth
                           className="border-accent text-accent hover:bg-accent hover:text-accent-foreground"
                         >
-                          Learn More
+                          More info
                         </Button>
                       </div>
                     </div>
@@ -159,9 +168,15 @@ const FeaturedServices = () => {
                   <button
                     key={index}
                     onClick={() => setCurrentSlide(index)}
-                    className={`w-2 h-2 rounded-full transition-luxury ${
+                    className={`rounded-full transition-luxury ${
                       index === currentSlide ? 'bg-accent' : 'bg-muted'
                     }`}
+                    style={{
+                      width: "6px",
+                      height: "6px",
+                      minWidth: "6px",
+                      minHeight: "6px"
+                    }}
                   />
                 ))}
               </div>
@@ -179,7 +194,8 @@ const FeaturedServices = () => {
         {/* Desktop Grid */}
         <div className="hidden lg:block">
           <div className="relative">
-            <div className="grid grid-cols-3 gap-8">
+           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
               {getVisibleServices()?.map((service) => (
                 <div key={service?.id} className="bg-card rounded-2xl shadow-luxury overflow-hidden border border-border hover:shadow-luxury-hover transition-luxury">
                   <div className="relative h-64 overflow-hidden">
@@ -216,7 +232,7 @@ const FeaturedServices = () => {
                       fullWidth
                       className="border-accent text-accent hover:bg-accent hover:text-accent-foreground"
                     >
-                      Learn More
+                      More info
                     </Button>
                   </div>
                 </div>
@@ -234,13 +250,19 @@ const FeaturedServices = () => {
               </button>
               
               <div className="flex gap-2">
-                {Array.from({ length: Math.ceil(services?.length / 3) })?.map((_, index) => (
+                {Array.from({ length: Math.ceil(services?.length / 4) })?.map((_, index) => (
                   <button
                     key={index}
                     onClick={() => setCurrentSlide(index)}
-                    className={`w-3 h-3 rounded-full transition-luxury ${
+                    className={`rounded-full transition-luxury ${
                       index === currentSlide ? 'bg-accent' : 'bg-muted'
                     }`}
+                    style={{
+                      width: "6px",
+                      height: "6px",
+                      minWidth: "6px",
+                      minHeight: "6px"
+                    }}
                   />
                 ))}
               </div>

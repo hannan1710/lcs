@@ -7,7 +7,7 @@ const StylistCard = ({ stylist, onViewDetails, onBookAppointment }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
 
   return (
-    <div className="bg-card rounded-lg shadow-luxury hover:shadow-luxury-hover transition-luxury-slow overflow-hidden group">
+    <div className="flex flex-col h-full bg-card rounded-lg shadow-luxury hover:shadow-luxury-hover transition-luxury-slow overflow-hidden group">
       {/* Profile Image */}
       <div className="relative h-20 sm:h-24 md:h-28 lg:h-32 overflow-hidden bg-muted">
         <Image
@@ -23,44 +23,41 @@ const StylistCard = ({ stylist, onViewDetails, onBookAppointment }) => {
             <Icon name="User" size={24} className="text-muted-foreground" />
           </div>
         )}
-        
         {/* Experience Badge */}
         <div className="absolute top-1 right-1 bg-accent text-accent-foreground px-1.5 py-0.5 rounded-full text-xs font-medium">
-          {stylist?.experience}+
+          {stylist?.experience}+ Yrs
         </div>
       </div>
-      
       {/* Content */}
-      <div className="p-2 sm:p-2.5 md:p-3">
-        {/* Name and Title */}
-        <div className="mb-2">
-          <h3 className="font-heading text-xs sm:text-sm font-semibold text-foreground mb-0.5">
-            {stylist?.name}
-          </h3>
-          <p className="text-accent font-medium text-[11px] sm:text-xs">{stylist?.title}</p>
-        </div>
-
-        {/* Specialties */}
-        <div className="mb-2">
-          <div className="flex flex-wrap gap-1">
-            {stylist?.specialties?.slice(0, 2)?.map((specialty, index) => (
-              <span
-                key={index}
-                className="px-1.5 py-0.5 bg-secondary text-secondary-foreground text-xs rounded-full"
-              >
-                {specialty}
-              </span>
-            ))}
-            {stylist?.specialties?.length > 2 && (
-              <span className="px-1.5 py-0.5 bg-muted text-muted-foreground text-xs rounded-full">
-                +{stylist?.specialties?.length - 2}
-              </span>
-            )}
+      <div className="flex flex-col flex-1 p-2 sm:p-2.5 md:p-3">
+        {/* Name, Title, Specialties */}
+        <div className="flex flex-col gap-2 flex-1">
+          <div>
+            <h3 className="font-heading text-xs sm:text-sm font-semibold text-foreground mb-0.5">
+              {stylist?.name}
+            </h3>
+            <p className="text-accent font-medium text-[11px] sm:text-xs">{stylist?.title}</p>
+          </div>
+          <div>
+            <div className="flex flex-wrap gap-1">
+              {stylist?.specialties?.slice(0, 2)?.map((specialty, index) => (
+                <span
+                  key={index}
+                  className="px-1.5 py-0.5 bg-secondary text-secondary-foreground text-xs rounded-full"
+                >
+                  {specialty}
+                </span>
+              ))}
+              {stylist?.specialties?.length > 2 && (
+                <span className="px-1.5 py-0.5 bg-muted text-muted-foreground text-xs rounded-full">
+                  +{stylist?.specialties?.length - 2}
+                </span>
+              )}
+            </div>
           </div>
         </div>
-
         {/* Rating */}
-        <div className="flex items-center mb-2.5">
+        <div className="flex items-center mb-2.5 mt-auto">
           <div className="flex items-center space-x-0.5">
             {[...Array(5)]?.map((_, i) => (
               <Icon
@@ -78,7 +75,6 @@ const StylistCard = ({ stylist, onViewDetails, onBookAppointment }) => {
             {stylist?.rating}
           </span>
         </div>
-
         {/* Action Buttons */}
         <div className="flex flex-col gap-1.5">
           <Button
