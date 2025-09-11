@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import Image from "../../../components/AppImage";
-import Button from "../../../components/ui/Button";
 import Icon from "../../../components/AppIcon";
 
 const StylistSpotlight = () => {
@@ -10,222 +8,150 @@ const StylistSpotlight = () => {
   const stylists = [
     {
       id: 1,
-      name: "Imran Salmani",
-      title: "Master Stylist & Creative Director",
-      specialties: ["Hair Coloring", "Balayage", "Styling"],
-      experience: "12+ years",
-      image: "/assets/images/imsa.jpg",
-      bio: "Imran is a master stylist specializing in precision hair coloring, balayage, and luxury styling. With over a decade of experience, he has transformed countless clients with his artistic touch.",
-      certifications: ["L'Oréal Professional Certified", "Balayage Expert"],
+      name: "Imran",
+      title: "Senior Hair Stylist",
+      specialties: ["Haircuts", "Beard Styling", "Grooming"],
+      experience: "8 years",
+      image: "/imsa.jpg",
+      bio: "Imran is known for his precision cuts and modern men’s grooming styles. Clients love his attention to detail and trend-focused approach.",
     },
     {
       id: 2,
-      name: "Nizam Shaikh",
-      title: "Creative Director",
-      specialties: ["Precision Cutting", "Editorial Styling", "Runway Looks"],
-      experience: "15+ years",
-      image: "/assets/images/nizam.jpg",
-      bio: "Nizam brings international expertise from London and New York, blending European precision with modern trends. His editorial and runway work makes him a leader in high-fashion styling.",
-      certifications: [
-        "Advanced Cutting - Vidal Sassoon",
-        "Editorial Styling Certified",
-      ],
+      name: "Nizam",
+      title: "Color Specialist",
+      specialties: ["Hair Coloring", "Balayage", "Highlights"],
+      experience: "6 years",
+      image: "/nizam.jpg",
+      bio: "Nizam transforms looks with bold and creative color techniques, ensuring every client leaves with a personalized, radiant style.",
     },
     {
       id: 3,
-      name: "Shahista Imran Salmani",
-      title: "Beauty & Nail Expert",
-      specialties: ["Pedicure", "Nail Art", "Manicure", "Hydra Facial"],
-      experience: "11+ years",
+      name: "Shahista",
+      title: "Bridal & Makeup Artist",
+      specialties: ["Bridal Styling", "Makeup", "Hairstyling"],
+      experience: "10 years",
       image: "/assets/images/shahi.jpg",
-      bio: "Shahista is a beauty and nail specialist dedicated to enhancing natural beauty with expert skin and nail care. Her precision and creativity in nail art and facials leave clients glowing with confidence.",
-      certifications: ["Nail Artistry Certified", "Hydra Facial Expert"],
+      bio: "Shahista specializes in luxury bridal looks, combining traditional elegance with modern artistry to create unforgettable transformations.",
     },
     {
       id: 4,
-      name: "Abdul Hannan Ansari",
-      title: "Social Media & Website Manager",
-      specialties: [
-        "Digital Branding",
-        "Social Media Marketing",
-        "Website Management",
-      ],
-      experience: "4+ years",
+      name: "Hannan",
+      title: "Salon Manager & Stylist",
+      specialties: ["Management", "Client Styling", "Luxury Experience"],
+      experience: "7 years",
       image: "/assets/images/hannan.jpg",
-      bio: "Hannan manages La Coiffure's online presence, ensuring the salon’s digital platforms reflect its luxury and creativity. He specializes in social media strategy, branding, and web management.",
-      certifications: [
-        "Certified Digital Marketer",
-        "Web Development Specialist",
-      ],
+      bio: "Hannan manages La Coiffure Salon while also bringing his own creative touch to client styling, ensuring a premium experience for all.",
     },
   ];
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentStylist((prev) => (prev + 1) % stylists.length);
+      setCurrentStylist((prev) => (prev + 1) % stylists?.length);
     }, 5000);
-
     return () => clearInterval(interval);
-  }, [stylists.length]);
+  }, [stylists?.length]);
 
-  const nextStylist = () => {
-    setCurrentStylist((prev) => (prev + 1) % stylists.length);
-  };
+  const nextStylist = () =>
+    setCurrentStylist((prev) => (prev + 1) % stylists?.length);
+  const prevStylist = () =>
+    setCurrentStylist((prev) => (prev - 1 + stylists?.length) % stylists?.length);
 
-  const prevStylist = () => {
-    setCurrentStylist((prev) => (prev - 1 + stylists.length) % stylists.length);
-  };
-
-  const currentStylistData = stylists[currentStylist];
+  const currentStylistData = stylists?.[currentStylist];
 
   return (
-    <section className="py-6 sm:py-10 bg-muted/30">
-      <div className="container mx-auto px-4 sm:px-6">
+    <section className="py-8 lg:py-16 bg-muted/30">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center mb-6 sm:mb-10">
-          <h2 className="font-heading text-xl sm:text-2xl lg:text-3xl font-bold text-foreground mb-2">
+        <div className="text-center mb-6 lg:mb-12">
+          <h2 className="font-heading text-2xl lg:text-3xl xl:text-4xl font-bold text-foreground mb-2">
             Meet Our Core Team
           </h2>
-          <p className="text-sm sm:text-base text-muted-foreground max-w-md mx-auto">
-            Brings years of expertise and artistic vision.
+          <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto">
+            Our expert team brings creativity, skill, and years of experience to
+            help you look your best.
           </p>
         </div>
 
         {/* Stylist Spotlight */}
-        <div className="max-w-2xl mx-auto">
-          <div className="bg-card rounded-lg sm:rounded-xl shadow-md overflow-hidden border border-border">
-            <div className="grid lg:grid-cols-2 gap-0">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-card rounded-xl shadow-luxury overflow-hidden border border-border">
+            <div className="grid grid-cols-1 lg:grid-cols-2">
               {/* Image Section */}
-              <div className="relative aspect-[4/5] overflow-hidden">
+              <div className="relative h-64 lg:h-96">
                 <Image
                   src={currentStylistData?.image}
                   alt={currentStylistData?.name}
-                  className="w-full h-full object-cover block"
+                  className="w-full h-full object-cover transition-opacity duration-500 ease-in-out"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
 
                 {/* Navigation Arrows */}
                 <button
                   onClick={prevStylist}
-                  className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 sm:w-8 sm:h-8 bg-white hover:bg-gray-200 rounded-full flex items-center justify-center shadow-md"
+                  className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center transition-luxury"
                 >
-                  <Icon name="ChevronLeft" size={16} className="text-black" />
+                  <Icon name="ChevronLeft" size={24} className="text-white" />
                 </button>
+
                 <button
                   onClick={nextStylist}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 sm:w-8 sm:h-8 bg-white hover:bg-gray-200 rounded-full flex items-center justify-center shadow-md"
+                  className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center transition-luxury"
                 >
-                  <Icon name="ChevronRight" size={16} className="text-black" />
+                  <Icon name="ChevronRight" size={24} className="text-white" />
                 </button>
               </div>
 
               {/* Content Section */}
-              <div className="p-3 sm:p-4 md:p-6 flex flex-col justify-center">
-                <div className="mb-3 sm:mb-4">
-                  <h3 className="font-heading text-base sm:text-lg lg:text-xl font-bold text-foreground mb-1">
-                    {currentStylistData?.name}
-                  </h3>
-                  <p className="text-accent font-medium text-xs sm:text-sm mb-2">
-                    {currentStylistData?.title}
-                  </p>
-                  <p className="text-muted-foreground leading-relaxed mb-3 sm:mb-4 text-xs sm:text-sm">
+              <div className="p-4 sm:p-6 lg:p-10 flex flex-col justify-center">
+                {/* Name */}
+                <h3 className="font-heading text-xl lg:text-3xl font-bold text-foreground mb-1">
+                  {currentStylistData?.name}
+                </h3>
+
+                {/* Title */}
+                <p className="text-accent font-medium text-sm sm:text-base mb-4">
+                  {currentStylistData?.title}
+                </p>
+
+                {/* Bio */}
+                <div className="mb-4 sm:mb-6">
+                  <p className="text-muted-foreground leading-relaxed text-sm sm:text-base">
                     {currentStylistData?.bio}
                   </p>
                 </div>
 
                 {/* Specialties */}
-                <div className="mb-3 sm:mb-4">
-                  <h4 className="font-semibold text-foreground mb-2 text-sm">
+                <div>
+                  <h4 className="font-semibold text-foreground mb-2 text-sm sm:text-base">
                     Specialties
                   </h4>
                   <div className="flex flex-wrap gap-2">
                     {currentStylistData?.specialties?.map((specialty, index) => (
                       <span
                         key={index}
-                        className="bg-accent/10 text-accent px-2 py-1 rounded-full text-xs font-medium"
+                        className="bg-accent/10 text-accent px-3 py-1 rounded-full text-xs font-medium"
                       >
                         {specialty}
                       </span>
                     ))}
                   </div>
                 </div>
-
-
-                      {/* Portfolio
-                <div className="mb-4 sm:mb-6">
-                  <h4 className="font-semibold text-foreground mb-2 text-sm">
-                    Portfolio
-                  </h4>
-                  <p className="text-xs sm:text-sm text-muted-foreground">
-                    {currentStylistData?.socialMedia?.portfolio}
-                  </p>
-                </div> */}
-
-                {/* Certifications */}
-                <div className="mb-4 sm:mb-6">
-                  <h4 className="font-semibold text-foreground mb-2 text-sm">
-                    Certifications
-                  </h4>
-                  <div className="space-y-1">
-                    {currentStylistData?.certifications?.map((cert, index) => (
-                      <div key={index} className="flex items-center gap-2">
-                        <Icon name="Award" size={14} className="text-accent" />
-                        <span className="text-xs sm:text-sm text-muted-foreground">
-                          {cert}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* CTA Button */}
-                {currentStylistData?.name !== "Abdul Hannan Ansari" && (
-                  <Button
-                    variant="default"
-                    className="bg-accent text-accent-foreground hover:bg-accent/90 text-xs sm:text-sm px-3 py-1.5"
-                    onClick={() =>
-                      (window.location.href = "/appointment-booking")
-                    }
-                  >
-                    Book with {currentStylistData?.name?.split(" ")?.[0]}
-                  </Button>
-                )}
               </div>
             </div>
           </div>
 
-          
-     {/* Stylist Indicators */}
-<div className="flex justify-center mt-5 sm:mt-6 gap-2">
+          {/* Dots Indicator */}
+          <div className="flex justify-center mt-4 sm:mt-6 gap-2">
   {stylists?.map((_, index) => (
     <button
       key={index}
       onClick={() => setCurrentStylist(index)}
-      className={`p-0 appearance-none rounded-full transition 
-        ${index === currentStylist ? "bg-accent" : "bg-muted"}`}
-      style={{
-        width: "6px",   // tiny dot
-        height: "6px",  // tiny dot
-        minWidth: "6px",
-        minHeight: "6px",
-      }}
+      className={`w-1.5 h-1.5 sm:w-2.5 sm:h-2.5 rounded-full transition-luxury ${
+        index === currentStylist ? "bg-accent scale-150" : "bg-muted"
+      }`}
     />
   ))}
 </div>
-
-        </div>
-
-        {/* View All Team CTA */}
-        <div className="text-center mt-8 sm:mt-10">
-          <Link to="/stylist-profiles">
-            <Button
-              variant="outline"
-              size="sm"
-              className="border-accent text-accent hover:bg-accent hover:text-accent-foreground text-xs sm:text-sm px-4 py-2"
-            >
-              Meet Our Full Team
-            </Button>
-          </Link>
         </div>
       </div>
     </section>

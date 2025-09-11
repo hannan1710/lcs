@@ -7,10 +7,10 @@ const SocialConnect = () => {
     {
       name: 'Instagram',
       handle: '@lacoiffuresalon',
-      followers: '12.5K',
-      description: 'Daily hair inspiration & behind-the-scenes',
+      followers: '8K',
+      description: '              ',
       icon: 'Instagram',
-      color: 'bg-pink-500',
+      color: 'bg-pink-600',
       url: 'https://instagram.com/lacoiffuresalon'
     },
     {
@@ -23,22 +23,13 @@ const SocialConnect = () => {
       url: 'https://facebook.com/lacoiffuresalonnyc'
     },
     {
-      name: 'Pinterest',
-      handle: 'La Coiffure Styles',
-      followers: '15.8K',
+      name: 'Youtube',
+      handle: 'La Coiffure Salon',
+      followers: '1K',
       description: 'Hair color & style inspiration boards',
-      icon: 'Image',
-      color: 'bg-red-600',
-      url: 'https://pinterest.com/lacoiffurestyles'
-    },
-    {
-      name: 'TikTok',
-      handle: '@lacoiffure_nyc',
-      followers: '6.7K',
-      description: 'Quick styling tips & transformations',
-      icon: 'Video',
-      color: 'bg-black',
-      url: 'https://tiktok.com/@lacoiffure_nyc'
+      icon: 'Youtube',
+      color: 'bg-red-400',
+      url: 'https://youtube.com/imranlcs'
     }
   ];
 
@@ -90,10 +81,10 @@ const SocialConnect = () => {
               Stay connected for daily inspiration and exclusive content
             </p>
           </div>
-          <div className="flex items-center space-x-2">
+          {/* <div className="flex items-center space-x-2">
             <Icon name="Heart" size={20} className="text-accent" />
             <span className="text-sm font-medium text-accent">42.2K Total Followers</span>
-          </div>
+          </div> */}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

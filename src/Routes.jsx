@@ -3,13 +3,13 @@ import { BrowserRouter, Routes as RouterRoutes, Route, Navigate } from "react-ro
 import ScrollToTop from "components/ScrollToTop";
 import ErrorBoundary from "components/ErrorBoundary";
 import NotFound from "pages/NotFound";
+import AboutUs from './pages/about-us';
 import GalleryPortfolio from './pages/gallery-portfolio';
 import AppointmentBooking from './pages/appointment-booking';
 import ContactLocationPage from './pages/contact-location';
 import ServicesCatalog from './pages/services-catalog';
-import StylistProfiles from './pages/stylist-profiles';
+// import StylistProfiles from './pages/stylist-profiles';
 import Homepage from './pages/homepage';
-import Blog from './pages/blog';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import Dashboard from './pages/dashboard/Dashboard';
@@ -32,10 +32,10 @@ const Routes = () => {
         <Route path="/homepage" element={<Homepage />} />
         <Route path="/appointment-booking" element={<AppointmentBooking />} />
         <Route path="/services-catalog" element={<ServicesCatalog />} />
-        <Route path="/stylist-profiles" element={<StylistProfiles />} />
+        {/** Team page removed */}
         <Route path="/gallery-portfolio" element={<GalleryPortfolio />} />
         <Route path="/contact-location" element={<ContactLocationPage />} />
-        <Route path="/blog" element={<Blog />} />
+        <Route path="/about-us" element={<AboutUs />} />
         
         {/* Authentication */}
         <Route path="/login" element={<Login />} />

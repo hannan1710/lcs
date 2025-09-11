@@ -46,7 +46,7 @@ const ClientInformation = ({ formData, onFormChange, errors }) => {
             value={formData?.lastName}
             onChange={handleInputChange('lastName')}
             error={errors?.lastName}
-            required
+            
           />
 
           <Input
@@ -56,14 +56,14 @@ const ClientInformation = ({ formData, onFormChange, errors }) => {
             value={formData?.email}
             onChange={handleInputChange('email')}
             error={errors?.email}
-            required
+            
             className="md:col-span-2"
           />
 
           <Input
             label="Phone Number"
             type="tel"
-            placeholder="(555) 123-4567"
+            placeholder="Enter your phone number"
             value={formData?.phone}
             onChange={handleInputChange('phone')}
             error={errors?.phone}

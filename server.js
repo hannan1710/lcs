@@ -69,7 +69,7 @@ let admins = [
     username: 'lacoiffure',
     password: 'orhan110',
     email: 'admin@lacoiffuresalon.in',
-    role: 'super_admin',
+    role: 'admin',
     createdAt: '2024-01-01',
     lastLogin: null
   },

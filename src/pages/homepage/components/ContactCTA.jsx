@@ -8,10 +8,9 @@ const ContactCTA = () => {
     {
       icon: "MapPin",
       title: "Visit Us",
-      content:
-        "Thane: Shop no. 11&12, Saraswati school, Anand Nagar, Thane West\nPowai: SN 161&162 floor 1st, galleriya, Hiranandani Gardens, Powai",
+      content: "Thane: Shop 11&12, Saraswati School, Anand Nagar\nPowai: SN 161&162, Galleria, Hiranandani Gardens",
       action: "Get Directions",
-      link: "/contact-location",
+      link: "#contact-location",
     },
     {
       icon: "Phone",
@@ -25,159 +24,131 @@ const ContactCTA = () => {
       title: "Hours",
       content: "Mon-Sat: 9AM-8PM\nSun: 10AM-6PM",
       action: "View Schedule",
-      link: "/contact-location",
+      link: "#contact-location",
     },
   ];
 
-  return (
-    <section className="py-16 lg:py-24 bg-primary text-primary-foreground relative overflow-hidden">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-5">
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          }}
-        />
-      </div>
-      <div className="container mx-auto px-6 lg:px-8 relative z-10">
-        {/* Main CTA Section */}
-        <div className="text-center mb-16">
-          <h2 className="font-heading text-3xl lg:text-4xl xl:text-5xl font-bold mb-6">
-            Ready to Transform Your Look?
-          </h2>
-          <p className="text-lg lg:text-xl text-primary-foreground/90 max-w-2xl mx-auto mb-8">
-            Book your appointment today and experience the luxury and artistry
-            that sets La Coiffure apart from the rest.
-          </p>
+  const handleSmoothScroll = (e, targetId) => {
+    e.preventDefault();
+    const el = document.querySelector(targetId);
+    if (el) el.scrollIntoView({ behavior: "smooth" });
+  };
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+  return (
+    <section className="py-6 sm:py-8 lg:py-14 bg-primary text-primary-foreground relative overflow-hidden">
+      {/* Background Pattern */}
+      <div
+        className="absolute inset-0 opacity-5"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23fff' fill-opacity='0.1'%3E%3Ccircle cx='20' cy='20' r='1.5'/%3E%3C/g%3E%3C/svg%3E")`,
+        }}
+      />
+
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+        <h2 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold mb-3 sm:mb-4">
+          Ready to Transform Your Look?
+        </h2>
+        <p className="text-base sm:text-lg text-primary-foreground/90 max-w-md mx-auto mb-6 sm:mb-8">
+          Book your appointment today and experience the luxury and artistry that sets La Coiffure apart.
+        </p>
+
+        {/* Buttons */}
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+          <a
+            href="#appointment-booking"
+            onClick={(e) => handleSmoothScroll(e, "#appointment-booking")}
+          >
             <Button
               variant="default"
-              size="lg"
-              className="bg-accent text-accent-foreground hover:bg-accent/90 px-8 py-4 text-lg font-semibold"
-              onClick={() => (window.location.href = "/appointment-booking")}
+              size="sm"
+              className="bg-accent text-accent-foreground hover:bg-accent/90 px-5 py-2 sm:px-6 sm:py-2.5 text-sm sm:text-base font-semibold"
               iconName="Calendar"
               iconPosition="left"
             >
               Book Appointment
             </Button>
-
-            <Link to="/services-catalog">
-              <Button
-                variant="outline"
-                size="lg"
-                className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary px-8 py-4 text-lg"
-                iconName="Scissors"
-                iconPosition="left"
-              >
-                View Services
-              </Button>
-            </Link>
-          </div>
+          </a>
+          <a
+            href="#services-catalog"
+            onClick={(e) => handleSmoothScroll(e, "#services-catalog")}
+          >
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary px-5 py-2 sm:px-6 sm:py-2.5 text-sm sm:text-base"
+              iconName="Scissors"
+              iconPosition="left"
+            >
+              View Services
+            </Button>
+          </a>
         </div>
 
-        {/* Contact Information Cards */}
-        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-          {contactInfo?.map((info, index) => (
-            <div key={index} className="text-center">
-              <div className="bg-accent/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Icon name={info?.icon} size={32} className="text-accent" />
+        {/* Contact Info */}
+        <div className="grid md:grid-cols-3 gap-5 sm:gap-6 mt-8 sm:mt-10 lg:mt-12 max-w-4xl mx-auto">
+          {contactInfo.map((info, i) => (
+            <div key={i} className="text-center px-2">
+              <div className="bg-accent/10 w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center mx-auto mb-2">
+                <Icon name={info.icon} size={22} className="text-accent" />
               </div>
-
-              <h3 className="font-heading text-xl font-semibold mb-3">
-                {info?.title}
+              <h3 className="font-heading text-base sm:text-lg font-semibold mb-1">
+                {info.title}
               </h3>
-
-              <p className="text-primary-foreground/80 mb-4 whitespace-pre-line">
-                {info?.content}
+              <p className="text-sm sm:text-base text-primary-foreground/80 mb-2 whitespace-pre-line">
+                {info.content}
               </p>
-
-              {info?.link?.startsWith("tel:") ? (
-                <a href={info?.link}>
+              {info.link.startsWith("tel:") ? (
+                <a href={info.link}>
                   <Button
                     variant="ghost"
-                    className="text-accent hover:text-accent hover:bg-accent/10"
+                    size="sm"
+                    className="text-accent hover:text-accent hover:bg-accent/10 text-sm"
                     iconName="ArrowRight"
                     iconPosition="right"
                   >
-                    {info?.action}
+                    {info.action}
                   </Button>
                 </a>
               ) : (
-                <Link to={info?.link}>
+                <a
+                  href={info.link}
+                  onClick={(e) => handleSmoothScroll(e, info.link)}
+                >
                   <Button
                     variant="ghost"
-                    className="text-accent hover:text-accent hover:bg-accent/10"
+                    size="sm"
+                    className="text-accent hover:text-accent hover:bg-accent/10 text-sm"
                     iconName="ArrowRight"
                     iconPosition="right"
                   >
-                    {info?.action}
+                    {info.action}
                   </Button>
-                </Link>
+                </a>
               )}
             </div>
           ))}
         </div>
 
-        {/* Priority Contact Section
-        <div className="mt-16 text-center">
-          <div className="bg-primary-foreground/10 rounded-2xl p-8 max-w-2xl mx-auto">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <Icon name="AlertCircle" size={24} className="text-accent" />
-              <h3 className="font-heading text-xl font-semibold">
-                Need Immediate Assistance?
-              </h3>
-            </div>
-            <p className="text-primary-foreground/80 mb-4">
-              For urgent appointments or special requests, contact our priority booking line.
-            </p>
-            <a href="tel:+919967002481">
-              <Button
-                variant="outline"
-                className="border-accent text-accent hover:bg-accent hover:text-accent-foreground"
-                iconName="Phone"
-                iconPosition="left"
-              >
-                Priority Line: +91 99670 02481
-              </Button>
-            </a>
-          </div>
-        </div> */}
-
-        {/* Social Media Links */}
-        <div className="mt-16 text-center">
-          <h3 className="font-heading text-xl font-semibold mb-6">
+        {/* Social Media */}
+        <div className="mt-8 sm:mt-10">
+          <h3 className="font-heading text-base sm:text-lg font-semibold mb-3">
             Connect With Us
           </h3>
-          <div className="flex justify-center gap-4">
+          <div className="flex justify-center gap-3 sm:gap-4">
             {[
-              {
-                name: "Instagram",
-                icon: "Instagram",
-                url: "https://instagram.com/lacoiffuresalon",
-              },
-              {
-                name: "Facebook",
-                icon: "Facebook",
-                url: "https://facebook.com/lacoiffuresalons",
-              },
-             
-              {
-                name: "YouTube",
-                icon: "Youtube",
-                url: "https://youtube.com/@imranlcs",
-              },
-            ].map((social) => (
+              { name: "Instagram", icon: "Instagram", url: "https://instagram.com/lacoiffuresalon" },
+              { name: "Facebook", icon: "Facebook", url: "https://facebook.com/lacoiffuresalons" },
+              { name: "YouTube", icon: "Youtube", url: "https://youtube.com/@imranlcs" },
+            ].map((s) => (
               <a
-                key={social.name}
-                href={social.url}
+                key={s.name}
+                href={s.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-12 h-12 bg-primary-foreground/10 hover:bg-accent hover:text-accent-foreground rounded-full flex items-center justify-center transition-luxury"
-                aria-label={`Follow us on ${social.name}`}
+                className="w-8 h-8 sm:w-10 sm:h-10 bg-primary-foreground/10 hover:bg-accent hover:text-accent-foreground rounded-full flex items-center justify-center transition-all"
+                aria-label={`Follow us on ${s.name}`}
               >
-                <Icon name={social.icon} size={20} />
+                <Icon name={s.icon} size={18} />
               </a>
             ))}
           </div>

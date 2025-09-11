@@ -35,13 +35,17 @@
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
     "axios": "^1.8.4",
+    "body-parser": "^2.2.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "cors": "^2.8.5",
     "d3": "^7.9.0",
     "date-fns": "^4.1.0",
-    "dotenv": "^16.0.1",
+    "dotenv": "^16.6.1",
+    "express": "^5.1.0",
     "framer-motion": "^10.16.4",
     "lucide-react": "^0.484.0",
+    "pg": "^8.16.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-helmet": "^6.1.0",
@@ -56,11 +60,11 @@
     "tailwindcss-fluid-type": "^2.0.7"
   },
   "scripts": {
-    "start": "vite",
+    "dev": "concurrently \"npm run server:dev\" \"vite\"",
     "build": "vite build --sourcemap",
     "serve": "vite preview",
     "server": "node server.js",
-    "dev": "concurrently \"npm run server\" \"npm run start\""
+    "server:dev": "nodemon server.js"
   },
   "eslintConfig": {
     "extends": [
@@ -87,9 +91,8 @@
     "@tailwindcss/typography": "^0.5.16",
     "@vitejs/plugin-react": "4.3.4",
     "autoprefixer": "10.4.2",
-    "concurrently": "^8.2.2",
-    "cors": "^2.8.5",
-    "express": "^4.21.2",
+    "concurrently": "^9.2.1",
+    "nodemon": "^3.1.10",
     "postcss": "8.4.8",
     "tailwindcss": "3.4.6",
     "vite": "5.0.0",

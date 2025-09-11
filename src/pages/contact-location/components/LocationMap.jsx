@@ -57,7 +57,7 @@ const LocationMap = () => {
           </button>
           
           <button
-            onClick={() => window.open('https://maps.google.com/?q=1247+Madison+Avenue+New+York+NY+10128&layer=t', '_blank')}
+            onClick={() => window.open('', '_blank')}
             className="bg-background/95 backdrop-blur-sm border border-border rounded-lg px-3 py-2 shadow-luxury hover:shadow-luxury-hover transition-luxury flex items-center space-x-2"
           >
             <Icon name="Satellite" size={16} className="text-accent" />

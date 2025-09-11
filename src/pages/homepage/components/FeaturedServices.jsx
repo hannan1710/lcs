@@ -110,7 +110,7 @@ const FeaturedServices = () => {
                 {services?.map((service) => (
                   <div key={service?.id} className="w-full flex-shrink-0 px-2">
                     <div className="bg-card rounded-lg shadow-luxury overflow-hidden border border-border">
-                      <div className="relative h-32 overflow-hidden">
+                      <div className="relative h-24 overflow-hidden">
                         <Image
                           src={service?.image}
                           alt={service?.name}
@@ -123,15 +123,15 @@ const FeaturedServices = () => {
                         </div>
                       </div>
                       <div className="p-4">
-                        <h3 className="font-heading text-lg font-semibold text-foreground mb-2">
+                        <h3 className="font-heading text-base font-semibold text-foreground mb-2">
                           {service?.name}
                         </h3>
-                        <p className="text-muted-foreground text-sm mb-3 line-clamp-2">
+                        <p className="text-muted-foreground text-xs mb-3 line-clamp-2">
                           {service?.description}
                         </p>
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center gap-3">
-                            <span className="text-base font-semibold text-accent">
+                            <span className="text-sm font-semibold text-accent">
                               From {service?.startingPrice}
                             </span>
                             <span className="text-xs text-muted-foreground">
@@ -198,7 +198,7 @@ const FeaturedServices = () => {
 
               {getVisibleServices()?.map((service) => (
                 <div key={service?.id} className="bg-card rounded-2xl shadow-luxury overflow-hidden border border-border hover:shadow-luxury-hover transition-luxury">
-                  <div className="relative h-64 overflow-hidden">
+                  <div className="relative h-48 overflow-hidden">
                     <Image
                       src={service?.image}
                       alt={service?.name}
@@ -210,19 +210,19 @@ const FeaturedServices = () => {
                       </span>
                     </div>
                   </div>
-                  <div className="p-6">
-                    <h3 className="font-heading text-xl font-semibold text-foreground mb-3">
+                  <div className="p-4">
+                    <h3 className="font-heading text-lg font-semibold text-foreground mb-3">
                       {service?.name}
                     </h3>
-                    <p className="text-muted-foreground mb-4 line-clamp-3">
+                    <p className="text-muted-foreground text-sm mb-4 line-clamp-3">
                       {service?.description}
                     </p>
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-4">
-                        <span className="text-lg font-semibold text-accent">
+                        <span className="text-base font-semibold text-accent">
                           From {service?.startingPrice}
                         </span>
-                        <span className="text-sm text-muted-foreground">
+                        <span className="text-xs text-muted-foreground">
                           {service?.duration}
                         </span>
                       </div>

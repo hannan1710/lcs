@@ -4,11 +4,11 @@ import StylistCard from './StylistCard';
 const StylistGrid = ({ stylists, onViewDetails, onBookAppointment, isLoading }) => {
   if (isLoading) {
     return (
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-2.5 sm:gap-3.5 lg:gap-4">
+      <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-1.5 sm:gap-2 lg:gap-2.5">
         {[...Array(12)]?.map((_, index) => (
           <div key={index} className="bg-card rounded-lg shadow-luxury overflow-hidden animate-pulse">
-            <div className="h-20 sm:h-24 md:h-28 lg:h-32 bg-muted" />
-            <div className="p-2 sm:p-2.5 md:p-3 space-y-2">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 bg-muted flex-shrink-0" />
+            <div className="p-2 space-y-1 flex-1 min-w-0">
               <div className="h-4 sm:h-5 bg-muted rounded" />
               <div className="h-3 bg-muted rounded w-2/3" />
               <div className="flex gap-1">
@@ -56,7 +56,7 @@ const StylistGrid = ({ stylists, onViewDetails, onBookAppointment, isLoading }) 
   }
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-2.5 sm:gap-3.5 lg:gap-4">
+    <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-1.5 sm:gap-2 lg:gap-2.5">
       {stylists?.map((stylist) => (
         <StylistCard
           key={stylist?.id}

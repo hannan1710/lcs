@@ -27,7 +27,7 @@ const HeroSection = () => {
             className="w-full h-full object-cover"
             onEnded={() => setIsVideoPlaying(false)}
           >
-            <source src="/videos/salon-video.mp4" type="video/mp4" />
+            <source src="/videos/lcss.mp4" type="video/mp4" />
           </video>
           <div className="absolute inset-0 bg-background/20" />
         </div>
@@ -75,7 +75,7 @@ const HeroSection = () => {
               </Button>
             </Link>
             
-            <button
+            {/* <button
               onClick={handlePlayVideo}
               className="flex items-center space-x-2 text-foreground hover:text-accent transition-luxury"
             >
@@ -83,7 +83,7 @@ const HeroSection = () => {
                 <Icon name="Play" size={20} className="text-accent" />
               </div>
               <span className="text-lg font-medium">Watch Our Story</span>
-            </button>
+            </button> */}
           </div>
 
           {/* Trust Indicators */}

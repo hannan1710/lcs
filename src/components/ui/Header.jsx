@@ -6,10 +6,9 @@ import Button from "./Button";
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const location = useLocation();
 
-  // Mock authentication state - in real app this would come from context/state management
+  // Mock authentication state - in a real app this would come from context/state management
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState({
     name: "Sarah Johnson",
@@ -35,10 +34,12 @@ const Header = () => {
         });
       } else if (regularUser) {
         const userData = JSON.parse(regularUser);
+        const userName = `${userData.firstName || userData.name} ${
+          userData.lastName || ""
+        }`.trim();
+        const capitalizedName = userName.charAt(0).toUpperCase() + userName.slice(1);
         setUser({
-          name: `${userData.firstName || userData.name} ${
-            userData.lastName || ""
-          }`,
+          name: capitalizedName,
           email: userData.email || "user@lacoiffure.com",
           avatar:
             "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=200&h=200&fit=crop&crop=face",
@@ -51,9 +52,9 @@ const Header = () => {
     { label: "Home", path: "/homepage", icon: "Home" },
     { label: "Services", path: "/services-catalog", icon: "Scissors" },
     { label: "Gallery", path: "/gallery-portfolio", icon: "Image" },
-    { label: "Our Team", path: "/stylist-profiles", icon: "Users" },
     { label: "Our Products", path: "/products", icon: "Package" },
     { label: "Contact", path: "/contact-location", icon: "MapPin" },
+    { label: "About Us", path: "/about-us", icon: "Info" },
   ];
 
   useEffect(() => {
@@ -90,10 +91,6 @@ const Header = () => {
     setIsMobileMenuOpen(false);
   };
 
-  const toggleUserMenu = () => {
-    setIsUserMenuOpen(!isUserMenuOpen);
-  };
-
   const handleLogout = () => {
     localStorage.removeItem("admin");
     localStorage.removeItem("adminToken");
@@ -106,7 +103,6 @@ const Header = () => {
       avatar:
         "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=200&h=200&fit=crop&crop=face",
     });
-    setIsUserMenuOpen(false);
   };
 
   const isActivePath = (path) => {
@@ -127,13 +123,12 @@ const Header = () => {
               to="/homepage"
               className="flex items-center space-x-3 transition-luxury hover:opacity-80"
               onClick={closeMobileMenu}
-            > 
-           <img 
-  src="/lfav.png"    // or {logo}
-  alt="La Coiffure Logo"
-  className="h-10 w-auto object-contain lg:h-12"
-/>
-
+            >
+              <img
+                src="/lcsg.png" // or {logo}
+                alt="La Coiffure Logo"
+                className="h-12 w-auto object-contain lg:h-14"
+              />
 
               <div className="flex flex-col">
                 <span className="font-heading font-semibold text-lg lg:text-xl text-primary">
@@ -172,83 +167,20 @@ const Header = () => {
                 </Button>
               </Link>
               {isAuthenticated ? (
-                // Authenticated User Menu
-                <div className="relative">
-                  <button
-                    onClick={toggleUserMenu}
-                    className="flex items-center space-x-2 p-2 rounded-lg hover:bg-muted transition-luxury"
-                  >
-                    <img
-                      src={user.avatar}
-                      alt={user.name}
-                      className="w-8 h-8 rounded-full"
-                    />
-                    <span className="text-sm font-medium text-foreground">
-                      {user.name}
-                    </span>
-                    <Icon
-                      name="ChevronDown"
-                      size={16}
-                      className="text-muted-foreground"
-                    />
-                  </button>
-
-                  {/* User Dropdown Menu */}
-                  {isUserMenuOpen && (
-                    <div className="absolute right-0 top-full mt-2 w-64 bg-card border border-border rounded-lg shadow-luxury py-2">
-                      <div className="px-4 py-3 border-b border-border">
-                        <p className="text-sm font-medium text-foreground">
-                          {user.name}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {user.email}
-                        </p>
-                      </div>
-                      <div className="py-2">
-                        <Link
-                          to="/dashboard"
-                          className="flex items-center space-x-3 px-4 py-2 text-sm text-foreground hover:bg-muted transition-luxury"
-                          onClick={() => setIsUserMenuOpen(false)}
-                        >
-                          <Icon name="Home" size={16} />
-                          <span>Dashboard</span>
-                        </Link>
-                        <Link
-                          to="/appointment-booking"
-                          className="flex items-center space-x-3 px-4 py-2 text-sm text-foreground hover:bg-muted transition-luxury"
-                          onClick={() => setIsUserMenuOpen(false)}
-                        >
-                          <Icon name="Calendar" size={16} />
-                          <span>Book Appointment</span>
-                        </Link>
-                        <Link
-                          to="/blog"
-                          className="flex items-center space-x-3 px-4 py-2 text-sm text-foreground hover:bg-muted transition-luxury"
-                          onClick={() => setIsUserMenuOpen(false)}
-                        >
-                          <Icon name="FileText" size={16} />
-                          <span>Blog</span>
-                        </Link>
-                        <Link
-                          to="/login"
-                          className="flex items-center space-x-3 px-4 py-2 text-sm text-foreground hover:bg-muted transition-luxury"
-                          onClick={() => setIsUserMenuOpen(false)}
-                        >
-                          <Icon name="Settings" size={16} />
-                          <span>Admin Login</span>
-                        </Link>
-                        <div className="border-t border-border my-2"></div>
-                        <button
-                          onClick={handleLogout}
-                          className="flex items-center space-x-3 px-4 py-2 text-sm text-destructive hover:bg-muted transition-luxury w-full"
-                        >
-                          <Icon name="LogOut" size={16} />
-                          <span>Sign Out</span>
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
+                // Authenticated User - Direct Link to Dashboard
+                <Link
+                  to="/dashboard"
+                  className="flex items-center space-x-2 p-2 rounded-lg hover:bg-muted transition-luxury"
+                >
+                  <img
+                    src={user.avatar}
+                    alt={user.name}
+                    className="w-8 h-8 rounded-full"
+                  />
+                  <span className="text-sm font-medium text-foreground">
+                    {user.name}
+                  </span>
+                </Link>
               ) : (
                 // Guest Actions
                 <Link to="/login">
@@ -257,13 +189,6 @@ const Header = () => {
                   </Button>
                 </Link>
               )}
-
-              <Link to="/appointment-booking">
-                <Button size="sm">
-                  <Icon name="Calendar" size={16} className="mr-2" />
-                  Book Now
-                </Button>
-              </Link>
             </div>
 
             {/* Mobile Menu Button */}
@@ -299,23 +224,14 @@ const Header = () => {
 
               <div className="border-t border-border mt-4 pt-4 space-y-3">
                 {isAuthenticated ? (
-                  <>
-                    <Link
-                      to="/dashboard"
-                      className="flex items-center space-x-3 px-4 py-3 rounded-lg text-foreground hover:bg-muted transition-luxury"
-                      onClick={closeMobileMenu}
-                    >
-                      <Icon name="Home" size={20} />
-                      <span>Dashboard</span>
-                    </Link>
-                    <button
-                      onClick={handleLogout}
-                      className="flex items-center space-x-3 px-4 py-3 rounded-lg text-destructive hover:bg-muted transition-luxury w-full"
-                    >
-                      <Icon name="LogOut" size={20} />
-                      <span>Sign Out</span>
-                    </button>
-                  </>
+                  <Link
+                    to="/dashboard"
+                    className="flex items-center space-x-3 px-4 py-3 rounded-lg text-foreground hover:bg-muted transition-luxury"
+                    onClick={closeMobileMenu}
+                  >
+                    <Icon name="Home" size={20} />
+                    <span>Dashboard</span>
+                  </Link>
                 ) : (
                   <Link
                     to="/login"
@@ -326,15 +242,6 @@ const Header = () => {
                     <span>Login</span>
                   </Link>
                 )}
-
-                <Link
-                  to="/appointment-booking"
-                  className="flex items-center space-x-3 px-4 py-4 rounded-lg bg-accent text-accent-foreground hover:bg-accent/90 transition-luxury touch-manipulation"
-                  onClick={closeMobileMenu}
-                >
-                  <Icon name="Calendar" size={20} />
-                  <span>Book Appointment</span>
-                </Link>
               </div>
             </div>
           )}
