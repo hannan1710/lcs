@@ -162,6 +162,44 @@ const Footer = () => {
             </div>
           </div>
         </div>
+        {/* Newsletter Signup */}
+        <div className="border-t border-white/20 pt-14 mb-14">
+          <div className="text-center max-w-md mx-auto">
+            <h4 className="font-bold mb-2 text-lg text-white">
+              Stay Updated With New Offers
+            </h4>
+            <p className="text-white/80 mb-4 text-sm">
+              Subscribe for exclusive offers, styling tips, & salon updates.
+            </p>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                // Add your form submission logic here
+                // e.g., send phone number to your API
+                console.log(
+                  "Submitting form with phone number:",
+                  e.target.elements[0].value
+                );
+              }}
+              className="flex flex-col sm:flex-row gap-2"
+            >
+              <input
+                type="tel"
+                id="phone-number-input"
+                name="phoneNumber"
+                placeholder="Enter your Phone Number"
+                aria-label="Enter your Phone Number"
+                className="flex-1 px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/50 focus:outline-none focus:border-accent"
+              />
+              <button
+                type="submit"
+                className="px-6 py-2 bg-accent text-accent-foreground rounded-lg hover:bg-accent/90 transition-luxury font-medium"
+              >
+                Subscribe
+              </button>
+            </form>
+          </div>
+        </div>
 
         {/* Salon Locations */}
         <div className="border-t border-white/20 pt-8 mb-8">
@@ -221,39 +259,6 @@ const Footer = () => {
             ))}
           </div>
         </div>
-
-        {/* Newsletter Signup
-        <div className="border-t border-white/20 pt-8 mb-8">
-          <div className="text-center max-w-md mx-auto">
-            <h4 className="font-semibold mb-2 text-lg text-white">
-              Stay Updated
-            </h4>
-            <p className="text-white/80 mb-4 text-sm">
-              Subscribe to our newsletter for exclusive offers, styling tips,
-              and salon updates.
-            </p>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                // handle submit logic here
-              }}
-              className="flex flex-col sm:flex-row gap-2"
-            >
-              <input
-                type="email"
-                placeholder="Enter your email"
-                aria-label="Email address"
-                className="flex-1 px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/50 focus:outline-none focus:border-accent"
-              />
-              <button
-                type="submit"
-                className="px-6 py-2 bg-accent text-accent-foreground rounded-lg hover:bg-accent/90 transition-luxury font-medium"
-              >
-                Subscribe
-              </button>
-            </form>
-          </div>
-        </div> */}
 
         {/* Bottom Footer */}
         <div className="border-t border-white/20 pt-8">

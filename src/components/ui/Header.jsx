@@ -52,7 +52,7 @@ const Header = () => {
     { label: "Home", path: "/homepage", icon: "Home" },
     { label: "Services", path: "/services-catalog", icon: "Scissors" },
     { label: "Gallery", path: "/gallery-portfolio", icon: "Image" },
-    { label: "Our Products", path: "/products", icon: "Package" },
+    // { label: "Our Products", path: "/products", icon: "Package" }, // This is commented out
     { label: "Contact", path: "/contact-location", icon: "MapPin" },
     { label: "About Us", path: "/about-us", icon: "Info" },
   ];
@@ -160,12 +160,14 @@ const Header = () => {
 
             {/* Desktop Actions */}
             <div className="hidden lg:flex items-center space-x-4">
+              {/*
               <Link to="/cart" className="relative">
                 <Button variant="outline" size="sm">
                   <Icon name="ShoppingCart" size={16} className="mr-2" />
                   Cart
                 </Button>
               </Link>
+              */}
               {isAuthenticated ? (
                 // Authenticated User - Direct Link to Dashboard
                 <Link
@@ -189,6 +191,11 @@ const Header = () => {
                   </Button>
                 </Link>
               )}
+              {/*
+              <Link to="/book-now">
+                <Button size="sm">Book Now</Button>
+              </Link>
+              */}
             </div>
 
             {/* Mobile Menu Button */}

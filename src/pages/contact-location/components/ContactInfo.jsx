@@ -3,12 +3,7 @@ import Icon from '../../../components/AppIcon';
 
 const ContactInfo = () => {
   const contactDetails = [
-    {
-      icon: 'MapPin',
-      title: 'Visit Our Salons',
-      content: 'Thane: Shop no. 11&12, Saraswati school, Anand Nagar, Thane West\nPowai: SN 161&162 floor 1st, galleriya, Hiranandani Gardens, Powai',
-      action: 'Get Directions'
-    },
+   
     {
       icon: 'Phone',
       title: 'Call Us',

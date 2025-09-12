@@ -6,7 +6,7 @@ import FeaturedServices from './components/FeaturedServices';
 import StylistSpotlight from './components/StylistSpotlight';
 import ClientTestimonials from './components/ClientTestimonials';
 import SalonGallery from './components/SalonGallery';
-import ContactCTA from './components/ContactCTA';
+// import ContactCTA from './components/ContactCTA';
 
 const Homepage = () => {
   return (
@@ -18,7 +18,7 @@ const Homepage = () => {
         <StylistSpotlight />
         <ClientTestimonials />
         <SalonGallery />
-        <ContactCTA />
+        {/* <ContactCTA /> */}
       </main>
       <Footer />
     </div>

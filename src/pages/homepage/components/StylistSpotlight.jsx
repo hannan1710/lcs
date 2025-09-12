@@ -141,7 +141,7 @@ const StylistSpotlight = () => {
           </div>
 
           {/* Dots Indicator */}
-          <div className="flex justify-center mt-4 sm:mt-6 gap-2">
+          {/* <div className="flex justify-center mt-4 sm:mt-6 gap-2">
   {stylists?.map((_, index) => (
     <button
       key={index}
@@ -151,7 +151,7 @@ const StylistSpotlight = () => {
       }`}
     />
   ))}
-</div>
+</div> */}
         </div>
       </div>
     </section>
