@@ -35,7 +35,12 @@ const HeroSection = () => {
 
       {/* Content */}
       <div className="relative z-30 container mx-auto px-6 lg:px-8 text-center">
-        <div className="max-w-4xl mx-auto pt-8 sm:pt-12 lg:pt-16">
+        {/*
+          The top padding on this div is what's creating the large gap.
+          It has been reduced from `pt-8 sm:pt-12 lg:pt-16`
+          to a smaller, more balanced `pt-4 sm:pt-6 lg:pt-8`
+        */}
+        <div className="max-w-4xl mx-auto pt-4 sm:pt-6 lg:pt-8">
 
 
           {/* Main Heading */}
@@ -74,16 +79,6 @@ const HeroSection = () => {
                 Book Appointment
               </Button>
             </Link>
-            
-            {/* <button
-              onClick={handlePlayVideo}
-              className="flex items-center space-x-2 text-foreground hover:text-accent transition-luxury"
-            >
-              <div className="w-12 h-12 bg-accent/10 rounded-full flex items-center justify-center">
-                <Icon name="Play" size={20} className="text-accent" />
-              </div>
-              <span className="text-lg font-medium">Watch Our Story</span>
-            </button> */}
           </div>
 
           {/* Trust Indicators */}
@@ -103,45 +98,6 @@ const HeroSection = () => {
           </div>
         </div>
       </div>
-
-      {/* Scroll Indicator
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-30">
-        <div className="flex flex-col items-center space-y-2 text-muted-foreground">
-          <span className="text-xs font-medium">Scroll to explore</span>
-          <div className="w-6 h-10 border-2 border-muted-foreground rounded-full flex justify-center">
-            <div className="w-1 h-3 bg-muted-foreground rounded-full mt-2 animate-bounce" />
-          </div>
-        </div>
-      </div> */}
-
-      {/* Floating Elements
-      <div className="absolute top-20 left-10 hidden lg:block">
-        <div className="bg-card/80 backdrop-blur-sm border border-border rounded-lg p-4 shadow-luxury">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-accent rounded-full flex items-center justify-center">
-              <Icon name="Scissors" size={20} color="white" />
-            </div>
-            <div>
-              <p className="font-medium text-foreground">Expert Stylists</p>
-              <p className="text-xs text-muted-foreground">15+ years experience</p>
-            </div>
-          </div>
-        </div>
-      </div> */}
-
-      {/* <div className="absolute top-40 right-10 hidden lg:block">
-        <div className="bg-card/80 backdrop-blur-sm border border-border rounded-lg p-4 shadow-luxury">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-success rounded-full flex items-center justify-center">
-              <Icon name="Award" size={20} color="white" />
-            </div>
-            <div>
-             
-              <p className="text-xs text-muted-foreground">Best Salon </p>
-            </div>
-          </div>
-        </div>
-      </div> */}
     </section>
   );
 };
