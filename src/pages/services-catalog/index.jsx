@@ -24,7 +24,6 @@ const ServicesCatalog = () => {
       category: "hair",
       image: "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=400&h=300&fit=crop",
       duration: "90 min",
-      startingPrice: 85,
       rating: 4.9,
       reviewCount: 127,
       description: "Premium precision cut with personalized styling consultation and luxury finishing.",
@@ -35,11 +34,6 @@ const ServicesCatalog = () => {
         "Personalized styling session",
         "Premium product application",
         "Styling tips and maintenance advice"
-      ],
-      pricingTiers: [
-        { name: "Classic Cut", description: "With junior stylist", price: 85 },
-        { name: "Premium Cut", description: "With senior stylist", price: 125 },
-        { name: "Master Cut", description: "With master stylist", price: 165 }
       ],
       recommendedStylists: [
         { name: "Isabella Martinez", specialty: "Precision Cuts", avatar: "https://randomuser.me/api/portraits/women/32.jpg", rating: 4.9 },
@@ -61,7 +55,6 @@ const ServicesCatalog = () => {
       category: "color",
       image: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400&h=300&fit=crop",
       duration: "3-4 hours",
-      startingPrice: 195,
       rating: 4.8,
       reviewCount: 89,
       description: "Hand-painted highlights for natural, sun-kissed dimension with premium color products.",
@@ -72,11 +65,6 @@ const ServicesCatalog = () => {
         "Toning service for perfect shade",
         "Deep conditioning treatment",
         "Color maintenance guidance"
-      ],
-      pricingTiers: [
-        { name: "Partial Balayage", description: "Face-framing highlights", price: 195 },
-        { name: "Full Balayage", description: "Complete color transformation", price: 285 },
-        { name: "Premium Balayage", description: "With master colorist", price: 385 }
       ],
       recommendedStylists: [
         { name: "Sophie Chen", specialty: "Color Specialist", avatar: "https://randomuser.me/api/portraits/women/28.jpg", rating: 4.9 },
@@ -98,7 +86,6 @@ const ServicesCatalog = () => {
       category: "styling",
       image: "https://images.unsplash.com/photo-1457972729786-0411a3b2b626?w=400&h=300&fit=crop",
       duration: "4-5 hours",
-      startingPrice: 350,
       rating: 5.0,
       reviewCount: 156,
       description: "Complete bridal beauty package with trial session and wedding day styling.",
@@ -109,11 +96,6 @@ const ServicesCatalog = () => {
         "Wedding day hair styling",
         "Professional makeup application",
         "Touch-up kit for the day"
-      ],
-      pricingTiers: [
-        { name: "Bridal Hair Only", description: "Styling and trial", price: 250 },
-        { name: "Hair & Makeup", description: "Complete bridal package", price: 350 },
-        { name: "Bridal Party Package", description: "Bride + 4 attendants", price: 850 }
       ],
       recommendedStylists: [
         { name: "Victoria Rose", specialty: "Bridal Specialist", avatar: "https://randomuser.me/api/portraits/women/35.jpg", rating: 5.0 },
@@ -135,7 +117,6 @@ const ServicesCatalog = () => {
       category: "treatments",
       image: "https://images.unsplash.com/photo-1559599101-f09722fb4948?w=400&h=300&fit=crop",
       duration: "2-3 hours",
-      startingPrice: 225,
       rating: 4.7,
       reviewCount: 94,
       description: "Professional smoothing treatment for frizz-free, manageable hair that lasts months.",
@@ -146,11 +127,6 @@ const ServicesCatalog = () => {
         "Keratin treatment application",
         "Professional blow-dry and styling",
         "Aftercare product recommendations"
-      ],
-      pricingTiers: [
-        { name: "Express Treatment", description: "Quick smoothing, 6-8 weeks", price: 225 },
-        { name: "Classic Keratin", description: "Full treatment, 3-4 months", price: 325 },
-        { name: "Premium Keratin", description: "Long-lasting, 4-6 months", price: 425 }
       ],
       recommendedStylists: [
         { name: "Maria Santos", specialty: "Chemical Services", avatar: "https://randomuser.me/api/portraits/women/29.jpg", rating: 4.8 },
@@ -172,7 +148,6 @@ const ServicesCatalog = () => {
       category: "spa",
       image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=400&h=300&fit=crop",
       duration: "75 min",
-      startingPrice: 145,
       rating: 4.9,
       reviewCount: 112,
       description: "Customized facial treatment with premium products for radiant, healthy skin.",
@@ -183,11 +158,6 @@ const ServicesCatalog = () => {
         "Customized mask application",
         "Relaxing facial massage",
         "Moisturizing and sun protection"
-      ],
-      pricingTiers: [
-        { name: "Classic Facial", description: "Essential skincare treatment", price: 145 },
-        { name: "Anti-Aging Facial", description: "Advanced anti-aging treatment", price: 195 },
-        { name: "Luxury Gold Facial", description: "Premium treatment with gold infusion", price: 295 }
       ],
       recommendedStylists: [
         { name: "Amanda Foster", specialty: "Licensed Esthetician", avatar: "https://randomuser.me/api/portraits/women/31.jpg", rating: 4.9 },
@@ -209,7 +179,6 @@ const ServicesCatalog = () => {
       category: "hair",
       image: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=400&h=300&fit=crop",
       duration: "45 min",
-      startingPrice: 65,
       rating: 4.8,
       reviewCount: 78,
       description: "Professional men\'s haircut with hot towel treatment and styling for the modern gentleman.",
@@ -220,11 +189,6 @@ const ServicesCatalog = () => {
         "Hot towel treatment",
         "Scalp massage",
         "Professional styling and finishing"
-      ],
-      pricingTiers: [
-        { name: "Classic Cut", description: "Traditional men\'s cut", price: 65 },
-        { name: "Executive Package", description: "Cut with beard trim", price: 85 },
-        { name: "VIP Experience", description: "Full grooming service", price: 125 }
       ],
       recommendedStylists: [
         { name: "Antonio Rodriguez", specialty: "Men\'s Grooming", avatar: "https://randomuser.me/api/portraits/men/41.jpg", rating: 4.9 },

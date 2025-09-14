@@ -259,7 +259,6 @@ const PaymentConfirmation = () => {
                                 <p className="font-medium text-foreground">{service.name}</p>
                                 <p className="text-sm text-muted-foreground">{service.duration}</p>
                               </div>
-                              <p className="font-medium text-foreground">${service.price}</p>
                             </div>
                           ))}
                         </div>

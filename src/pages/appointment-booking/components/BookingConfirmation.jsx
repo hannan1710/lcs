@@ -109,7 +109,6 @@ const BookingConfirmation = ({ bookingData, onNewBooking, onGoHome }) => {
                     <p className="text-sm text-muted-foreground">{service?.duration}</p>
                   </div>
                 </div>
-                <p className="font-semibold text-accent">${service?.price}</p>
               </div>
             ))}
           </div>
@@ -138,7 +137,7 @@ const BookingConfirmation = ({ bookingData, onNewBooking, onGoHome }) => {
           <div className="flex items-center justify-between">
             <p className="font-semibold text-foreground">Total Amount</p>
             <p className="text-xl font-heading font-bold text-accent">
-              ${bookingData?.selectedServices?.reduce((total, service) => total + service?.price, 0)}
+              $0
             </p>
           </div>
         </div>

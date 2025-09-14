@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Image from '../../../components/AppImage';
@@ -5,86 +6,78 @@ import Button from '../../../components/ui/Button';
 import Icon from '../../../components/AppIcon';
 
 const FeaturedServices = () => {
-  const [currentSlide, setCurrentSlide] = useState(0);
+  const [currentSlide, setCurrentSlide] = useState(0);
 
-  const services = [
-    {
-      id: 1,
-      name: "Signature Hair Cut & Style",
-      description: "Personalized cutting and styling consultation with our master stylists, tailored to enhance your unique features and lifestyle.",
-      startingPrice: "$150",
-      image: "https://images.pexels.com/photos/3993449/pexels-photo-3993449.jpeg?auto=compress&cs=tinysrgb&w=800",
-      duration: "90 min",
-      category: "Hair"
-    },
-    {
-      id: 2,
-      name: "Premium Color Treatment",
-      description: "Advanced color techniques including balayage, highlights, and full color transformations using luxury professional products.",
-      startingPrice: "$250",
-      image: "https://images.pixabay.com/photos/2016/03/26/22/13/woman-1281826_960_720.jpg",
-      duration: "3 hours",
-      category: "Color"
-    },
-    {
-      id: 3,
-      name: "Luxury Facial Treatment",
-      description: "Rejuvenating facial treatments with premium skincare products, customized to your skin type and concerns.",
-      startingPrice: "$120",
-      image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      duration: "75 min",
-      category: "Skincare"
-    },
-    {
-      id: 4,
-      name: "Bridal Beauty Package",
-      description: "Complete bridal preparation including hair styling, makeup application, and skincare treatments for your special day.",
-      startingPrice: "$450",
-      image: "https://images.pexels.com/photos/1043474/pexels-photo-1043474.jpeg?auto=compress&cs=tinysrgb&w=800",
-      duration: "4 hours",
-      category: "Bridal"
-    },
-    {
-      id: 5,
-      name: "Keratin Treatment",
-      description: "Professional keratin smoothing treatment to eliminate frizz and create silky, manageable hair that lasts for months.",
-      startingPrice: "$300",
-      image: "https://images.pixabay.com/photos/2017/07/31/11/22/people-2557396_960_720.jpg",
-      duration: "2.5 hours",
-      category: "Treatment"
-    },
-    {
-      id: 6,
-      name: "Men's Grooming Service",
-      description: "Complete men's grooming experience including precision cuts, beard styling, and premium skincare treatments.",
-      startingPrice: "$85",
-      image: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      duration: "60 min",
-      category: "Men's"
-    },
-     {
-      id: 6,
-      name: "woMen's Grooming Service",
-      description: "Complete men's grooming experience including precision cuts, beard styling, and premium skincare treatments.",
-      startingPrice: "$85",
-      image: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      duration: "60 min",
-      category: "Men's"
-    }
-  ];
+  const services = [
+    {
+      id: 1,
+      name: "Signature Hair Cut & Style",
+      description: "Personalized cutting and styling consultation with our master stylists, tailored to enhance your unique features and lifestyle.",
+      image: "https://images.pexels.com/photos/3993449/pexels-photo-3993449.jpeg?auto=compress&cs=tinysrgb&w=800",
+      duration: "90 min",
+      category: "Hair"
+    },
+    {
+      id: 2,
+      name: "Premium Color Treatment",
+      description: "Advanced color techniques including balayage, highlights, and full color transformations using luxury professional products.",
+      image: "https://images.pixabay.com/photos/2016/03/26/22/13/woman-1281826_960_720.jpg",
+      duration: "3 hours",
+      category: "Color"
+    },
+    {
+      id: 3,
+      name: "Luxury Facial Treatment",
+      description: "Rejuvenating facial treatments with premium skincare products, customized to your skin type and concerns.",
+      image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+      duration: "75 min",
+      category: "Skincare"
+    },
+    {
+      id: 4,
+      name: "Bridal Beauty Package",
+      description: "Complete bridal preparation including hair styling, makeup application, and skincare treatments for your special day.",
+      image: "https://images.pexels.com/photos/1043474/pexels-photo-1043474.jpeg?auto=compress&cs=tinysrgb&w=800",
+      duration: "4 hours",
+      category: "Bridal"
+    },
+    {
+      id: 5,
+      name: "Keratin Treatment",
+      description: "Professional keratin smoothing treatment to eliminate frizz and create silky, manageable hair that lasts for months.",
+      image: "https://images.pixabay.com/photos/2017/07/31/11/22/people-2557396_960_720.jpg",
+      duration: "2.5 hours",
+      category: "Treatment"
+    },
+    {
+      id: 6,
+      name: "Men's Grooming Service",
+      description: "Complete men's grooming experience including precision cuts, beard styling, and premium skincare treatments.",
+      image: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+      duration: "60 min",
+      category: "Men's"
+    },
+     {
+      id: 7,
+      name: "woMen's Grooming Service",
+      description: "Complete men's grooming experience including precision cuts, beard styling, and premium skincare treatments.",
+      image: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+      duration: "60 min",
+      category: "Men's"
+    }
+  ];
 
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % Math.ceil(services?.length / 4));
-  };
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % Math.ceil(services?.length / 4));
+  };
 
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + Math.ceil(services?.length / 4)) % Math.ceil(services?.length / 3));
-  };
-
-  const getVisibleServices = () => {
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + Math.ceil(services?.length / 4)) % Math.ceil(services?.length / 3));
+  };
+const getVisibleServices = () => {
     const startIndex = currentSlide * 4;
     return services?.slice(startIndex, startIndex + 4);
-  };
+};
 
   return (
     <section className="py-16 lg:py-24 bg-background">
@@ -132,7 +125,7 @@ const FeaturedServices = () => {
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center gap-3">
                             <span className="text-sm font-semibold text-accent">
-                              From {service?.startingPrice}
+                              {/* Removed starting price */}
                             </span>
                             <span className="text-xs text-muted-foreground">
                               {service?.duration}
@@ -194,7 +187,7 @@ const FeaturedServices = () => {
         {/* Desktop Grid */}
         <div className="hidden lg:block">
           <div className="relative">
-           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
 
               {getVisibleServices()?.map((service) => (
                 <div key={service?.id} className="bg-card rounded-2xl shadow-luxury overflow-hidden border border-border hover:shadow-luxury-hover transition-luxury">
@@ -219,9 +212,7 @@ const FeaturedServices = () => {
                     </p>
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-4">
-                        <span className="text-base font-semibold text-accent">
-                          From {service?.startingPrice}
-                        </span>
+                        {/* Removed starting price */}
                         <span className="text-xs text-muted-foreground">
                           {service?.duration}
                         </span>

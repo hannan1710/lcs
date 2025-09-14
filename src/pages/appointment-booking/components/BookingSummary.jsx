@@ -14,7 +14,7 @@ const BookingSummary = ({
   isLoading 
 }) => {
   const calculateTotal = () => {
-    return selectedServices?.reduce((total, service) => total + service?.price, 0);
+    return 0; // No pricing for services
   };
 
   const formatDate = (date) => {
@@ -84,7 +84,6 @@ const BookingSummary = ({
                     <p className="text-sm text-muted-foreground">{service?.duration}</p>
                   </div>
                 </div>
-                <p className="font-semibold text-accent">${service?.price}</p>
               </div>
             ))}
           </div>

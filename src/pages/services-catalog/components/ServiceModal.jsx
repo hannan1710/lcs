@@ -42,17 +42,16 @@ const ServiceModal = ({ service, isOpen, onClose, onBookNow }) => {
                       <span className="text-muted-foreground">Duration:</span>
                       <p className="font-medium">{service?.duration}</p>
                     </div>
-                    <div>
+                    {/* <div>
                       <span className="text-muted-foreground">Starting Price:</span>
-                      <p className="font-medium text-accent">${service?.startingPrice}</p>
-                    </div>
-                    <div>
+                    </div> */}
+                    {/* <div>
                       <span className="text-muted-foreground">Rating:</span>
                       <div className="flex items-center">
                         <Icon name="Star" size={16} className="text-accent mr-1" />
                         <span className="font-medium">{service?.rating}</span>
                       </div>
-                    </div>
+                    </div> */}
                     <div>
                       <span className="text-muted-foreground">Reviews:</span>
                       <p className="font-medium">{service?.reviewCount} reviews</p>
@@ -102,7 +101,7 @@ const ServiceModal = ({ service, isOpen, onClose, onBookNow }) => {
                 </ul>
               </div>
               
-              <div>
+              {/* <div>
                 <h3 className="font-heading font-semibold text-lg mb-3">Pricing Tiers</h3>
                 <div className="space-y-3">
                   {service?.pricingTiers?.map((tier, index) => (
@@ -111,11 +110,10 @@ const ServiceModal = ({ service, isOpen, onClose, onBookNow }) => {
                         <p className="font-medium">{tier?.name}</p>
                         <p className="text-sm text-muted-foreground">{tier?.description}</p>
                       </div>
-                      <span className="font-semibold text-accent">${tier?.price}</span>
                     </div>
                   ))}
                 </div>
-              </div>
+              </div> */}
               
               <div>
                 <h3 className="font-heading font-semibold text-lg mb-3">Recommended Stylists</h3>
@@ -143,7 +141,7 @@ const ServiceModal = ({ service, isOpen, onClose, onBookNow }) => {
               </div>
               
               <div>
-                <h3 className="font-heading font-semibold text-lg mb-3">Preparation Instructions</h3>
+                <h3 className="font-heading font-semibold text-lg mb-3"> Instructions</h3>
                 <div className="bg-muted p-4 rounded-lg">
                   <ul className="space-y-2 text-sm">
                     {service?.preparation?.map((instruction, index) => (
@@ -152,6 +150,8 @@ const ServiceModal = ({ service, isOpen, onClose, onBookNow }) => {
                         <span>{instruction}</span>
                       </li>
                     ))}
+                
+
                   </ul>
                 </div>
               </div>

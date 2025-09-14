@@ -298,7 +298,7 @@ const Products = () => {
 
   const buyNow = (product) => {
     const bookingData = {
-      selectedService: { name: product.name, price: product.price },
+      selectedService: { name: product.name },
       selectedStylist: { name: 'Online Purchase' },
       selectedDate: new Date().toISOString().split('T')[0],
       selectedTime: '',

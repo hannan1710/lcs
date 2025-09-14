@@ -37,7 +37,7 @@ const Payment = () => {
     formData: { firstName: 'Sarah', lastName: 'Johnson' }
   };
 
-  const subtotal = bookingData.selectedServices.reduce((sum, service) => sum + service.price, 0);
+  const subtotal = 0; // No pricing for services
   const tax = subtotal * 0.08; // 8% tax
   const giftCardDiscount = giftCardData.isValid ? Math.min(giftCardData.remainingAmount, subtotal) : 0;
   const total = subtotal + tax - giftCardDiscount;
@@ -459,7 +459,6 @@ const Payment = () => {
                           <p className="font-medium text-foreground">{service.name}</p>
                           <p className="text-sm text-muted-foreground">{service.duration}</p>
                         </div>
-                        <p className="font-medium text-foreground">${service.price}</p>
                       </div>
                     ))}
                   </div>

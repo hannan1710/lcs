@@ -270,52 +270,53 @@ const SingleStepBookingForm = ({ onSubmit, isLoading }) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
-      {/* Branch Selection */}
-      <div className="bg-card rounded-lg border border-border p-6">
-        <h3 className="text-xl font-heading font-semibold text-foreground mb-4">
-          Select Branch
-        </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <button
-            type="button"
-            onClick={() => handleInputChange('branch', 'powai')}
-            className={`p-4 rounded-lg border-2 transition-luxury hover:shadow-luxury-hover ${
-              formData.branch === 'powai'
-                ? 'border-accent bg-accent/10 shadow-luxury'
-                : 'border-border hover:border-accent/50'
-            }`}
-          >
-            <div className="flex items-center space-x-3">
-              <Icon name="MapPin" size={24} className="text-accent" />
-              <div className="text-left">
-                <h4 className="font-semibold text-foreground">Powai</h4>
-                <p className="text-sm text-muted-foreground">Powai Lake, Mumbai</p>
-              </div>
-            </div>
-          </button>
-          
-          <button
-            type="button"
-            onClick={() => handleInputChange('branch', 'thane')}
-            className={`p-4 rounded-lg border-2 transition-luxury hover:shadow-luxury-hover ${
-              formData.branch === 'thane'
-                ? 'border-accent bg-accent/10 shadow-luxury'
-                : 'border-border hover:border-accent/50'
-            }`}
-          >
-            <div className="flex items-center space-x-3">
-              <Icon name="MapPin" size={24} className="text-accent" />
-              <div className="text-left">
-                <h4 className="font-semibold text-foreground">Thane</h4>
-                <p className="text-sm text-muted-foreground">Thane West, Mumbai</p>
-              </div>
-            </div>
-          </button>
+    {/* Branch Selection */}
+  <div className="bg-card rounded-lg border border-border p-6">
+    <h3 className="text-xl font-heading font-semibold text-foreground mb-4">
+      Select Branch
+    </h3>
+    {/* Change grid-cols-1 to grid-cols-2 */}
+    <div className="grid grid-cols-2 gap-4">
+      <button
+        type="button"
+        onClick={() => handleInputChange('branch', 'powai')}
+        className={`p-4 rounded-lg border-2 transition-luxury hover:shadow-luxury-hover ${
+          formData.branch === 'powai'
+            ? 'border-accent bg-accent/10 shadow-luxury'
+            : 'border-border hover:border-accent/50'
+        }`}
+      >
+        <div className="flex items-center space-x-3">
+          <Icon name="MapPin" size={24} className="text-accent" />
+          <div className="text-left">
+            <h4 className="font-semibold text-foreground">Powai</h4>
+            <p className="text-sm text-muted-foreground">Galleria </p>
+          </div>
         </div>
-        {errors.branch && (
-          <p className="text-error text-sm mt-2">{errors.branch}</p>
-        )}
-      </div>
+      </button>
+
+      <button
+        type="button"
+        onClick={() => handleInputChange('branch', 'thane')}
+        className={`p-4 rounded-lg border-2 transition-luxury hover:shadow-luxury-hover ${
+          formData.branch === 'thane'
+            ? 'border-accent bg-accent/10 shadow-luxury'
+            : 'border-border hover:border-accent/50'
+        }`}
+      >
+        <div className="flex items-center space-x-3">
+          <Icon name="MapPin" size={24} className="text-accent" />
+          <div className="text-left">
+            <h4 className="font-semibold text-foreground">Thane</h4>
+            <p className="text-sm text-muted-foreground">Anand Nagar</p>
+          </div>
+        </div>
+      </button>
+    </div>
+    {errors.branch && (
+      <p className="text-error text-sm mt-2">{errors.branch}</p>
+    )}
+  </div>
 
       {/* Customer Details */}
       <div className="bg-card rounded-lg border border-border p-6">
@@ -346,45 +347,121 @@ const SingleStepBookingForm = ({ onSubmit, isLoading }) => {
       </div>
 
       {/* Service Selection */}
-      <div className="bg-card rounded-lg border border-border p-6">
-        <h3 className="text-xl font-heading font-semibold text-foreground mb-4">
-          Service Selection
-        </h3>
-        
-        <div className="space-y-6">
-          {/* Step 1: Category Selection */}
-          {!selectedCategory && !showAddMoreCategories && (
-            <div className="space-y-4">
-              <div className="text-center mb-6">
-                <h4 className="text-lg font-semibold text-foreground mb-2">Step 1: Choose Service Category</h4>
-                <p className="text-sm text-muted-foreground">Select the main category of services you're interested in</p>
+      <div className="bg-card rounded-lg border border-border p-6"> 
+  <h3 className="text-xl font-heading font-semibold text-foreground mb-4">
+    Service Selection
+  </h3>
+
+  <div className="space-y-6">
+    {/* Step 1: Category Selection */}
+    {!selectedCategory && !showAddMoreCategories && (
+      <div className="space-y-4">
+        <div className="text-center mb-6">
+          <h4 className="text-lg font-semibold text-foreground mb-2">
+            Step 1: Choose Service Category
+          </h4>
+          <p className="text-sm text-muted-foreground">
+            Select the main category of services you're interested in
+          </p>
+        </div>
+
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+          {Object.keys(groupedServices).map((category) => {
+            const categoryServices = groupedServices[category];
+            const isSelected = formData.services.some(
+              (service) => service.category === category
+            );
+
+            return (
+              <div
+                key={category}
+                onClick={() => handleCategorySelect(category)}
+                className={`p-4 rounded-lg border-2 cursor-pointer transition-luxury hover:shadow-luxury-hover ${
+                  isSelected
+                    ? "border-accent bg-accent/10 shadow-luxury"
+                    : "border-border hover:border-accent/50"
+                }`}
+              >
+                <div className="text-center">
+                  <h5 className="font-semibold text-foreground capitalize mb-2">
+                    {category} Services
+                  </h5>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    {categoryServices.length} service
+                    {categoryServices.length !== 1 ? "s" : ""} available
+                  </p>
+                  {isSelected && (
+                    <div className="text-xs text-accent font-medium">
+                      {
+                        formData.services.filter(
+                          (s) => s.category === category
+                        ).length
+                      }{" "}
+                      selected
+                    </div>
+                  )}
+                </div>
               </div>
-              
-              <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-                {Object.keys(groupedServices).map((category) => {
-                  const categoryServices = groupedServices[category];
-                  const isSelected = formData.services.some(service => service.category === category);
-                  
+            );
+          })}
+        </div>
+
+        {/* Direct Service Search Option */}
+        <div className="border-t border-border pt-4">
+          <Input
+            label="Search Services"
+            type="text"
+            placeholder="Search for a service"
+            value={searchQuery}
+            onChange={(e) => handleServiceSearch(e.target.value)}
+          />
+
+          {searchResults.length > 0 && (
+            <div className="space-y-2 mt-3">
+              <p className="text-sm font-medium text-foreground">
+                Search Results:
+              </p>
+              <div className="space-y-2 max-h-48 overflow-y-auto">
+                {searchResults.map((service) => {
+                  const isSelected = formData.services.some(
+                    (s) => s.id === service.id
+                  );
+
                   return (
                     <div
-                      key={category}
-                      onClick={() => handleCategorySelect(category)}
-                      className={`p-4 rounded-lg border-2 cursor-pointer transition-luxury hover:shadow-luxury-hover ${
+                      key={service.id}
+                      onClick={() =>
+                        !isSelected && handleSearchServiceSelect(service)
+                      }
+                      className={`p-3 rounded-lg border cursor-pointer transition-luxury ${
                         isSelected
-                          ? 'border-accent bg-accent/10 shadow-luxury'
-                          : 'border-border hover:border-accent/50'
+                          ? "border-accent bg-accent/10 cursor-not-allowed opacity-60"
+                          : "border-border hover:border-accent/50 hover:bg-muted"
                       }`}
                     >
-                      <div className="text-center">
-                        <h5 className="font-semibold text-foreground capitalize mb-2">
-                          {category} Services
-                        </h5>
-                        <p className="text-xs text-muted-foreground mb-2">
-                          {categoryServices.length} service{categoryServices.length !== 1 ? 's' : ''} available
-                        </p>
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <h6 className="font-semibold text-foreground text-sm">
+                            {service.name}
+                          </h6>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {service.description}
+                          </p>
+                          <div className="flex items-center justify-between mt-2">
+                            <span className="text-xs text-muted-foreground capitalize">
+                              {service.category} • {service.duration}
+                            </span>
+                            {/* <span className="text-sm font-semibold text-accent">
+                            </span> */}
+                          </div>
+                        </div>
                         {isSelected && (
-                          <div className="text-xs text-accent font-medium">
-                            {formData.services.filter(s => s.category === category).length} selected
+                          <div className="w-5 h-5 rounded-full bg-accent flex items-center justify-center ml-3">
+                            <Icon
+                              name="Check"
+                              size={12}
+                              color="var(--color-accent-foreground)"
+                            />
                           </div>
                         )}
                       </div>
@@ -392,279 +469,211 @@ const SingleStepBookingForm = ({ onSubmit, isLoading }) => {
                   );
                 })}
               </div>
-
-              {/* Service Search Option */}
-              <div className="border-t border-border pt-4">
-                <div className="flex items-center space-x-2 mb-3">
-                  <input
-                    type="checkbox"
-                    id="serviceSearch"
-                    checked={showServiceSearch}
-                    onChange={(e) => setShowServiceSearch(e.target.checked)}
-                    className="rounded border-border"
-                  />
-                  <label htmlFor="serviceSearch" className="text-sm font-medium text-foreground">
-                    Or search for a specific service
-                  </label>
-                </div>
-
-                {showServiceSearch && (
-                  <div className="space-y-3">
-                    <Input
-                      label="Search Services"
-                      type="text"
-                      placeholder="Type to search for services..."
-                      value={searchQuery}
-                      onChange={(e) => handleServiceSearch(e.target.value)}
-                    />
-                    
-                    {searchResults.length > 0 && (
-                      <div className="space-y-2">
-                        <p className="text-sm font-medium text-foreground">Search Results:</p>
-                        <div className="space-y-2 max-h-48 overflow-y-auto">
-                          {searchResults.map((service) => {
-                            const isSelected = formData.services.some(s => s.id === service.id);
-                            
-                            return (
-                              <div
-                                key={service.id}
-                                onClick={() => !isSelected && handleSearchServiceSelect(service)}
-                                className={`p-3 rounded-lg border cursor-pointer transition-luxury ${
-                                  isSelected
-                                    ? 'border-accent bg-accent/10 cursor-not-allowed opacity-60'
-                                    : 'border-border hover:border-accent/50 hover:bg-muted'
-                                }`}
-                              >
-                                <div className="flex items-start justify-between">
-                                  <div className="flex-1">
-                                    <h6 className="font-semibold text-foreground text-sm">
-                                      {service.name}
-                                    </h6>
-                                    <p className="text-xs text-muted-foreground mt-1">
-                                      {service.description}
-                                    </p>
-                                    <div className="flex items-center justify-between mt-2">
-                                      <span className="text-xs text-muted-foreground capitalize">
-                                        {service.category} • {service.duration}
-                                      </span>
-                                      <span className="text-sm font-semibold text-accent">
-                                        ${service.price}
-                                      </span>
-                                    </div>
-                                  </div>
-                                  {isSelected && (
-                                    <div className="w-5 h-5 rounded-full bg-accent flex items-center justify-center ml-3">
-                                      <Icon name="Check" size={12} color="var(--color-accent-foreground)" />
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    )}
-                    
-                    {searchQuery.length > 2 && searchResults.length === 0 && (
-                      <div className="p-4 bg-muted rounded-lg text-center">
-                        <p className="text-sm text-muted-foreground">
-                          No services found matching "{searchQuery}"
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
             </div>
           )}
 
-          {/* Step 2: Service Selection from Category */}
-          {selectedCategory && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h4 className="text-lg font-semibold text-foreground capitalize">
-                    {selectedCategory} Services
-                  </h4>
-                  <p className="text-sm text-muted-foreground">Select the services you want from this category</p>
-                </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setSelectedCategory('')}
-                  iconName="ArrowLeft"
-                  iconPosition="left"
-                >
-                  Back to Categories
-                </Button>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {getServicesFromCategory(selectedCategory).map((service) => {
-                  const isSelected = formData.services.some(s => s.id === service.id);
-                  
-                  return (
-                    <div
-                      key={service.id}
-                      onClick={() => handleServiceToggle(service)}
-                      className={`p-4 rounded-lg border-2 cursor-pointer transition-luxury hover:shadow-luxury-hover ${
-                        isSelected 
-                          ? 'border-accent bg-accent/10 shadow-luxury' 
-                          : 'border-border hover:border-accent/50'
-                      }`}
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <h5 className="font-semibold text-foreground text-sm">
-                            {service.name}
-                          </h5>
-                          <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                            {service.description}
-                          </p>
-                          <div className="flex items-center justify-between mt-2">
-                            <span className="text-xs text-muted-foreground">
-                              {service.duration}
-                            </span>
-                            <span className="text-sm font-semibold text-accent">
-                              ${service.price}
-                            </span>
-                          </div>
-                        </div>
-                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ml-3 ${
-                          isSelected 
-                            ? 'bg-accent border-accent' 
-                            : 'border-muted-foreground'
-                        }`}>
-                          {isSelected && (
-                            <Icon name="Check" size={12} color="var(--color-accent-foreground)" />
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-border">
-                <Button
-                  type="button"
-                  variant="default"
-                  size="sm"
-                  onClick={handleFinishCategorySelection}
-                  className="bg-accent text-accent-foreground hover:bg-accent/90"
-                >
-                  <Icon name="Check" size={16} className="mr-2" />
-                  Done with {selectedCategory}
-                </Button>
-                
-                {getAvailableCategories().length > 1 && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={handleAddMoreCategories}
-                    iconName="Plus"
-                    iconPosition="left"
-                  >
-                    Add Services from Another Category
-                  </Button>
-                )}
-              </div>
+          {searchQuery.length > 2 && searchResults.length === 0 && (
+            <div className="p-4 bg-muted rounded-lg text-center mt-3">
+              <p className="text-sm text-muted-foreground">
+                No services found matching "{searchQuery}"
+              </p>
             </div>
-          )}
-
-          {/* Add More Categories */}
-          {showAddMoreCategories && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h4 className="text-lg font-semibold text-foreground">Add More Categories</h4>
-                  <p className="text-sm text-muted-foreground">Select another category to add more services</p>
-                </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={handleFinishCategorySelection}
-                  iconName="X"
-                >
-                  Finish Selection
-                </Button>
-              </div>
-
-              <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-                {getAvailableCategories().map((category) => (
-                  <div
-                    key={category}
-                    onClick={() => handleCategorySelect(category)}
-                    className="p-4 rounded-lg border-2 border-border cursor-pointer transition-luxury hover:border-accent/50 hover:shadow-luxury-hover"
-                  >
-                    <div className="text-center">
-                      <h5 className="font-semibold text-foreground capitalize mb-2">
-                        {category} Services
-                      </h5>
-                      <p className="text-xs text-muted-foreground">
-                        {groupedServices[category].length} service{groupedServices[category].length !== 1 ? 's' : ''} available
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Selected Services Summary */}
-          {formData.services.length > 0 && (
-            <div className="bg-muted rounded-lg p-4">
-              <div className="flex items-center justify-between mb-3">
-                <h5 className="font-semibold text-foreground">Selected Services</h5>
-                {formData.services.length > 0 && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={handleAddMoreCategories}
-                    iconName="Plus"
-                    iconPosition="left"
-                  >
-                    Add More
-                  </Button>
-                )}
-              </div>
-              
-              <div className="space-y-2">
-                {Object.keys(groupedServices).map(category => {
-                  const categoryServices = formData.services.filter(service => service.category === category);
-                  if (categoryServices.length === 0) return null;
-                  
-                  return (
-                    <div key={category} className="border-l-2 border-accent pl-3">
-                      <h6 className="text-sm font-medium text-foreground capitalize mb-1">
-                        {category} Services
-                      </h6>
-                      <div className="space-y-1">
-                        {categoryServices.map(service => (
-                          <div key={service.id} className="flex items-center justify-between text-sm">
-                            <span className="text-foreground">{service.name}</span>
-                            <span className="text-accent font-semibold">${service.price}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })}
-                
-              </div>
-            </div>
-          )}
-
-          {errors.services && (
-            <p className="text-error text-sm">{errors.services}</p>
           )}
         </div>
       </div>
+    )}
+
+    {/* Step 2: Service Selection from Category */}
+    {selectedCategory && (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h4 className="text-lg font-semibold text-foreground capitalize">
+              {selectedCategory} Services
+            </h4>
+            <p className="text-sm text-muted-foreground">
+              Select the services you want from this category
+            </p>
+          </div>
+          <Button
+  type="button"
+  variant="outline"
+  size="sm"
+  className="inline-flex flex-wrap items-center gap-2 px-3 py-1.5 rounded-md 
+             border border-gray-600 text-sm font-medium text-white 
+             hover:bg-gray-800 w-auto max-w-full break-words whitespace-normal"
+  onClick={() => setSelectedCategory("")}
+ 
+>
+  Back to Categories
+</Button>
+
+
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {getServicesFromCategory(selectedCategory).map((service) => {
+            const isSelected = formData.services.some(
+              (s) => s.id === service.id
+            );
+
+            return (
+              <div
+                key={service.id}
+                onClick={() => handleServiceToggle(service)}
+                className={`p-4 rounded-lg border-2 cursor-pointer transition-luxury hover:shadow-luxury-hover ${
+                  isSelected
+                    ? "border-accent bg-accent/10 shadow-luxury"
+                    : "border-border hover:border-accent/50"
+                }`}
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <h5 className="font-semibold text-foreground text-sm">
+                      {service.name}
+                    </h5>
+                    <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                      {service.description}
+                    </p>
+                    <div className="flex items-center justify-between mt-2">
+                      <span className="text-xs text-muted-foreground">
+                        {service.duration}
+                      </span>
+                      {/* <span className="text-sm font-semibold text-accent">
+                      </span> */}
+                    </div>
+                  </div>
+                  <div
+                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ml-3 ${
+                      isSelected
+                        ? "bg-accent border-accent"
+                        : "border-muted-foreground"
+                    }`}
+                  >
+                    {isSelected && (
+                      <Icon
+                        name="Check"
+                        size={12}
+                        color="var(--color-accent-foreground)"
+                      />
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-border">
+          <Button
+            type="button"
+            variant="default"
+            size="sm"
+            onClick={handleFinishCategorySelection}
+            className="bg-accent text-accent-foreground hover:bg-accent/90"
+          >
+            <Icon name="Check" size={16} className="mr-2" />
+            Done with {selectedCategory}
+          </Button>
+
+          {getAvailableCategories().length > 1 && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleAddMoreCategories}
+              iconName="Plus"
+              iconPosition="left"
+            >
+              Add Services from Another Category
+            </Button>
+          )}
+        </div>
+      </div>
+    )}
+
+    {/* Add More Categories */}
+    {showAddMoreCategories && (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h4 className="text-lg font-semibold text-foreground">
+            Pick from Another Category
+            </h4>
+            <p className="text-sm text-muted-foreground">
+            Add services from a different category
+            </p>
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handleFinishCategorySelection}
+            iconName="X"
+          >
+            Finish Selection
+          </Button>
+        </div>
+
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+          {getAvailableCategories().map((category) => (
+            <div
+              key={category}
+              onClick={() => handleCategorySelect(category)}
+              className="p-4 rounded-lg border-2 border-border cursor-pointer transition-luxury hover:border-accent/50 hover:shadow-luxury-hover"
+            >
+              <div className="text-center">
+                <h5 className="font-semibold text-foreground capitalize mb-2">
+                  {category} Services
+                </h5>
+                <p className="text-xs text-muted-foreground">
+                  {groupedServices[category].length} service
+                  {groupedServices[category].length !== 1 ? "s" : ""} available
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
+
+    {/* Selected Services Summary */}
+    {formData.services.length > 0 && (
+      <div className="bg-muted rounded-lg p-4">
+        <div className="flex items-center justify-between mb-3">
+          <h5 className="font-semibold text-foreground">Selected Services</h5>
+          {formData.services.length > 0 && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleAddMoreCategories}
+              iconName="Plus"
+              iconPosition="left"
+            >
+              Add More Services
+            </Button>
+          )}
+        </div>
+
+        <div className="space-y-2">
+        {formData.services.map((service) => (
+  <div key={service.id} className="flex items-center justify-between text-lg">
+    <span className="text-accent font-semibold">{service.name}</span>
+  </div>
+))}
+
+        </div>
+      </div>
+    )}
+
+    {errors.services && (
+      <p className="text-error text-sm">{errors.services}</p>
+    )}
+  </div>
+</div>
+
 
       {/* Preferred Stylists */}
       <div className="bg-card rounded-lg border border-border p-6">

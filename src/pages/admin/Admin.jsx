@@ -1,11 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from '../../components/ui/Header';
 import Button from '../../components/ui/Button';
 import Icon from '../../components/AppIcon';
 import { appointmentsAPI, servicesAPI, stylistsAPI, clientsAPI, analyticsAPI, settingsAPI, productsAPI } from '../../services/api';
 import PaymentManagement from './components/PaymentManagement';
 import AdminManagement from './components/AdminManagement';
+import AdminSidebar from './components/AdminSidebar';
+import AdminHeader from './components/AdminHeader';
+import AdminDashboard from './components/AdminDashboard';
+import AdminProfile from './components/AdminProfile';
+import ServiceManagement from './components/ServiceManagement';
+import ProductManagement from './components/ProductManagement';
+import AppointmentManagement from './components/AppointmentManagement';
+import GalleryManagement from './components/GalleryManagement';
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -13,6 +20,7 @@ const Admin = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [adminRole, setAdminRole] = useState('admin');
+  const [adminUser, setAdminUser] = useState(null);
   const [data, setData] = useState({
     appointments: [],
     services: [],
@@ -20,12 +28,13 @@ const Admin = () => {
     clients: [],
     stats: [],
     settings: {},
-    products: []
+    products: [],
+    gallery: []
   });
   const [selectedItem, setSelectedItem] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState('');
-  const [editContext, setEditContext] = useState(''); // 'appointment' | 'service' | 'stylist'
+  const [editContext, setEditContext] = useState(''); // 'appointment' | 'stylist' only
   const [editData, setEditData] = useState({});
   const defaultProductCategories = ['shampoo','conditioner','treatment','styling','accessories'];
   const [productCategories, setProductCategories] = useState(defaultProductCategories);
@@ -39,6 +48,7 @@ const Admin = () => {
       try {
         const parsed = JSON.parse(admin);
         setAdminRole(parsed?.role || 'admin');
+        setAdminUser(parsed);
       } catch {}
       setIsAuthenticated(true);
     }
@@ -48,6 +58,21 @@ const Admin = () => {
     localStorage.removeItem('admin');
     localStorage.removeItem('adminToken');
     navigate('/login');
+  };
+
+  const handleUpdateProfile = async (profileData) => {
+    // Here you would call the API to update the admin profile
+    console.log('Updating profile:', profileData);
+    
+    // Update local state
+    setAdminUser(prev => ({
+      ...prev,
+      ...profileData
+    }));
+    
+    // Update localStorage
+    const updatedAdmin = { ...adminUser, ...profileData };
+    localStorage.setItem('admin', JSON.stringify(updatedAdmin));
   };
 
   // Load data from API
@@ -90,38 +115,34 @@ const Admin = () => {
     }
   }, [isAuthenticated]);
 
-  // Handle CRUD operations
+  // Handle CRUD operations for stylists and appointments only
   const handleAdd = (type) => {
-    setModalType('add');
-    setSelectedItem(null);
-    setEditContext(type);
-    // sensible defaults per context
-    if (type === 'appointment') {
-      setEditData({ client: '', service: '', date: '', time: '', status: 'pending' });
-    } else if (type === 'service') {
-      setEditData({ name: '', price: '', duration: '', category: '', status: 'active' });
-    } else if (type === 'stylist') {
-      setEditData({ name: '', specialty: '', experience: '', status: 'active' });
-    } else if (type === 'product') {
-      setEditData({ name: '', description: '', image: '', images: [], price: 0, originalPrice: 0, category: '', size: '', inStock: true, featured: false, bestSeller: false });
+    if (type === 'stylist' || type === 'appointment') {
+      setModalType('add');
+      setSelectedItem(null);
+      setEditContext(type);
+      // sensible defaults per context
+      if (type === 'appointment') {
+        setEditData({ client: '', service: '', date: '', time: '', status: 'pending' });
+      } else if (type === 'stylist') {
+        setEditData({ name: '', specialty: '', experience: '', status: 'active' });
+      }
+      setShowModal(true);
     }
-    setShowModal(true);
   };
 
   const handleEdit = (item, type) => {
-    setModalType('edit');
-    setSelectedItem(item);
-    setEditContext(type);
-    if (type === 'appointment') {
-      setEditData({ client: item.client, service: item.service, date: item.date, time: item.time, status: item.status });
-    } else if (type === 'service') {
-      setEditData({ name: item.name, price: item.price, duration: item.duration, category: item.category, status: item.status });
-    } else if (type === 'stylist') {
-      setEditData({ name: item.name, specialty: item.specialty, experience: item.experience, status: item.status });
-    } else if (type === 'product') {
-      setEditData({ name: item.name, description: item.description, image: item.image, images: item.images || (item.image ? [item.image] : []), price: item.price, originalPrice: item.originalPrice, category: item.category, size: item.size, inStock: item.inStock, featured: item.featured, bestSeller: item.bestSeller });
+    if (type === 'stylist' || type === 'appointment') {
+      setModalType('edit');
+      setSelectedItem(item);
+      setEditContext(type);
+      if (type === 'appointment') {
+        setEditData({ client: item.client, service: item.service, date: item.date, time: item.time, status: item.status });
+      } else if (type === 'stylist') {
+        setEditData({ name: item.name, specialty: item.specialty, experience: item.experience, status: item.status });
+      }
+      setShowModal(true);
     }
-    setShowModal(true);
   };
 
   const submitEdit = async (e) => {
@@ -133,31 +154,11 @@ const Admin = () => {
         } else {
           await appointmentsAPI.update(selectedItem.id, editData);
         }
-      } else if (editContext === 'service') {
-        if (modalType === 'add') {
-          await servicesAPI.create(editData);
-        } else {
-          await servicesAPI.update(selectedItem.id, editData);
-        }
       } else if (editContext === 'stylist') {
         if (modalType === 'add') {
           await stylistsAPI.create(editData);
         } else {
           await stylistsAPI.update(selectedItem.id, editData);
-        }
-      } else if (editContext === 'product') {
-        // Merge existing images with new ones on edit
-        let images = Array.isArray(editData.images) ? editData.images : [];
-        if (modalType === 'edit' && selectedItem && Array.isArray(selectedItem.images)) {
-          // Preserve existing images that are not overwritten
-          images = Array.from(new Set([...(selectedItem.images || []), ...images]));
-        }
-        const payload = { ...editData, images };
-        if (images.length > 0) payload.image = images[0];
-        if (modalType === 'add') {
-          await productsAPI.create(payload);
-        } else {
-          await productsAPI.update(selectedItem.id, payload);
         }
       }
       setShowModal(false);
@@ -257,95 +258,39 @@ const Admin = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <main className="pt-20 pb-16">
-        <div className="container mx-auto px-6 lg:px-8">
-          {/* Admin Header */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl font-heading font-bold text-foreground mb-2">
-                  Admin Dashboard
-                </h1>
-                <p className="text-muted-foreground">
-                  Manage your salon operations, appointments, and services
-                </p>
-              </div>
-              <Button
-                variant="outline"
-                onClick={handleLogout}
-                className="border-error text-error hover:bg-error hover:text-error-foreground"
-              >
-                <Icon name="LogOut" size={16} className="mr-2" />
-                Logout
-              </Button>
-            </div>
-          </div>
+    <div className="min-h-screen bg-background flex">
+      {/* Sidebar - Desktop Only */}
+      <div className="hidden lg:block">
+        <AdminSidebar 
+          activeTab={activeTab} 
+          setActiveTab={setActiveTab} 
+          adminRole={adminRole} 
+          onLogout={handleLogout} 
+        />
+      </div>
 
-          {/* Tab Navigation */}
-          <div className="flex flex-wrap gap-2 mb-8">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-luxury ${
-                  activeTab === tab.id
-                    ? 'bg-accent text-accent-foreground'
-                    : 'bg-muted text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                <Icon name={tab.icon} size={16} />
-                <span>{tab.label}</span>
-              </button>
-            ))}
-          </div>
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col min-h-screen">
+        {/* Mobile Header */}
+        <AdminHeader 
+          activeTab={activeTab} 
+          setActiveTab={setActiveTab} 
+          adminRole={adminRole} 
+          onLogout={handleLogout} 
+        />
+
+        {/* Main Content Area */}
+        <main className="flex-1 p-4 lg:p-8 overflow-y-auto">
+          <div className="max-w-7xl mx-auto">
 
           {/* Dashboard Content */}
           {activeTab === 'dashboard' && (
-            <div className="space-y-8">
-              {/* Stats Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {stats.map((stat) => (
-                  <div key={stat.title} className="bg-card border border-border rounded-lg p-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm text-muted-foreground">{stat.title}</p>
-                        <p className="text-2xl font-bold text-foreground">{stat.value}</p>
-                        <p className="text-xs text-success">{stat.change}</p>
-                      </div>
-                      <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center">
-                        <Icon name={stat.icon} size={24} className="text-accent" />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Recent Appointments */}
-              <div className="bg-card border border-border rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-foreground mb-4">Recent Appointments</h3>
-                <div className="space-y-3">
-                  {recentAppointments?.slice(0, 5).map((appointment) => (
-                    <div key={appointment.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-accent/10 rounded-full flex items-center justify-center">
-                          <Icon name="Calendar" size={16} className="text-accent" />
-                        </div>
-                        <div>
-                          <p className="font-medium text-foreground">{appointment.client}</p>
-                          <p className="text-sm text-muted-foreground">{appointment.service}</p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-sm font-medium text-foreground">{appointment.date}</p>
-                        <p className="text-xs text-muted-foreground">{appointment.time}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+            <AdminDashboard 
+              stats={stats}
+              recentAppointments={recentAppointments}
+              services={services}
+              stylists={stylists}
+            />
           )}
 
           {/* Payments Tab */}
@@ -381,7 +326,6 @@ const Admin = () => {
                     {services?.slice(0, 3).map((service) => (
                       <div key={service.id} className="flex items-center justify-between">
                         <span className="text-sm text-foreground">{service.name}</span>
-                        <span className="text-sm font-medium text-accent">${service.price}</span>
                       </div>
                     ))}
                   </div>
@@ -392,149 +336,129 @@ const Admin = () => {
 
           {/* Appointments Tab */}
           {activeTab === 'appointments' && (
-            <div className="bg-card border border-border rounded-lg p-6">
-                             <div className="flex items-center justify-between mb-6">
-                 <h3 className="text-lg font-semibold text-foreground">All Appointments</h3>
-                 <Button size="sm" onClick={() => handleAdd('appointment')}>
-                   <Icon name="Plus" size={16} className="mr-2" />
-                   Add Appointment
-                 </Button>
-               </div>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-border">
-                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Client</th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Service</th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Date & Time</th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Stylist</th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Status</th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {recentAppointments.map((appointment) => (
-                      <tr key={appointment.id} className="border-b border-border/50">
-                        <td className="py-3 px-4">
-                          <div>
-                            <p className="font-medium text-foreground">{appointment.client}</p>
-                          </div>
-                        </td>
-                        <td className="py-3 px-4 text-sm text-muted-foreground">{appointment.service}</td>
-                        <td className="py-3 px-4 text-sm text-muted-foreground">
-                          {appointment.date} at {appointment.time}
-                        </td>
-                        <td className="py-3 px-4 text-sm text-muted-foreground">Emma Rodriguez</td>
-                        <td className="py-3 px-4">
-                          <span className={`inline-flex items-center space-x-1 px-2 py-1 rounded-full text-xs ${getStatusColor(appointment.status)}`}>
-                            <Icon name={getStatusIcon(appointment.status)} size={12} />
-                            <span>{appointment.status}</span>
-                          </span>
-                        </td>
-                                                 <td className="py-3 px-4">
-                           <div className="flex items-center space-x-2">
-                             <Button 
-                               size="xs" 
-                               variant="outline"
-                               onClick={() => handleEdit(appointment, 'appointment')}
-                             >
-                               <Icon name="Edit" size={12} />
-                             </Button>
-                             <Button 
-                               size="xs" 
-                               variant="outline"
-                               onClick={() => handleDelete(appointment.id, 'appointment')}
-                             >
-                               <Icon name="Trash" size={12} />
-                             </Button>
-                           </div>
-                         </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+            <AppointmentManagement
+              appointments={recentAppointments}
+              onAdd={(data) => handleAdd('appointment', data)}
+              onEdit={(id, data) => handleEdit({ id, ...data }, 'appointment')}
+              onDelete={(id) => handleDelete(id, 'appointment')}
+              adminRole={adminRole}
+            />
           )}
 
           {/* Services Tab */}
           {activeTab === 'services' && (
-            <div className="bg-card border border-border rounded-lg p-6">
-                             <div className="flex items-center justify-between mb-6">
-                 <h3 className="text-lg font-semibold text-foreground">Services Management</h3>
-                 <Button size="sm" onClick={() => handleAdd('service')}>
-                   <Icon name="Plus" size={16} className="mr-2" />
-                   Add Service
-                 </Button>
-               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {services.map((service) => (
-                  <div key={service.id} className="border border-border rounded-lg p-4">
-                    <div className="flex items-start justify-between mb-3">
-                      <h4 className="font-medium text-foreground">{service.name}</h4>
-                      <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(service.status)}`}>
-                        {service.status}
-                      </span>
-                    </div>
-                      <div className="space-y-2 text-sm text-muted-foreground">
-                      <p>Price: {service.price}</p>
-                      <p>Duration: {service.duration}</p>
-                      <p>Category: {service.category}</p>
-                    </div>
-                    <div className="flex items-center space-x-2 mt-4">
-                      <Button size="xs" variant="outline" onClick={() => handleEdit(service, 'service')}>
-                        <Icon name="Edit" size={12} />
-                      </Button>
-                      {adminRole === 'super_admin' && (
-                        <Button size="xs" variant="outline" onClick={() => handleDelete(service.id, 'service')}>
-                          <Icon name="Trash" size={12} />
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <ServiceManagement
+              services={services}
+              onAdd={async (data) => {
+                try {
+                  await servicesAPI.create(data);
+                  await loadData();
+                } catch (error) {
+                  console.error('Error adding service:', error);
+                  alert('Failed to add service');
+                }
+              }}
+              onEdit={async (id, data) => {
+                try {
+                  await servicesAPI.update(id, data);
+                  await loadData();
+                } catch (error) {
+                  console.error('Error updating service:', error);
+                  alert('Failed to update service');
+                }
+              }}
+              onDelete={async (id) => {
+                try {
+                  await servicesAPI.delete(id);
+                  await loadData();
+                } catch (error) {
+                  console.error('Error deleting service:', error);
+                  alert('Failed to delete service');
+                }
+              }}
+              adminRole={adminRole}
+            />
           )}
 
           {/* Products Tab */}
           {activeTab === 'products' && (
-            <div className="bg-card border border-border rounded-lg p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-semibold text-foreground">Products Management</h3>
-                <Button size="sm" onClick={() => handleAdd('product')}>
-                  <Icon name="Plus" size={16} className="mr-2" />
-                  Add Product
-                </Button>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {products.map((p) => (
-                  <div key={p.id} className="border border-border rounded-lg p-4">
-                    <div className="flex items-start justify-between mb-3">
-                      <h4 className="font-medium text-foreground">{p.name}</h4>
-                      <span className={`text-xs px-2 py-1 rounded-full ${p.inStock ? 'text-success' : 'text-muted-foreground'}`}>
-                        {p.inStock ? 'in stock' : 'out of stock'}
-                      </span>
-                    </div>
-                    <div className="space-y-2 text-sm text-muted-foreground">
-                      <p>Price: ${p.price}</p>
-                      <p>Size: {p.size}</p>
-                      <p>Category: {p.category}</p>
-                    </div>
-                    <div className="flex items-center space-x-2 mt-4">
-                      <Button size="xs" variant="outline" onClick={() => handleEdit(p, 'product')}>
-                        <Icon name="Edit" size={12} />
-                      </Button>
-                      {adminRole === 'super_admin' && (
-                        <Button size="xs" variant="outline" onClick={() => handleDelete(p.id, 'product')}>
-                          <Icon name="Trash" size={12} />
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <ProductManagement
+              products={products}
+              onAdd={async (data) => {
+                try {
+                  await productsAPI.create(data);
+                  await loadData();
+                } catch (error) {
+                  console.error('Error adding product:', error);
+                  alert('Failed to add product');
+                }
+              }}
+              onEdit={async (id, data) => {
+                try {
+                  await productsAPI.update(id, data);
+                  await loadData();
+                } catch (error) {
+                  console.error('Error updating product:', error);
+                  alert('Failed to update product');
+                }
+              }}
+              onDelete={async (id) => {
+                try {
+                  await productsAPI.delete(id);
+                  await loadData();
+                } catch (error) {
+                  console.error('Error deleting product:', error);
+                  alert('Failed to delete product');
+                }
+              }}
+              adminRole={adminRole}
+            />
+          )}
+
+          {/* Gallery Tab */}
+          {activeTab === 'gallery' && (
+            <GalleryManagement
+              galleryItems={data.gallery}
+              onAdd={async (data) => {
+                try {
+                  // For now, just add to local state since we don't have a gallery API
+                  setData(prev => ({
+                    ...prev,
+                    gallery: [...prev.gallery, { ...data, id: Date.now() }]
+                  }));
+                } catch (error) {
+                  console.error('Error adding gallery item:', error);
+                  alert('Failed to add gallery item');
+                }
+              }}
+              onEdit={async (id, data) => {
+                try {
+                  // For now, just update local state since we don't have a gallery API
+                  setData(prev => ({
+                    ...prev,
+                    gallery: prev.gallery.map(item => 
+                      item.id === id ? { ...item, ...data } : item
+                    )
+                  }));
+                } catch (error) {
+                  console.error('Error updating gallery item:', error);
+                  alert('Failed to update gallery item');
+                }
+              }}
+              onDelete={async (id) => {
+                try {
+                  // For now, just update local state since we don't have a gallery API
+                  setData(prev => ({
+                    ...prev,
+                    gallery: prev.gallery.filter(item => item.id !== id)
+                  }));
+                } catch (error) {
+                  console.error('Error deleting gallery item:', error);
+                  alert('Failed to delete gallery item');
+                }
+              }}
+              adminRole={adminRole}
+            />
           )}
 
           {/* Stylists Tab */}
@@ -615,23 +539,6 @@ const Admin = () => {
                       </select>
                     </>
                   )}
-                  {editContext === 'service' && (
-                    <>
-                      <label className="block text-sm font-medium text-foreground">Name</label>
-                      <input className="w-full mt-1 p-2 border border-border rounded-md bg-background" value={editData.name} onChange={(e) => setEditData({ ...editData, name: e.target.value })} />
-                      <label className="block text-sm font-medium text-foreground">Price</label>
-                      <input type="number" className="w-full mt-1 p-2 border border-border rounded-md bg-background" value={editData.price} onChange={(e) => setEditData({ ...editData, price: Number(e.target.value) })} />
-                      <label className="block text-sm font-medium text-foreground">Duration</label>
-                      <input className="w-full mt-1 p-2 border border-border rounded-md bg-background" value={editData.duration} onChange={(e) => setEditData({ ...editData, duration: e.target.value })} />
-                      <label className="block text-sm font-medium text-foreground">Category</label>
-                      <input className="w-full mt-1 p-2 border border-border rounded-md bg-background" value={editData.category} onChange={(e) => setEditData({ ...editData, category: e.target.value })} />
-                      <label className="block text-sm font-medium text-foreground">Status</label>
-                      <select className="w-full mt-1 p-2 border border-border rounded-md bg-background" value={editData.status} onChange={(e) => setEditData({ ...editData, status: e.target.value })}>
-                        <option value="active">active</option>
-                        <option value="inactive">inactive</option>
-                      </select>
-                    </>
-                  )}
                   {editContext === 'stylist' && (
                     <>
                       <label className="block text-sm font-medium text-foreground">Name</label>
@@ -645,59 +552,6 @@ const Admin = () => {
                         <option value="active">active</option>
                         <option value="inactive">inactive</option>
                       </select>
-                    </>
-                  )}
-                  {editContext === 'product' && (
-                    <>
-                      <label className="block text-sm font-medium text-foreground">Name</label>
-                      <input className="w-full mt-1 p-2 border border-border rounded-md bg-background" value={editData.name} onChange={(e) => setEditData({ ...editData, name: e.target.value })} />
-                      <label className="block text-sm font-medium text-foreground">Description</label>
-                      <textarea className="w-full mt-1 p-2 border border-border rounded-md bg-background" value={editData.description} onChange={(e) => setEditData({ ...editData, description: e.target.value })} />
-                      <label className="block text-sm font-medium text-foreground">Images</label>
-                      <input type="file" multiple accept="image/*" className="w-full mt-1 p-2 border border-border rounded-md bg-background" onChange={(e) => {
-                        const files = Array.from(e.target.files || []);
-                        const readers = files.map(file => new Promise((resolve) => {
-                          const fr = new FileReader();
-                          fr.onload = () => resolve(fr.result);
-                          fr.readAsDataURL(file);
-                        }));
-                        Promise.all(readers).then(urls => setEditData(prev => ({ ...prev, images: urls })));
-                      }} />
-                      {Array.isArray(editData.images) && editData.images.length > 0 && (
-                        <div className="grid grid-cols-4 gap-2 mt-2">
-                          {editData.images.map((url, idx) => (
-                            <img key={idx} src={url} alt={`preview-${idx}`} className="w-full h-16 object-cover rounded" />
-                          ))}
-                        </div>
-                      )}
-                      <label className="block text-sm font-medium text-foreground">Price</label>
-                      <input type="number" className="w-full mt-1 p-2 border border-border rounded-md bg-background" value={editData.price} onChange={(e) => setEditData({ ...editData, price: Number(e.target.value) })} />
-                      <label className="block text-sm font-medium text-foreground">Original Price</label>
-                      <input type="number" className="w-full mt-1 p-2 border border-border rounded-md bg-background" value={editData.originalPrice} onChange={(e) => setEditData({ ...editData, originalPrice: Number(e.target.value) })} />
-                      <label className="block text-sm font-medium text-foreground">Category</label>
-                      <div className="flex items-center space-x-2">
-                        <select className="flex-1 p-2 border border-border rounded-md bg-background" value={editData.category || ''} onChange={(e) => setEditData({ ...editData, category: e.target.value })}>
-                          <option value="">Select category</option>
-                          {productCategories.map(cat => (
-                            <option key={cat} value={cat}>{cat.charAt(0).toUpperCase() + cat.slice(1)}</option>
-                          ))}
-                        </select>
-                        <Button size="xs" variant="outline" type="button" onClick={() => {
-                          const name = prompt('Enter new category name');
-                          if (name && name.trim()) {
-                            const normalized = name.trim().toLowerCase();
-                            setProductCategories(prev => Array.from(new Set([...(prev || []), normalized])));
-                            setEditData(prev => ({ ...prev, category: normalized }));
-                          }
-                        }}>New</Button>
-                      </div>
-                      <label className="block text-sm font-medium text-foreground">Size</label>
-                      <input className="w-full mt-1 p-2 border border-border rounded-md bg-background" value={editData.size} onChange={(e) => setEditData({ ...editData, size: e.target.value })} />
-                      <div className="grid grid-cols-2 gap-2">
-                        <label className="flex items-center space-x-2 text-sm"><input type="checkbox" checked={!!editData.inStock} onChange={(e) => setEditData({ ...editData, inStock: e.target.checked })} /> <span>In Stock</span></label>
-                        <label className="flex items-center space-x-2 text-sm"><input type="checkbox" checked={!!editData.featured} onChange={(e) => setEditData({ ...editData, featured: e.target.checked })} /> <span>Featured</span></label>
-                        <label className="flex items-center space-x-2 text-sm"><input type="checkbox" checked={!!editData.bestSeller} onChange={(e) => setEditData({ ...editData, bestSeller: e.target.checked })} /> <span>Best Seller</span></label>
-                      </div>
                     </>
                   )}
                   <div className="flex items-center justify-end space-x-2 pt-4">
@@ -758,12 +612,21 @@ const Admin = () => {
             </div>
           )}
 
+          {/* Profile Tab */}
+          {activeTab === 'profile' && (
+            <AdminProfile 
+              adminUser={adminUser} 
+              onUpdateProfile={handleUpdateProfile} 
+            />
+          )}
+
           {/* Admin Management Tab */}
           {activeTab === 'admin' && (
             <AdminManagement />
           )}
-        </div>
-      </main>
+          </div>
+        </main>
+      </div>
     </div>
   );
 };

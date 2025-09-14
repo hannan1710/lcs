@@ -243,7 +243,6 @@ const StylistDetailModal = ({ stylist, isOpen, onClose, onBookAppointment }) => 
           <div className="flex items-center space-x-4">
             <span className="text-sm text-muted-foreground">Starting from</span>
             <span className="font-heading text-xl font-semibold text-accent">
-              ${stylist?.startingPrice}
             </span>
           </div>
           <div className="flex items-center space-x-3">

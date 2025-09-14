@@ -121,7 +121,7 @@ const Header = () => {
             {/* Logo */}
             <Link
               to="/homepage"
-              className="flex items-center space-x-3 transition-luxury hover:opacity-80"
+              className="flex items-center space-x-0.5 transition-luxury hover:opacity-80"
               onClick={closeMobileMenu}
             >
               <img
@@ -131,12 +131,12 @@ const Header = () => {
               />
 
               <div className="flex flex-col">
-                <span className="font-heading font-semibold text-lg lg:text-xl text-primary">
-                  La Coiffure
+                <span className="font-heading font-bold text-lg lg:text-xl text-primary ">
+                  La Coiffure Salon
                 </span>
-                <span className="font-caption text-xs text-muted-foreground -mt-1">
-                  Luxury Salon
-                </span>
+                {/* <span className="font-caption text-s text-muted-foreground -mt-1">
+                   Salon
+                </span> */}
               </div>
             </Link>
 

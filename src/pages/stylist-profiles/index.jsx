@@ -25,7 +25,6 @@ const StylistProfiles = () => {
       experience: 12,
       rating: 4.8,
       reviewCount: 203,
-      startingPrice: 220,
       specialties: [
         "Hair Stylist",
         "Hair Color",
@@ -121,7 +120,6 @@ const StylistProfiles = () => {
       experience: 20,
       rating: 4.8,
       reviewCount: 203,
-      startingPrice: 220,
       specialties: [
         "Precision Cuts",
         "Men's Grooming",
@@ -199,7 +197,6 @@ const StylistProfiles = () => {
       experience: 5,
       rating: 4.9,
       reviewCount: 89,
-      startingPrice: 160,
       specialties: [
         "Hair Extensions",
         "Keratin Treatments",
@@ -277,7 +274,6 @@ const StylistProfiles = () => {
       experience: 10,
       rating: 4.7,
       reviewCount: 156,
-      startingPrice: 85,
       specialties: [
         "Men's Cuts",
         "Beard Styling",
@@ -363,7 +359,6 @@ const StylistProfiles = () => {
       experience: 9,
       rating: 4.8,
       reviewCount: 160,
-      startingPrice: 200,
       specialties: ["Pedicure", "Nails", "Manicure", "Hydra Facial"],
       bio: "Preety enhances natural beauty with elegant nail care and glowing skin treatments, perfect for brides and special events.",
       fullBio: `Preety is our versatile bridal and beauty specialist with 9 years of experience in event styling and personal care services. In addition to creating stunning bridal looks, she is skilled in pedicure, manicure, and hydra facial treatments that prepare clients for their most important moments.\n\nHer approach focuses on delivering a balanced mix of beauty and wellness. Whether it’s ensuring flawless nails for a wedding, providing a calming pedicure before a big event, or giving a hydra facial for radiant skin, Preety tailors each service to suit the occasion. She is known for her warm personality, attention to detail, and ability to create a luxurious experience that leaves clients feeling both confident and pampered.`,
@@ -443,7 +438,6 @@ const StylistProfiles = () => {
       experience: 11,
       rating: 4.9,
       reviewCount: 182,
-      startingPrice: 150,
       specialties: ["Pedicure", "Nails", "Manicure", "Hydra Facial"],
       bio: "Pooja specializes in advanced nail and skin care, offering luxurious pedicures, manicures, and hydra facials.",
       fullBio: `Pooja is our dedicated nail and skin care specialist with 11 years of experience in beauty and wellness treatments. She focuses on delivering professional pedicures, manicures, and advanced hydra facials that enhance both beauty and self-care.\n\nHer expertise lies in combining modern techniques with premium products to provide lasting results and a relaxing experience. Pooja is known for her precision in nail artistry, her attention to detail in hand and foot care, and her rejuvenating hydra facial treatments. She regularly attends workshops to stay updated with the latest beauty trends and skin care innovations. Clients appreciate her gentle approach, creativity, and commitment to making every session a pampering experience.`,

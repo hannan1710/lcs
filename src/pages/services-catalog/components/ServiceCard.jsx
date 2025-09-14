@@ -23,10 +23,9 @@ const ServiceCard = ({ service, onBookNow, onViewDetails }) => {
           <h3 className="font-heading font-semibold text-sm sm:text-base md:text-lg text-card-foreground group-hover:text-accent transition-luxury">
             {service?.name}
           </h3>
-          <div className="text-right">
+          {/* <div className="text-right">
             <p className="text-xs text-muted-foreground">Starting at</p>
-            <p className="font-semibold text-accent text-xs sm:text-sm md:text-base">${service?.startingPrice}</p>
-          </div>
+          </div> */}
         </div>
         
         <p className="text-muted-foreground text-xs sm:text-sm mb-2 sm:mb-3 md:mb-4 line-clamp-2">

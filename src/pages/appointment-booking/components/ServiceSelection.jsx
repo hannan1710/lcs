@@ -75,7 +75,6 @@ const ServiceSelection = ({ services, selectedServices, onServiceToggle }) => {
                         <span>{service?.duration}</span>
                       </div>
                       <div className="text-base sm:text-lg font-semibold text-accent">
-                        ${service?.price}
                       </div>
                     </div>
                   </div>

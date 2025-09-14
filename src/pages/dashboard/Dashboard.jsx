@@ -232,7 +232,6 @@ const Dashboard = () => {
                           </p>
                         </div>
                         <div className="text-left sm:text-right mt-4 sm:mt-0">
-                          <p className="font-medium text-foreground">${booking.price}</p>
                           <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(booking.status)} bg-muted`}>
                             {booking.status}
                           </span>

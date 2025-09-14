@@ -16,6 +16,7 @@ const CartPage = () => {
       setCart([]);
     }
     const handler = () => {
+      
       try {
         const saved = JSON.parse(localStorage.getItem('cart') || '[]');
         setCart(Array.isArray(saved) ? saved : []);
@@ -47,7 +48,7 @@ const CartPage = () => {
 
   const checkout = () => {
     const bookingData = {
-      selectedServices: cart.map(i => ({ name: i.name, price: i.price, duration: i.quantity + ' pcs' })),
+      selectedServices: cart.map(i => ({ name: i.name, duration: i.quantity + ' pcs' })),
       selectedStylist: { name: 'Online Purchase' },
       selectedDate: new Date().toISOString().split('T')[0],
       selectedTime: '',
@@ -77,7 +78,6 @@ const CartPage = () => {
                       <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded" />
                       <div>
                         <p className="font-medium text-foreground">{item.name}</p>
-                        <p className="text-sm text-muted-foreground">${item.price.toFixed(2)}</p>
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
@@ -110,6 +110,8 @@ const CartPage = () => {
 };
 
 export default CartPage;
+
+
 
 
 

@@ -40,7 +40,6 @@ const Routes = () => {
         {/* Authentication */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/admin-login" element={<Navigate to="/login" replace />} />
         
         {/* User Dashboard */}
         <Route path="/dashboard" element={<Dashboard />} />
