@@ -126,3 +126,4 @@ export const UserProvider = ({ children }) => {
 
 // Add display name for better debugging and HMR
 UserProvider.displayName = 'UserProvider';
+

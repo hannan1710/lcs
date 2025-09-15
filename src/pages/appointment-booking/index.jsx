@@ -81,9 +81,10 @@ const AppointmentBooking = () => {
             <h1 className="text-3xl lg:text-4xl font-heading font-bold text-foreground mb-4">
               Book Your Appointment
             </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Experience luxury hair care with our expert stylists. Complete your booking in one simple step.
-            </p>
+            <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
+  Please provide your details, and our team will contact you via call or WhatsApp to confirm your appointment.
+</p>
+
           </div>
 
           {/* Single Step Booking Form */}

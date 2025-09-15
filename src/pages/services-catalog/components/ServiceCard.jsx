@@ -3,7 +3,12 @@ import Image from '../../../components/AppImage';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 
-const ServiceCard = ({ service, onBookNow, onViewDetails }) => {
+const ServiceCard = ({ service, onBookNow, onViewDetails, categories = [] }) => {
+  // Get the category name from the category ID
+  const getCategoryName = (categoryId) => {
+    const category = categories.find(cat => cat.id === categoryId);
+    return category ? category.name : categoryId;
+  };
   return (
     <div className="bg-card rounded-lg shadow-luxury hover:shadow-luxury-hover transition-luxury-slow overflow-hidden group">
       <div className="relative h-24 sm:h-32 md:h-40 lg:h-48 overflow-hidden">
@@ -14,7 +19,7 @@ const ServiceCard = ({ service, onBookNow, onViewDetails }) => {
         />
         <div className="absolute top-2 right-2">
           <span className="bg-accent text-accent-foreground px-2 py-1 rounded-full text-xs font-medium">
-            {service?.category?.charAt(0)?.toUpperCase() + service?.category?.slice(1)}
+            {getCategoryName(service?.category)}
           </span>
         </div>
         {service?.featured && (

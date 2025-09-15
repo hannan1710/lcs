@@ -17,6 +17,8 @@ const AdminSidebar = ({ activeTab, setActiveTab, adminRole, onLogout }) => {
     { id: 'clients', label: 'Clients', icon: 'User', description: 'Customer database' },
     { id: 'payments', label: 'Payments', icon: 'CreditCard', description: 'Payment & refunds' },
     { id: 'analytics', label: 'Analytics', icon: 'BarChart', description: 'Reports & insights' },
+    { id: 'categories', label: 'Categories', icon: 'Tags', description: 'Service categories' },
+    { id: 'whatsapp', label: 'WhatsApp Test', icon: 'MessageCircle', description: 'Test notifications' },
     { id: 'profile', label: 'Profile', icon: 'UserCircle', description: 'Manage your profile' },
     ...(adminRole === 'super_admin' ? [
       { id: 'settings', label: 'Settings', icon: 'Settings', description: 'System configuration' },

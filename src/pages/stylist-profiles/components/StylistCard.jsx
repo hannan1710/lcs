@@ -25,7 +25,7 @@ const StylistCard = ({ stylist, onViewDetails, onBookAppointment }) => {
         )}
         {/* Experience Badge */}
         <div className="absolute -top-1 -right-1 bg-accent text-accent-foreground px-1 py-0.5 rounded-full text-[8px] font-medium">
-          {stylist?.experience}+
+          {stylist?.experience?.replace(' years', '')}+
         </div>
       </div>
       {/* Content */}
@@ -36,20 +36,20 @@ const StylistCard = ({ stylist, onViewDetails, onBookAppointment }) => {
             <h3 className="font-heading text-[9px] font-semibold text-foreground truncate">
               {stylist?.name}
             </h3>
-            <p className="text-accent font-medium text-[8px] truncate">{stylist?.title}</p>
+            <p className="text-accent font-medium text-[8px] truncate">{stylist?.specialty}</p>
           </div>
           <div className="flex flex-wrap gap-0.5">
-            {stylist?.specialties?.slice(0, 1)?.map((specialty, index) => (
+            {stylist?.services?.slice(0, 1)?.map((service, index) => (
               <span
                 key={index}
                 className="px-1 py-0.5 bg-secondary text-secondary-foreground text-[8px] rounded-full truncate"
               >
-                {specialty}
+                {service}
               </span>
             ))}
-            {stylist?.specialties?.length > 1 && (
+            {stylist?.services?.length > 1 && (
               <span className="px-1 py-0.5 bg-muted text-muted-foreground text-[8px] rounded-full">
-                +{stylist?.specialties?.length - 1}
+                +{stylist?.services?.length - 1}
               </span>
             )}
           </div>

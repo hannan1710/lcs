@@ -12,11 +12,15 @@ const apiCall = async (endpoint, options = {}) => {
       ...options,
     });
 
+    const data = await response.json();
+
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const error = new Error(data.message || `HTTP error! status: ${response.status}`);
+      error.response = { data, status: response.status };
+      throw error;
     }
 
-    return await response.json();
+    return data;
   } catch (error) {
     console.error('API call failed:', error);
     throw error;
@@ -89,8 +93,9 @@ export const adminAPI = {
 
 // Appointments API
 export const appointmentsAPI = {
-  getAll: async () => {
-    return apiCall('/appointments');
+  getAll: async (branch = null) => {
+    const url = branch ? `/appointments?branch=${branch}` : '/appointments';
+    return apiCall(url);
   },
 
   getById: async (id) => {
@@ -158,8 +163,9 @@ export const servicesAPI = {
 
 // Stylists API
 export const stylistsAPI = {
-  getAll: async () => {
-    return apiCall('/stylists');
+  getAll: async (branch = null) => {
+    const url = branch ? `/stylists?branch=${branch}` : '/stylists';
+    return apiCall(url);
   },
 
   getById: async (id) => {
@@ -220,8 +226,9 @@ export const clientsAPI = {
 
 // Analytics API
 export const analyticsAPI = {
-  getDashboardStats: async () => {
-    return apiCall('/analytics/dashboard');
+  getDashboardStats: async (branch = null) => {
+    const url = branch ? `/analytics/dashboard?branch=${branch}` : '/analytics/dashboard';
+    return apiCall(url);
   },
 
   getRevenueStats: async (period = 'month') => {

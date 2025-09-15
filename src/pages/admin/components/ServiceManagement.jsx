@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
 import Select from '../../../components/ui/Select';
@@ -6,6 +6,7 @@ import ImageUpload from '../../../components/ui/ImageUpload';
 import Icon from '../../../components/AppIcon';
 import { useCategory } from '../../../contexts/CategoryContext';
 import CategoryManagement from './CategoryManagement';
+import * as XLSX from 'xlsx';
 
 const ServiceManagement = ({ services, onAdd, onEdit, onDelete, adminRole }) => {
   const { categories, getCategoriesForSelect } = useCategory();
@@ -17,6 +18,11 @@ const ServiceManagement = ({ services, onAdd, onEdit, onDelete, adminRole }) => 
   const [showModal, setShowModal] = useState(false);
   const [editingService, setEditingService] = useState(null);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [importFile, setImportFile] = useState(null);
+  const [importType, setImportType] = useState('excel');
+  const [isImporting, setIsImporting] = useState(false);
+  const fileInputRef = useRef(null);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -140,6 +146,211 @@ const ServiceManagement = ({ services, onAdd, onEdit, onDelete, adminRole }) => 
     return statusOption?.color || 'text-muted-foreground';
   };
 
+  // Import functionality
+  const handleFileSelect = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImportFile(file);
+      const extension = file.name.split('.').pop().toLowerCase();
+      if (['csv'].includes(extension)) {
+        setImportType('csv');
+      } else if (['xlsx', 'xls'].includes(extension)) {
+        setImportType('excel');
+      } else if (['pdf'].includes(extension)) {
+        setImportType('pdf');
+      }
+    }
+  };
+
+  const parseCSV = (csvText) => {
+    const lines = csvText.split('\n');
+    const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+    const services = [];
+    
+    for (let i = 1; i < lines.length; i++) {
+      if (lines[i].trim()) {
+        const values = lines[i].split(',').map(v => v.trim());
+        const service = {};
+        
+        headers.forEach((header, index) => {
+          const value = values[index] || '';
+          const headerLower = header.toLowerCase();
+          
+          if (headerLower.includes('name')) {
+            service.name = value;
+          } else if (headerLower.includes('price')) {
+            service.price = parseFloat(value) || 0;
+          } else if (headerLower.includes('duration')) {
+            service.duration = value || '';
+          } else if (headerLower.includes('category')) {
+            service.category = value || '';
+          } else if (headerLower.includes('description')) {
+            service.description = value || '';
+          } else if (headerLower.includes('status')) {
+            service.status = value || 'active';
+          }
+        });
+        
+        if (service.name) {
+          // Ensure all fields are present, even if empty
+          const completeService = {
+            name: service.name || '',
+            price: service.price || '',
+            duration: service.duration || '',
+            category: service.category || 'other', // Default to 'other' category if empty
+            description: service.description || '',
+            status: service.status || 'active',
+            image: '',
+            tags: '',
+            featured: false
+          };
+          services.push(completeService);
+        }
+      }
+    }
+    
+    return services;
+  };
+
+  const parseExcel = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const sheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[sheetName];
+          const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+          
+          if (jsonData.length < 2) {
+            reject(new Error('Excel file must have at least a header row and one data row'));
+            return;
+          }
+          
+          const headers = jsonData[0].map(h => h ? h.toString().trim().toLowerCase() : '');
+          const services = [];
+          
+          for (let i = 1; i < jsonData.length; i++) {
+            const row = jsonData[i];
+            if (row.some(cell => cell !== undefined && cell !== '')) {
+              const service = {};
+              
+              headers.forEach((header, index) => {
+                const value = row[index] ? row[index].toString().trim() : '';
+                const headerLower = header.toLowerCase();
+                
+                if (headerLower.includes('name')) {
+                  service.name = value;
+                } else if (headerLower.includes('price')) {
+                  service.price = parseFloat(value) || 0;
+                } else if (headerLower.includes('duration')) {
+                  service.duration = value;
+                } else if (headerLower.includes('category')) {
+                  service.category = value;
+                } else if (headerLower.includes('description')) {
+                  service.description = value;
+                } else if (headerLower.includes('status')) {
+                  service.status = value || 'active';
+                }
+              });
+              
+              if (service.name) {
+                // Ensure all fields are present, even if empty
+                const completeService = {
+                  name: service.name || '',
+                  price: service.price || '',
+                  duration: service.duration || '',
+                  category: service.category || 'other', // Default to 'other' category if empty
+                  description: service.description || '',
+                  status: service.status || 'active',
+                  image: '',
+                  tags: '',
+                  featured: false
+                };
+                services.push(completeService);
+              }
+            }
+          }
+          
+          resolve(services);
+        } catch (error) {
+          reject(error);
+        }
+      };
+      reader.onerror = () => reject(new Error('Failed to read Excel file'));
+      reader.readAsArrayBuffer(file);
+    });
+  };
+
+  const handleImport = async () => {
+    if (!importFile) return;
+    
+    setIsImporting(true);
+    try {
+      let servicesToImport = [];
+      
+      if (importType === 'csv') {
+        const text = await importFile.text();
+        servicesToImport = parseCSV(text);
+      } else if (importType === 'excel') {
+        servicesToImport = await parseExcel(importFile);
+      } else if (importType === 'pdf') {
+        // For PDF files, show instructions for manual entry
+        alert('PDF files cannot be automatically parsed. Please convert your PDF to Excel or CSV format, or manually add services using the "Add New Service" button.');
+        setIsImporting(false);
+        return;
+      }
+      
+      // Validate and clean up services before importing
+      const validCategoryIds = categories.map(cat => cat.id);
+      const cleanedServices = servicesToImport.map(service => ({
+        ...service,
+        category: validCategoryIds.includes(service.category) ? service.category : 'other'
+      }));
+      
+      // Import services one by one
+      for (const service of cleanedServices) {
+        try {
+          await onAdd(service);
+        } catch (error) {
+          console.error('Error importing service:', service.name, error);
+        }
+      }
+      
+      alert(`Successfully imported ${cleanedServices.length} services!`);
+      setShowImportModal(false);
+      setImportFile(null);
+    } catch (error) {
+      console.error('Error importing file:', error);
+      alert(`Error importing file: ${error.message}. Please check the format and try again.`);
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
+  // Function to fix existing services with invalid categories
+  const fixInvalidCategories = () => {
+    const validCategoryIds = categories.map(cat => cat.id);
+    const updatedServices = services.map(service => {
+      if (service.category && !validCategoryIds.includes(service.category)) {
+        return { ...service, category: 'other' };
+      }
+      return service;
+    });
+    
+    // Update the services in the parent component
+    if (onEdit) {
+      updatedServices.forEach(service => {
+        if (service.category === 'other' && !validCategoryIds.includes(service.category)) {
+          onEdit(service.id, { category: 'other' });
+        }
+      });
+    }
+    
+    alert('Invalid categories have been fixed! Services with invalid categories have been assigned to "Other" category.');
+  };
+
   return (
     <div className="space-y-6">
       {/* Header with Actions */}
@@ -151,11 +362,27 @@ const ServiceManagement = ({ services, onAdd, onEdit, onDelete, adminRole }) => 
         <div className="flex gap-2">
           <Button 
             variant="outline" 
+            onClick={() => setShowImportModal(true)} 
+            className="w-fit"
+          >
+            <Icon name="Upload" size={16} className="mr-2" />
+            Import Services
+          </Button>
+          <Button 
+            variant="outline" 
             onClick={() => setShowCategoryModal(true)} 
             className="w-fit"
           >
             <Icon name="Tags" size={16} className="mr-2" />
             Manage Categories
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={fixInvalidCategories}
+            className="w-fit bg-yellow-50 border-yellow-200 text-yellow-800 hover:bg-yellow-100"
+          >
+            <Icon name="Wrench" size={16} className="mr-2" />
+            Fix Categories
           </Button>
           <Button onClick={handleAdd} className="w-fit">
             <Icon name="Plus" size={16} className="mr-2" />
@@ -528,6 +755,133 @@ const ServiceManagement = ({ services, onAdd, onEdit, onDelete, adminRole }) => 
             </div>
             <div className="p-6">
               <CategoryManagement adminRole={adminRole} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Import Services Modal */}
+      {showImportModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-card border border-border rounded-lg p-6 w-full max-w-md">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-semibold text-foreground">Import Services</h3>
+              <Button variant="ghost" size="sm" onClick={() => setShowImportModal(false)}>
+                <Icon name="X" size={16} />
+              </Button>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">File Type</label>
+                <select
+                  value={importType}
+                  onChange={(e) => setImportType(e.target.value)}
+                  className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
+                >
+                  <option value="excel">Excel File (.xlsx)</option>
+                  <option value="csv">CSV File</option>
+                  <option value="pdf">PDF File</option>
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">Select File</label>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept={importType === 'csv' ? '.csv' : importType === 'excel' ? '.xlsx,.xls' : '.pdf'}
+                  onChange={handleFileSelect}
+                  className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
+                />
+                {importFile && (
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Selected: {importFile.name}
+                  </p>
+                )}
+              </div>
+              
+              {importType === 'excel' && (
+                <div className="bg-muted/50 p-3 rounded-lg">
+                  <h4 className="text-sm font-medium text-foreground mb-2">Excel File Support:</h4>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    Your Excel file should have these columns (in any order):
+                  </p>
+                  <ul className="text-xs text-muted-foreground space-y-1">
+                    <li>• <strong>Name</strong> (required)</li>
+                    <li>• Price (optional)</li>
+                    <li>• Duration (optional)</li>
+                    <li>• Category (optional)</li>
+                    <li>• Description (optional)</li>
+                    <li>• Status (optional)</li>
+                  </ul>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Only Name is required. All other columns are optional.
+                  </p>
+                </div>
+              )}
+              
+              {importType === 'csv' && (
+                <div className="bg-muted/50 p-3 rounded-lg">
+                  <h4 className="text-sm font-medium text-foreground mb-2">CSV Format Requirements:</h4>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    Your CSV should have these columns (in any order):
+                  </p>
+                  <ul className="text-xs text-muted-foreground space-y-1">
+                    <li>• <strong>Name</strong> (required)</li>
+                    <li>• Price (optional)</li>
+                    <li>• Duration (optional)</li>
+                    <li>• Category (optional)</li>
+                    <li>• Description (optional)</li>
+                    <li>• Status (optional)</li>
+                  </ul>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Only Name is required. All other columns are optional.
+                  </p>
+                </div>
+              )}
+              
+              {importType === 'pdf' && (
+                <div className="bg-yellow-50 border border-yellow-200 p-3 rounded-lg">
+                  <div className="flex items-start">
+                    <Icon name="AlertTriangle" size={16} className="text-yellow-600 mr-2 mt-0.5" />
+                    <div>
+                      <h4 className="text-sm font-medium text-yellow-800">PDF Import Notice</h4>
+                      <p className="text-xs text-yellow-700 mt-1">
+                        PDF files cannot be automatically parsed. Please convert your PDF to Excel or CSV format, or manually add services using the "Add New Service" button.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              <div className="flex space-x-3 pt-4">
+                <Button
+                  onClick={handleImport}
+                  disabled={!importFile || isImporting}
+                  className="flex-1"
+                >
+                  {isImporting ? (
+                    <>
+                      <Icon name="Loader" size={16} className="mr-2 animate-spin" />
+                      Importing...
+                    </>
+                  ) : (
+                    <>
+                      <Icon name="Upload" size={16} className="mr-2" />
+                      Import Services
+                    </>
+                  )}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowImportModal(false)}
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+              </div>
             </div>
           </div>
         </div>

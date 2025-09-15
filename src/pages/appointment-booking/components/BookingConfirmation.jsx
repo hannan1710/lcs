@@ -57,8 +57,8 @@ const BookingConfirmation = ({ bookingData, onNewBooking, onGoHome }) => {
                 bookingData.whatsappSent ? "text-success" : "text-warning"
               }`}>
                 {bookingData.whatsappSent 
-                  ? "WhatsApp notification sent to branch" 
-                  : "WhatsApp notification pending"
+                  ? `Notification sent to branch (${bookingData?.confirmationMethod === 'whatsapp' ? 'WhatsApp' : 'Phone Call'} confirmation)` 
+                  : "Notification pending"
                 }
               </p>
             </div>
@@ -109,6 +109,20 @@ const BookingConfirmation = ({ bookingData, onNewBooking, onGoHome }) => {
                 <div>
                   <p className="font-medium text-foreground">(555) 123-4567</p>
                   <p className="text-sm text-muted-foreground">Salon Phone</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center space-x-3">
+                <Icon 
+                  name={bookingData?.confirmationMethod === 'whatsapp' ? "MessageCircle" : "Phone"} 
+                  size={20} 
+                  className={bookingData?.confirmationMethod === 'whatsapp' ? "text-green-500" : "text-blue-500"} 
+                />
+                <div>
+                  <p className="font-medium text-foreground">
+                    {bookingData?.confirmationMethod === 'whatsapp' ? 'WhatsApp' : 'Phone Call'}
+                  </p>
+                  <p className="text-sm text-muted-foreground">Confirmation Method</p>
                 </div>
               </div>
             </div>

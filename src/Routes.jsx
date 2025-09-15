@@ -6,6 +6,7 @@ import { GalleryProvider } from "./contexts/GalleryContext";
 import { ServiceProvider } from "./contexts/ServiceContext";
 import { CategoryProvider } from "./contexts/CategoryContext";
 import { UserProvider } from "./contexts/UserContext";
+import { BranchProvider } from "./contexts/BranchContext";
 import NotFound from "pages/NotFound";
 import AboutUs from './pages/about-us';
 import GalleryPortfolio from './pages/gallery-portfolio';
@@ -33,7 +34,8 @@ const Routes = () => {
           <ServiceProvider>
             <CategoryProvider>
               <UserProvider>
-                <ScrollToTop />
+                <BranchProvider>
+                  <ScrollToTop />
             <RouterRoutes>
         {/* Main Pages */}
         <Route path="/" element={<Homepage />} />
@@ -67,6 +69,7 @@ const Routes = () => {
         {/* 404 */}
         <Route path="*" element={<NotFound />} />
             </RouterRoutes>
+                </BranchProvider>
               </UserProvider>
             </CategoryProvider>
           </ServiceProvider>

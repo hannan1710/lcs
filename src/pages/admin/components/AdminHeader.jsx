@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
+import BranchSelector from './BranchSelector';
+import BranchAccessManager from './BranchAccessManager';
 
 const AdminHeader = ({ activeTab, setActiveTab, adminRole, onLogout }) => {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -28,8 +30,12 @@ const AdminHeader = ({ activeTab, setActiveTab, adminRole, onLogout }) => {
       <div className="lg:hidden bg-card border-b border-border px-4 py-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-accent/80 flex items-center justify-center">
-              <Icon name="Shield" size={16} className="text-accent-foreground" />
+            <div className="w-8 h-8 flex items-center justify-center">
+              <img 
+                src="/lcsg.png" 
+                alt="La Coiffure Salon Logo" 
+                className="w-full h-full object-contain"
+              />
             </div>
             <div>
               <h1 className="font-heading font-bold text-lg text-foreground">Admin Panel</h1>
@@ -38,6 +44,7 @@ const AdminHeader = ({ activeTab, setActiveTab, adminRole, onLogout }) => {
           </div>
           
           <div className="flex items-center space-x-2">
+            <BranchSelector />
             <Button
               variant="outline"
               size="sm"
@@ -87,31 +94,27 @@ const AdminHeader = ({ activeTab, setActiveTab, adminRole, onLogout }) => {
       {/* Desktop Header - Hidden on mobile */}
       <div className="hidden lg:block bg-card border-b border-border px-6 py-4">
         <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-heading font-bold text-foreground">
-              {tabs.find(tab => tab.id === activeTab)?.label || 'Admin Dashboard'}
-            </h1>
-            <p className="text-muted-foreground">
-              {tabs.find(tab => tab.id === activeTab)?.description || 'Manage your salon operations'}
-            </p>
+          <div className="flex items-center space-x-4">
+            <div className="w-10 h-10 flex items-center justify-center">
+              <img 
+                src="/lcsg.png" 
+                alt="La Coiffure Salon Logo" 
+                className="w-full h-full object-contain"
+              />
+            </div>
+            <div>
+              <h1 className="text-2xl font-heading font-bold text-foreground">
+                {tabs.find(tab => tab.id === activeTab)?.label || 'Admin Dashboard'}
+              </h1>
+              <p className="text-muted-foreground">
+                {tabs.find(tab => tab.id === activeTab)?.description || 'Manage your salon operations'}
+              </p>
+            </div>
           </div>
           
           <div className="flex items-center space-x-4">
-            {/* Quick Stats */}
-            <div className="hidden xl:flex items-center space-x-6">
-              <div className="text-center">
-                <p className="text-2xl font-bold text-foreground">24</p>
-                <p className="text-xs text-muted-foreground">Today's Appointments</p>
-              </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-success">$2,450</p>
-                <p className="text-xs text-muted-foreground">Today's Revenue</p>
-              </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-accent">12</p>
-                <p className="text-xs text-muted-foreground">Pending Tasks</p>
-              </div>
-            </div>
+            {/* Branch Selector */}
+            <BranchSelector />
 
             {/* Admin User Info */}
             <div className="flex items-center space-x-3">

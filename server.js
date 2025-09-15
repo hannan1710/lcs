@@ -62,7 +62,7 @@ const sendWhatsAppMessage = async (to, message, branch = 'powai') => {
 };
 
 const sendBranchNotification = async (appointmentData) => {
-  const { branch, fullName, mobileNumber, selectedDate, selectedTime, bookingType } = appointmentData;
+  const { branch, fullName, mobileNumber, selectedDate, selectedTime, bookingType, confirmationMethod } = appointmentData;
   
   // Get the appropriate WhatsApp number for the branch
   const branchNumber = WHATSAPP_CONFIG.BRANCH_NUMBERS[branch];
@@ -81,12 +81,14 @@ const sendBranchNotification = async (appointmentData) => {
   });
   
   // Create the message
+  const confirmationMethodText = confirmationMethod === 'whatsapp' ? 'WhatsApp' : 'Phone Call';
   const message = `🎉 *New Booking Alert - ${branch.toUpperCase()} Branch*
 
 👤 *Client Details:*
 • Name: ${fullName}
 • Phone: ${mobileNumber}
 • Booking Type: ${bookingType}
+• Confirmation Method: ${confirmationMethodText}
 
 📅 *Appointment Details:*
 • Date: ${appointmentDate}
@@ -94,8 +96,9 @@ const sendBranchNotification = async (appointmentData) => {
 • Branch: ${branch === 'powai' ? 'Powai (Galleria)' : 'Thane (Anand Nagar)'}
 
 📱 *Contact Client:* ${mobileNumber}
+${confirmationMethod === 'whatsapp' ? '💬 *Client prefers WhatsApp confirmation*' : '📞 *Client prefers phone call confirmation*'}
 
-Please confirm this appointment with the client.
+Please confirm this appointment with the client using their preferred method.
 
 ---
 La Coiffure Salon - ${branch.toUpperCase()} Branch`;
@@ -111,7 +114,9 @@ Your appointment is confirmed:
 ⏰ Time: ${selectedTime}
 📍 Branch: ${branch === 'powai' ? 'Powai (Galleria)' : 'Thane (Anand Nagar)'}
 
-We'll contact you soon to confirm the details.
+${confirmationMethod === 'whatsapp' 
+  ? '💬 We\'ll send you a WhatsApp confirmation shortly.' 
+  : '📞 We\'ll call you soon to confirm the details.'}
 
 La Coiffure Salon Team`;
 
@@ -261,15 +266,20 @@ let services = [
 ];
 
 let stylists = [
+  // Powai Branch Stylists
   {
     id: 1,
     name: 'Emma Rodriguez',
     specialty: 'Color Specialist',
     experience: '8 years',
     status: 'active',
+    branch: 'powai',
     image: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=200&h=200&fit=crop&crop=face',
     rating: 4.9,
-    reviewCount: 127
+    reviewCount: 127,
+    bio: 'Emma specializes in color transformations and has been with La Coiffure for 8 years.',
+    services: ['Hair Coloring', 'Highlights', 'Balayage', 'Color Correction'],
+    availability: 'Monday-Friday, 9AM-6PM'
   },
   {
     id: 2,
@@ -277,29 +287,72 @@ let stylists = [
     specialty: 'Cutting Expert',
     experience: '12 years',
     status: 'active',
+    branch: 'powai',
     image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face',
     rating: 4.8,
-    reviewCount: 89
+    reviewCount: 89,
+    bio: 'David is our master cutter with 12 years of experience in precision cutting.',
+    services: ['Hair Cutting', 'Styling', 'Men\'s Grooming', 'Beard Trimming'],
+    availability: 'Tuesday-Saturday, 10AM-7PM'
   },
   {
     id: 3,
     name: 'Sophia Martinez',
-    specialty: 'Styling Specialist',
+    specialty: 'Bridal Specialist',
     experience: '6 years',
     status: 'active',
+    branch: 'powai',
     image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop&crop=face',
     rating: 4.7,
-    reviewCount: 156
+    reviewCount: 156,
+    bio: 'Sophia creates magical bridal looks and specializes in special occasion styling.',
+    services: ['Bridal Hair', 'Makeup', 'Special Occasion', 'Hair Styling'],
+    availability: 'Monday-Sunday, 8AM-8PM'
   },
+  // Thane Branch Stylists
   {
     id: 4,
     name: 'James Wilson',
     specialty: 'Men\'s Grooming',
     experience: '10 years',
     status: 'active',
+    branch: 'thane',
     image: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=200&h=200&fit=crop&crop=face',
     rating: 4.9,
-    reviewCount: 203
+    reviewCount: 203,
+    bio: 'James is our men\'s grooming expert with a focus on modern cuts and styling.',
+    services: ['Men\'s Haircut', 'Beard Styling', 'Hair Styling', 'Grooming'],
+    availability: 'Monday-Friday, 9AM-6PM'
+  },
+  // Additional Powai Stylists
+  {
+    id: 5,
+    name: 'Priya Sharma',
+    specialty: 'Hair Treatments',
+    experience: '5 years',
+    status: 'active',
+    branch: 'powai',
+    image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop&crop=face',
+    rating: 4.6,
+    reviewCount: 67,
+    bio: 'Priya specializes in hair treatments and scalp care for healthy, beautiful hair.',
+    services: ['Hair Treatments', 'Scalp Care', 'Hair Masks', 'Keratin Treatment'],
+    availability: 'Monday-Friday, 9AM-5PM'
+  },
+  // Additional Thane Stylists
+  {
+    id: 6,
+    name: 'Rajesh Kumar',
+    specialty: 'Hair Cutting',
+    experience: '11 years',
+    status: 'active',
+    branch: 'thane',
+    image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop&crop=face',
+    rating: 4.7,
+    reviewCount: 89,
+    bio: 'Rajesh is our senior stylist with expertise in all types of hair cutting techniques.',
+    services: ['Hair Cutting', 'Hair Styling', 'Hair Consultation', 'Hair Care'],
+    availability: 'Monday-Saturday, 9AM-7PM'
   }
 ];
 
@@ -752,21 +805,58 @@ const getCardBrand = (cardNumber) => {
 app.post('/api/auth/login', (req, res) => {
   const { email, password } = req.body;
   
-  // Mock authentication
-  if (email === 'user@example.com' && password === 'password123') {
-    res.json({
-      success: true,
-      user: {
-        id: 1,
-        name: 'John Doe',
-        email: email,
-        role: 'client'
-      },
-      token: 'mock-jwt-token'
+  // Mock user data
+  const users = [
+    {
+      id: 1,
+      name: 'John Doe',
+      email: 'user@example.com',
+      password: 'password123',
+      role: 'client'
+    },
+    {
+      id: 2,
+      name: 'Sarah Johnson',
+      email: 'sarah@example.com',
+      password: 'sarah123',
+      role: 'client'
+    },
+    {
+      id: 3,
+      name: 'Hannan',
+      email: 'shahista@lacoiffure.com',
+      password: 'shahi123',
+      role: 'client'
+    }
+  ];
+  
+  // Find user by email
+  const user = users.find(u => u.email === email);
+  
+  if (!user) {
+    return res.status(401).json({ 
+      success: false, 
+      message: 'Email not found. Please check your email address.' 
     });
-  } else {
-    res.status(401).json({ success: false, message: 'Invalid credentials' });
   }
+  
+  if (user.password !== password) {
+    return res.status(401).json({ 
+      success: false, 
+      message: 'Incorrect password. Please check your password.' 
+    });
+  }
+  
+  res.json({
+    success: true,
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role
+    },
+    token: 'mock-jwt-token'
+  });
 });
 
 app.post('/api/auth/register', (req, res) => {
@@ -790,23 +880,33 @@ app.post('/api/auth/admin-login', (req, res) => {
   // Find admin by username OR email (supports passing email in the username field)
   const admin = admins.find(a => a.username === username || a.email === username || a.email === email);
   
-  if (admin && admin.password === password) {
-    // Update last login time
-    admin.lastLogin = new Date().toISOString();
-    
-    res.json({
-      success: true,
-      user: {
-        id: admin.id,
-        username: admin.username,
-        email: admin.email,
-        role: admin.role
-      },
-      token: 'mock-admin-jwt-token'
+  if (!admin) {
+    return res.status(401).json({ 
+      success: false, 
+      message: 'Username or email not found. Please check your credentials.' 
     });
-  } else {
-    res.status(401).json({ success: false, message: 'Invalid admin credentials' });
   }
+  
+  if (admin.password !== password) {
+    return res.status(401).json({ 
+      success: false, 
+      message: 'Incorrect password. Please check your password.' 
+    });
+  }
+  
+  // Update last login time
+  admin.lastLogin = new Date().toISOString();
+  
+  res.json({
+    success: true,
+    user: {
+      id: admin.id,
+      username: admin.username,
+      email: admin.email,
+      role: admin.role
+    },
+    token: 'mock-admin-jwt-token'
+  });
 });
 
 app.post('/api/auth/logout', (req, res) => {
@@ -987,7 +1087,7 @@ app.post('/api/appointments', async (req, res) => {
     
     // Send WhatsApp notification to the appropriate branch
     if (newAppointment.branch && newAppointment.mobileNumber) {
-      console.log(`Sending WhatsApp notification for ${newAppointment.branch} branch...`);
+      console.log(`Sending WhatsApp notification for ${newAppointment.branch} branch with ${newAppointment.confirmationMethod || 'whatsapp'} confirmation...`);
       const whatsappResult = await sendBranchNotification(newAppointment);
       
       if (whatsappResult.success) {
@@ -1094,7 +1194,20 @@ app.delete('/api/services/:id', (req, res) => {
 
 // Stylists endpoints
 app.get('/api/stylists', (req, res) => {
-  res.json(stylists);
+  const { branch } = req.query;
+  
+  let filteredStylists = stylists;
+  
+  // Filter by branch if specified
+  if (branch) {
+    filteredStylists = stylists.filter(stylist => stylist.branch === branch);
+  }
+  
+  res.json({
+    stylists: filteredStylists,
+    total: filteredStylists.length,
+    branch: branch || 'all'
+  });
 });
 
 app.get('/api/stylists/:id', (req, res) => {
@@ -1184,8 +1297,15 @@ app.delete('/api/clients/:id', (req, res) => {
 
 // Analytics endpoints
 app.get('/api/analytics/dashboard', (req, res) => {
-  const totalAppointments = appointments.length;
-  const totalRevenue = appointments.reduce((sum, apt) => sum + apt.price, 0);
+  const { branch } = req.query;
+  
+  let filteredAppointments = appointments;
+  if (branch) {
+    filteredAppointments = appointments.filter(apt => apt.branch === branch);
+  }
+  
+  const totalAppointments = filteredAppointments.length;
+  const totalRevenue = filteredAppointments.reduce((sum, apt) => sum + apt.price, 0);
   const activeClients = clients.length;
   const totalServices = services.length;
 

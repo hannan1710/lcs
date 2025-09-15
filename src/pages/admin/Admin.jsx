@@ -18,11 +18,17 @@ import CategoryManagement from './components/CategoryManagement';
 import ErrorBoundary from '../../components/ErrorBoundary';
 import { useGallery } from '../../contexts/GalleryContext';
 import { useService } from '../../contexts/ServiceContext';
+import { useBranch } from '../../contexts/BranchContext';
+import BranchSelector from './components/BranchSelector';
+import AdminLogin from './components/AdminLogin';
+import AdminUserManagement from './components/AdminUserManagement';
+import ClientManagement from './components/ClientManagement';
 
 const Admin = () => {
   const navigate = useNavigate();
   const { galleryData, addGalleryItem, updateGalleryItem, deleteGalleryItem } = useGallery();
   const { services: contextServices, addService, updateService, deleteService } = useService();
+  const { currentBranch, getCurrentBranchData, isSuperAdmin } = useBranch();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isLoading, setIsLoading] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -56,6 +62,17 @@ const Admin = () => {
         const parsed = JSON.parse(admin);
         setAdminRole(parsed?.role || 'admin');
         setAdminUser(parsed);
+        
+        // Set up branch permissions if not already set
+        if (!parsed.branches) {
+          const updatedAdmin = {
+            ...parsed,
+            branches: ['powai', 'thane'], // Give access to all branches by default
+            role: 'super_admin'
+          };
+          localStorage.setItem('admin', JSON.stringify(updatedAdmin));
+          setAdminUser(updatedAdmin);
+        }
       } catch {}
       setIsAuthenticated(true);
     }
@@ -86,24 +103,26 @@ const Admin = () => {
   const loadData = async () => {
     setIsLoading(true);
     try {
-      const [appointmentsResponse, services, stylists, clients, analytics, settings, products] = await Promise.all([
-        appointmentsAPI.getAll().catch(err => {
-          console.error('Error loading appointments:', err);
-          return { appointments: [] };
-        }),
+      // Load appointments filtered by current branch
+      const appointmentsResponse = await appointmentsAPI.getAll(currentBranch).catch(err => {
+        console.error('Error loading appointments:', err);
+        return { appointments: [] };
+      });
+      
+      const [services, stylists, clients, analytics, settings, products] = await Promise.all([
         servicesAPI.getAll().catch(err => {
           console.error('Error loading services:', err);
           return [];
         }),
-        stylistsAPI.getAll().catch(err => {
+        stylistsAPI.getAll(currentBranch).catch(err => {
           console.error('Error loading stylists:', err);
-          return [];
+          return { stylists: [] };
         }),
         clientsAPI.getAll().catch(err => {
           console.error('Error loading clients:', err);
           return [];
         }),
-        analyticsAPI.getDashboardStats().catch(err => {
+        analyticsAPI.getDashboardStats(currentBranch).catch(err => {
           console.error('Error loading analytics:', err);
           return { stats: [] };
         }),
@@ -120,7 +139,7 @@ const Admin = () => {
       setData({
         appointments: appointmentsResponse?.appointments || [],
         services: services || [],
-        stylists: stylists || [],
+        stylists: stylists?.stylists || stylists || [],
         clients: clients || [],
         stats: analytics?.stats || [],
         settings: settings || {},
@@ -148,10 +167,10 @@ const Admin = () => {
 
   // Load data when authenticated
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && currentBranch) {
       loadData();
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, currentBranch]);
 
   // Handle CRUD operations for stylists and appointments only
   const handleAdd = (type) => {
@@ -287,14 +306,7 @@ const Admin = () => {
   ];
 
   if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <Icon name="Loader" size={48} className="animate-spin text-accent mx-auto mb-4" />
-          <p className="text-muted-foreground">Loading admin panel...</p>
-        </div>
-      </div>
-    );
+    return <AdminLogin />;
   }
 
   return (
@@ -465,6 +477,41 @@ const Admin = () => {
             />
           )}
 
+          {/* Clients Tab */}
+          {activeTab === 'clients' && (
+            <ClientManagement
+              clients={data.clients || []}
+              onAdd={async (clientData) => {
+                try {
+                  await clientsAPI.create(clientData);
+                  await loadData();
+                } catch (error) {
+                  console.error('Error adding client:', error);
+                  alert('Failed to add client');
+                }
+              }}
+              onEdit={async (id, clientData) => {
+                try {
+                  await clientsAPI.update(id, clientData);
+                  await loadData();
+                } catch (error) {
+                  console.error('Error updating client:', error);
+                  alert('Failed to update client');
+                }
+              }}
+              onDelete={async (id) => {
+                try {
+                  await clientsAPI.delete(id);
+                  await loadData();
+                } catch (error) {
+                  console.error('Error deleting client:', error);
+                  alert('Failed to delete client');
+                }
+              }}
+              adminRole={adminRole}
+            />
+          )}
+
           {/* Stylists Tab */}
           {activeTab === 'stylists' && (
             <div className="bg-card border border-border rounded-lg p-6">
@@ -626,7 +673,7 @@ const Admin = () => {
 
           {/* Admin Management Tab */}
           {activeTab === 'admin' && (
-            <AdminManagement />
+            <AdminUserManagement />
           )}
           </div>
         </main>

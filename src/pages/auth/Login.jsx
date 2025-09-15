@@ -108,7 +108,7 @@ const Login = () => {
           localStorage.setItem("token", response.token);
           navigate("/dashboard");
         } else {
-          setErrors({ email: "Invalid credentials" });
+          setErrors({ email: response.message || "Invalid credentials" });
         }
       } else {
         const response = await authAPI.register({
@@ -126,7 +126,9 @@ const Login = () => {
       }
     } catch (error) {
       console.error("Authentication error:", error);
-      setErrors({ email: "Authentication failed. Please try again." });
+      // Check if error has a specific message from the server
+      const errorMessage = error.response?.data?.message || error.message || "Authentication failed. Please try again.";
+      setErrors({ email: errorMessage });
     } finally {
       setIsLoading(false);
     }

@@ -11,18 +11,20 @@ const SingleStepBookingForm = ({ onSubmit, isLoading }) => {
     mobileNumber: '',
     selectedDate: null,
     selectedTime: '',
-    bookingType: 'appointment'
+    bookingType: 'appointment',
+    confirmationMethod: 'whatsapp'
   });
 
   const [errors, setErrors] = useState({});
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
 
-  
+
   const timeSlots = [
-    "9:00 AM", "9:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM",
-    "12:00 PM", "12:30 PM", "1:00 PM", "1:30 PM", "2:00 PM", "2:30 PM",
-    "3:00 PM", "3:30 PM", "4:00 PM", "4:30 PM", "5:00 PM", "5:30 PM"
+    
+      "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM","12:00 PM", "12:30 PM", "1:00 PM", "1:30 PM",
+      "2:00 PM", "2:30 PM", "3:00 PM", "3:30 PM","4:00 PM", "4:30 PM", "5:00 PM", "5:30 PM",
+      "6:00 PM", "6:30 PM", "7:00 PM", "7:30 PM","8:00 PM", "8:30 PM", "9:00 PM", "9:30 PM"
   ];
 
   const monthNames = [
@@ -96,7 +98,7 @@ const SingleStepBookingForm = ({ onSubmit, isLoading }) => {
     const newErrors = {};
 
     if (!formData.branch) newErrors.branch = 'Please select a branch';
-    if (!formData.fullName.trim()) newErrors.fullName = 'Full name is required';
+    if (!formData.fullName.trim()) newErrors.fullName = 'Name is required';
     if (!formData.mobileNumber.trim()) {
       newErrors.mobileNumber = 'Mobile number is required';
     } else if (!/^[0-9]{10}$/.test(formData.mobileNumber.replace(/\D/g, ''))) {
@@ -105,6 +107,7 @@ const SingleStepBookingForm = ({ onSubmit, isLoading }) => {
     if (!formData.selectedDate) newErrors.selectedDate = 'Please select a date';
     if (!formData.selectedTime) newErrors.selectedTime = 'Please select a time';
     if (!formData.bookingType) newErrors.bookingType = 'Please select booking type';
+    if (!formData.confirmationMethod) newErrors.confirmationMethod = 'Please select confirmation method';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -170,13 +173,13 @@ const SingleStepBookingForm = ({ onSubmit, isLoading }) => {
       {/* Customer Details */}
       <div className="bg-card rounded-lg border border-border p-6">
         <h3 className="text-xl font-heading font-semibold text-foreground mb-4">
-          Customer Details
+          Your Details
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Input
-            label="Full Name"
+            label=" Name"
             type="text"
-            placeholder="Enter your full name"
+            placeholder="Enter your Name"
             value={formData.fullName}
             onChange={(e) => handleInputChange('fullName', e.target.value)}
             error={errors.fullName}
@@ -199,7 +202,7 @@ const SingleStepBookingForm = ({ onSubmit, isLoading }) => {
       {/* Date & Time Selection */}
       <div className="bg-card rounded-lg border border-border p-6">
         <h3 className="text-xl font-heading font-semibold text-foreground mb-6">
-          Date & Time
+          Select Date & Time
         </h3>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
@@ -286,7 +289,7 @@ const SingleStepBookingForm = ({ onSubmit, isLoading }) => {
               <div className="flex flex-col items-center justify-center py-12 text-center">
                 <Icon name="Calendar" size={48} className="text-muted-foreground mb-4" />
                 <p className="text-muted-foreground">
-                  Please select a date to view available times
+                  Please select date to view available times
                 </p>
               </div>
             )}
@@ -342,6 +345,54 @@ const SingleStepBookingForm = ({ onSubmit, isLoading }) => {
         </div>
         {errors.bookingType && (
           <p className="text-error text-sm mt-2">{errors.bookingType}</p>
+        )}
+      </div>
+
+      {/* Confirmation Method */}
+      <div className="bg-card rounded-lg border border-border p-6">
+        <h3 className="text-xl font-heading font-semibold text-foreground mb-4">
+          How would you like us to confirm your appointment?
+        </h3>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <button
+            type="button"
+            onClick={() => handleInputChange('confirmationMethod', 'whatsapp')}
+            className={`p-4 rounded-lg border-2 transition-luxury hover:shadow-luxury-hover ${
+              formData.confirmationMethod === 'whatsapp'
+                ? 'border-accent bg-accent/10 shadow-luxury'
+                : 'border-border hover:border-accent/50'
+            }`}
+          >
+            <div className="flex items-center space-x-3">
+              <Icon name="MessageCircle" size={24} className="text-green-500" />
+              <div className="text-left">
+                <h4 className="font-semibold text-foreground">WhatsApp</h4>
+                <p className="text-sm text-muted-foreground">Instant confirmation via WhatsApp</p>
+              </div>
+            </div>
+          </button>
+          
+          <button
+            type="button"
+            onClick={() => handleInputChange('confirmationMethod', 'call')}
+            className={`p-4 rounded-lg border-2 transition-luxury hover:shadow-luxury-hover ${
+              formData.confirmationMethod === 'call'
+                ? 'border-accent bg-accent/10 shadow-luxury'
+                : 'border-border hover:border-accent/50'
+            }`}
+          >
+            <div className="flex items-center space-x-3">
+              <Icon name="Phone" size={24} className="text-blue-500" />
+              <div className="text-left">
+                <h4 className="font-semibold text-foreground">Phone Call</h4>
+                <p className="text-sm text-muted-foreground">We'll call you to confirm</p>
+              </div>
+            </div>
+          </button>
+        </div>
+        {errors.confirmationMethod && (
+          <p className="text-error text-sm mt-2">{errors.confirmationMethod}</p>
         )}
       </div>
 

@@ -5,18 +5,45 @@ import FilterSection from "./components/FilterSection";
 import StylistGrid from "./components/StylistGrid";
 import StylistDetailModal from "./components/StylistDetailModal";
 import Icon from "../../components/AppIcon";
+import { stylistsAPI } from "../../services/api";
+import { useBranch } from "../../contexts/BranchContext";
 
 const StylistProfiles = () => {
   const navigate = useNavigate();
+  const { currentBranch, getCurrentBranchData } = useBranch();
   const [selectedSpecialty, setSelectedSpecialty] = useState("all");
   const [selectedExperience, setSelectedExperience] = useState("all");
   const [selectedStylist, setSelectedStylist] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [stylists, setStylists] = useState([]);
   const [filteredStylists, setFilteredStylists] = useState([]);
 
-  // Mock stylist data
-  const stylists = [
+  // Load stylists from API
+  useEffect(() => {
+    const loadStylists = async () => {
+      setIsLoading(true);
+      try {
+        const response = await stylistsAPI.getAll(currentBranch);
+        const stylistsData = response.stylists || response || [];
+        setStylists(stylistsData);
+        setFilteredStylists(stylistsData);
+      } catch (error) {
+        console.error('Error loading stylists:', error);
+        setStylists([]);
+        setFilteredStylists([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (currentBranch) {
+      loadStylists();
+    }
+  }, [currentBranch]);
+
+  // Mock stylist data (fallback)
+  const mockStylists = [
     {
       id: 1,
       name: "Imran Salmani",
@@ -25,6 +52,7 @@ const StylistProfiles = () => {
       experience: 12,
       rating: 4.8,
       reviewCount: 203,
+      startingPrice: 220,
       specialties: [
         "Hair Stylist",
         "Hair Color",
@@ -120,6 +148,7 @@ const StylistProfiles = () => {
       experience: 20,
       rating: 4.8,
       reviewCount: 203,
+      startingPrice: 220,
       specialties: [
         "Precision Cuts",
         "Men's Grooming",
@@ -197,6 +226,7 @@ const StylistProfiles = () => {
       experience: 5,
       rating: 4.9,
       reviewCount: 89,
+      startingPrice: 160,
       specialties: [
         "Hair Extensions",
         "Keratin Treatments",
@@ -274,6 +304,7 @@ const StylistProfiles = () => {
       experience: 10,
       rating: 4.7,
       reviewCount: 156,
+      startingPrice: 85,
       specialties: [
         "Men's Cuts",
         "Beard Styling",
@@ -359,6 +390,7 @@ const StylistProfiles = () => {
       experience: 9,
       rating: 4.8,
       reviewCount: 160,
+      startingPrice: 200,
       specialties: ["Pedicure", "Nails", "Manicure", "Hydra Facial"],
       bio: "Preety enhances natural beauty with elegant nail care and glowing skin treatments, perfect for brides and special events.",
       fullBio: `Preety is our versatile bridal and beauty specialist with 9 years of experience in event styling and personal care services. In addition to creating stunning bridal looks, she is skilled in pedicure, manicure, and hydra facial treatments that prepare clients for their most important moments.\n\nHer approach focuses on delivering a balanced mix of beauty and wellness. Whether it’s ensuring flawless nails for a wedding, providing a calming pedicure before a big event, or giving a hydra facial for radiant skin, Preety tailors each service to suit the occasion. She is known for her warm personality, attention to detail, and ability to create a luxurious experience that leaves clients feeling both confident and pampered.`,
@@ -438,6 +470,7 @@ const StylistProfiles = () => {
       experience: 11,
       rating: 4.9,
       reviewCount: 182,
+      startingPrice: 150,
       specialties: ["Pedicure", "Nails", "Manicure", "Hydra Facial"],
       bio: "Pooja specializes in advanced nail and skin care, offering luxurious pedicures, manicures, and hydra facials.",
       fullBio: `Pooja is our dedicated nail and skin care specialist with 11 years of experience in beauty and wellness treatments. She focuses on delivering professional pedicures, manicures, and advanced hydra facials that enhance both beauty and self-care.\n\nHer expertise lies in combining modern techniques with premium products to provide lasting results and a relaxing experience. Pooja is known for her precision in nail artistry, her attention to detail in hand and foot care, and her rejuvenating hydra facial treatments. She regularly attends workshops to stay updated with the latest beauty trends and skin care innovations. Clients appreciate her gentle approach, creativity, and commitment to making every session a pampering experience.`,
@@ -515,43 +548,42 @@ const StylistProfiles = () => {
           "Balayage",
           "Color Correction",
           "Highlights",
+          "Hair Coloring",
+          "Ombre"
         ],
-        "hair-cuts": ["Precision Cuts", "Men's Cuts", "Hair Cuts"],
+        "hair-cuts": ["Precision Cuts", "Men's Cuts", "Hair Cuts", "Hair Cutting", "Men's Haircut"],
         extensions: ["Hair Extensions", "Volume Enhancement"],
-        bridal: ["Bridal", "Bridal Styling", "Special Events"],
-        treatments: ["Hair Treatments", "Keratin Treatments", "Scalp Care"],
+        bridal: ["Bridal", "Bridal Styling", "Special Events", "Bridal Hair"],
+        treatments: ["Hair Treatments", "Keratin Treatments", "Scalp Care", "Hair Masks"],
+        styling: ["Hair Styling", "Styling", "Blowouts", "Hair Styling"]
       };
 
       const targetSpecialties = specialtyMap?.[selectedSpecialty] || [];
       filtered = filtered?.filter((stylist) =>
-        stylist?.specialties?.some((specialty) =>
+        stylist?.services?.some((service) =>
           targetSpecialties?.some(
             (target) =>
-              specialty?.toLowerCase()?.includes(target?.toLowerCase()) ||
-              target?.toLowerCase()?.includes(specialty?.toLowerCase())
+              service?.toLowerCase()?.includes(target?.toLowerCase()) ||
+              target?.toLowerCase()?.includes(service?.toLowerCase())
           )
-        )
+        ) || 
+        stylist?.specialty?.toLowerCase()?.includes(selectedSpecialty?.toLowerCase())
       );
     }
 
     if (selectedExperience !== "all") {
       const minExperience = parseInt(selectedExperience?.replace("+", ""));
       filtered = filtered?.filter(
-        (stylist) => stylist?.experience >= minExperience
+        (stylist) => {
+          const experience = parseInt(stylist?.experience?.replace(" years", ""));
+          return experience >= minExperience;
+        }
       );
     }
 
     setFilteredStylists(filtered);
-  }, [selectedSpecialty, selectedExperience]);
+  }, [selectedSpecialty, selectedExperience, stylists]);
 
-  // Simulate loading
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, []);
 
   const handleViewDetails = (stylist) => {
     setSelectedStylist(stylist);
@@ -589,11 +621,17 @@ const StylistProfiles = () => {
             <h1 className="font-heading text-4xl lg:text-5xl font-bold text-foreground mb-6">
               Meet Our Expert Stylists
             </h1>
-            <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
+            <p className="text-lg text-muted-foreground mb-4 leading-relaxed">
               Discover La Coiffure's talented team of luxury hair professionals.
               Each stylist brings unique expertise and artistry to create your
               perfect look with personalized attention and exceptional skill.
             </p>
+            {currentBranch && (
+              <div className="inline-flex items-center space-x-2 px-4 py-2 bg-accent/10 text-accent rounded-full text-sm font-medium mb-8">
+                <Icon name="MapPin" size={16} />
+                <span>{getCurrentBranchData()?.name || 'Current Branch'} Stylists</span>
+              </div>
+            )}
             <div className="flex items-center justify-center space-x-8 text-sm text-muted-foreground">
               <div className="flex items-center space-x-2">
                 <Icon name="Award" size={16} className="text-accent" />

@@ -356,6 +356,7 @@ const ServicesCatalog = () => {
                       service={service}
                       onViewDetails={handleViewDetails}
                       onBookNow={handleBookNow}
+                      categories={categories}
                     />
                   ))}
                 </div>
