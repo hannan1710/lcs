@@ -26,12 +26,15 @@ const ServiceModal = ({ service, isOpen, onClose, onBookNow }) => {
         <div className="p-6">
           <div className="grid lg:grid-cols-2 gap-8">
             <div>
-              <div className="relative h-64 rounded-lg overflow-hidden mb-6">
-                <Image
-                  src={service?.image}
-                  alt={service?.name}
-                  className="w-full h-full object-cover"
-                />
+              <div className="mb-6">
+                {/* Single Thumbnail Image */}
+                <div className="relative h-64 rounded-lg overflow-hidden">
+                  <Image
+                    src={service?.image}
+                    alt={service?.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
               </div>
               
               <div className="space-y-4">
@@ -40,22 +43,22 @@ const ServiceModal = ({ service, isOpen, onClose, onBookNow }) => {
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
                       <span className="text-muted-foreground">Duration:</span>
-                      <p className="font-medium">{service?.duration}</p>
+                      <p className="font-medium">{service?.duration} min</p>
                     </div>
-                    {/* <div>
-                      <span className="text-muted-foreground">Starting Price:</span>
-                    </div> */}
-                    {/* <div>
-                      <span className="text-muted-foreground">Rating:</span>
-                      <div className="flex items-center">
-                        <Icon name="Star" size={16} className="text-accent mr-1" />
-                        <span className="font-medium">{service?.rating}</span>
-                      </div>
-                    </div> */}
                     <div>
-                      <span className="text-muted-foreground">Reviews:</span>
-                      <p className="font-medium">{service?.reviewCount} reviews</p>
+                      <span className="text-muted-foreground">Pricing:</span>
+                      <p className="font-medium">Contact for pricing</p>
                     </div>
+                    <div>
+                      <span className="text-muted-foreground">Category:</span>
+                      <p className="font-medium capitalize">{service?.category}</p>
+                    </div>
+                    {service?.tags && (
+                      <div>
+                        <span className="text-muted-foreground">Tags:</span>
+                        <p className="font-medium">{service?.tags}</p>
+                      </div>
+                    )}
                   </div>
                 </div>
                 
@@ -89,17 +92,6 @@ const ServiceModal = ({ service, isOpen, onClose, onBookNow }) => {
                 </p>
               </div>
               
-              <div>
-                <h3 className="font-heading font-semibold text-lg mb-3">What's Included</h3>
-                <ul className="space-y-2">
-                  {service?.includes?.map((item, index) => (
-                    <li key={index} className="flex items-center space-x-2">
-                      <Icon name="Check" size={16} className="text-success" />
-                      <span className="text-sm">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
               
               {/* <div>
                 <h3 className="font-heading font-semibold text-lg mb-3">Pricing Tiers</h3>
@@ -115,30 +107,6 @@ const ServiceModal = ({ service, isOpen, onClose, onBookNow }) => {
                 </div>
               </div> */}
               
-              <div>
-                <h3 className="font-heading font-semibold text-lg mb-3">Recommended Stylists</h3>
-                <div className="space-y-3">
-                  {service?.recommendedStylists?.map((stylist, index) => (
-                    <div key={index} className="flex items-center space-x-3 p-3 bg-muted rounded-lg">
-                      <div className="w-10 h-10 rounded-full overflow-hidden">
-                        <Image
-                          src={stylist?.avatar}
-                          alt={stylist?.name}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-medium">{stylist?.name}</p>
-                        <p className="text-sm text-muted-foreground">{stylist?.specialty}</p>
-                      </div>
-                      <div className="flex items-center">
-                        <Icon name="Star" size={14} className="text-accent mr-1" />
-                        <span className="text-sm">{stylist?.rating}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
               
               <div>
                 <h3 className="font-heading font-semibold text-lg mb-3"> Instructions</h3>

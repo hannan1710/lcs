@@ -14,9 +14,16 @@ const ServiceCard = ({ service, onBookNow, onViewDetails }) => {
         />
         <div className="absolute top-2 right-2">
           <span className="bg-accent text-accent-foreground px-2 py-1 rounded-full text-xs font-medium">
-            {service?.duration}
+            {service?.category?.charAt(0)?.toUpperCase() + service?.category?.slice(1)}
           </span>
         </div>
+        {service?.featured && (
+          <div className="absolute top-2 left-2">
+            <span className="bg-accent text-accent-foreground px-2 py-1 rounded-full text-xs font-medium">
+              Featured
+            </span>
+          </div>
+        )}
       </div>
       <div className="p-3 sm:p-4 md:p-6">
         <div className="flex items-start justify-between mb-2 sm:mb-3">
@@ -33,10 +40,12 @@ const ServiceCard = ({ service, onBookNow, onViewDetails }) => {
         </p>
         
         <div className="flex items-center mb-2 sm:mb-3 md:mb-4">
-          <Icon name="Star" size={12} className="text-accent mr-1" />
-          <span className="text-xs sm:text-sm text-muted-foreground">
-            {service?.rating} ({service?.reviewCount} reviews)
-          </span>
+          <div className="flex items-center">
+            <Icon name="Clock" size={12} className="text-muted-foreground mr-1" />
+            <span className="text-xs sm:text-sm text-muted-foreground">
+              {service?.duration} min
+            </span>
+          </div>
         </div>
         
         <div className="flex gap-2">
@@ -44,7 +53,7 @@ const ServiceCard = ({ service, onBookNow, onViewDetails }) => {
             variant="outline"
             size="sm"
             onClick={() => onViewDetails(service)}
-            className="flex-1 border-border hover:border-accent hover:text-accent text-xs"
+            className="flex-1 border-border hover:border-accent hover:text-accent hover:bg-transparent text-xs"
           >
             View Details
           </Button>

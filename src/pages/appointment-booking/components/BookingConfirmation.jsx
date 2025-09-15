@@ -39,6 +39,31 @@ const BookingConfirmation = ({ bookingData, onNewBooking, onGoHome }) => {
           <p className="text-sm text-muted-foreground">Booking ID</p>
           <p className="font-mono font-semibold text-accent text-lg">{bookingId}</p>
         </div>
+        
+        {/* WhatsApp Notification Status */}
+        {bookingData?.whatsappSent !== undefined && (
+          <div className={`mt-4 p-3 rounded-lg inline-block ${
+            bookingData.whatsappSent 
+              ? 'bg-success/10 border border-success/20' 
+              : 'bg-warning/10 border border-warning/20'
+          }`}>
+            <div className="flex items-center space-x-2">
+              <Icon 
+                name={bookingData.whatsappSent ? "CheckCircle" : "AlertCircle"} 
+                size={16} 
+                className={bookingData.whatsappSent ? "text-success" : "text-warning"} 
+              />
+              <p className={`text-sm font-medium ${
+                bookingData.whatsappSent ? "text-success" : "text-warning"
+              }`}>
+                {bookingData.whatsappSent 
+                  ? "WhatsApp notification sent to branch" 
+                  : "WhatsApp notification pending"
+                }
+              </p>
+            </div>
+          </div>
+        )}
       </div>
       {/* Booking Details Card */}
       <div className="bg-card rounded-lg border border-border overflow-hidden">

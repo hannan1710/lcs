@@ -14,6 +14,15 @@ body {
   margin: unset;
 }
 
+/* Remove any unwanted borders */
+section {
+  border: none !important;
+}
+
+div {
+  border: none !important;
+}
+
 /* Mobile-specific improvements */
 @media (max-width: 768px) {
   html {

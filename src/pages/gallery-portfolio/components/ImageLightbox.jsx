@@ -81,14 +81,27 @@ const ImageLightbox = ({
           </button>
         </>
       )}
-      {/* Main Image */}
+      {/* Main Media */}
       <div className="flex items-center justify-center h-full p-4 lg:p-8">
         <div className="relative max-w-4xl max-h-full">
-          <Image
-            src={currentImage?.image}
-            alt={currentImage?.title}
-            className="max-w-full max-h-full object-contain rounded-lg"
-          />
+          {currentImage?.mediaType && currentImage?.mediaType.startsWith('video/') ? (
+            <video
+              src={currentImage?.image}
+              className="max-w-full max-h-full object-contain rounded-lg"
+              controls
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+            />
+          ) : (
+            <Image
+              src={currentImage?.image}
+              alt={currentImage?.title}
+              className="max-w-full max-h-full object-contain rounded-lg"
+            />
+          )}
           
           {/* Before/After Indicator */}
           {currentImage?.isBeforeAfter && (
@@ -136,28 +149,6 @@ const ImageLightbox = ({
           </div>
         </div>
       </div>
-      {/* Image Counter Dots */}
-      {images?.length > 1 && (
-        <div className="absolute bottom-20 left-1/2 -translate-x-1/2 flex space-x-2">
-          {images?.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => {
-                const diff = index - currentIndex;
-                if (diff > 0) {
-                  for (let i = 0; i < diff; i++) onNext();
-                } else if (diff < 0) {
-                  for (let i = 0; i < Math.abs(diff); i++) onPrevious();
-                }
-              }}
-              className={`w-2 h-2 rounded-full transition-luxury ${
-                index === currentIndex ? 'bg-white' : 'bg-white/40'
-              }`}
-              aria-label={`Go to image ${index + 1}`}
-            />
-          ))}
-        </div>
-      )}
     </div>
   );
 };

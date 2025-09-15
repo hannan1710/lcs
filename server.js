@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const axios = require('axios');
 const app = express();
 const PORT = 3001;
 
@@ -8,6 +9,117 @@ app.use(cors());
 // Increase body size limit to allow base64 images for multi-photo uploads
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
+// WhatsApp Configuration
+const WHATSAPP_CONFIG = {
+  // Replace with your actual WhatsApp Business API credentials
+  ACCESS_TOKEN: process.env.WHATSAPP_ACCESS_TOKEN || 'your_whatsapp_access_token',
+  PHONE_NUMBER_ID: process.env.WHATSAPP_PHONE_NUMBER_ID || 'your_phone_number_id',
+  API_VERSION: 'v17.0',
+  
+  // Branch-specific WhatsApp numbers
+  BRANCH_NUMBERS: {
+    powai: '+917400068615', // Powai branch WhatsApp number
+    thane: '+919967002481'  // Thane branch WhatsApp number
+  }
+};
+
+// WhatsApp API helper functions
+const sendWhatsAppMessage = async (to, message, branch = 'powai') => {
+  try {
+    const phoneNumberId = WHATSAPP_CONFIG.PHONE_NUMBER_ID;
+    const accessToken = WHATSAPP_CONFIG.ACCESS_TOKEN;
+    
+    // Format phone number (remove + and ensure it starts with country code)
+    const formattedNumber = to.replace(/\D/g, '');
+    const recipientNumber = formattedNumber.startsWith('91') ? formattedNumber : `91${formattedNumber}`;
+    
+    const url = `https://graph.facebook.com/${WHATSAPP_CONFIG.API_VERSION}/${phoneNumberId}/messages`;
+    
+    const payload = {
+      messaging_product: 'whatsapp',
+      to: recipientNumber,
+      type: 'text',
+      text: {
+        body: message
+      }
+    };
+    
+    const response = await axios.post(url, payload, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    console.log(`WhatsApp message sent successfully to ${to} for ${branch} branch:`, response.data);
+    return { success: true, messageId: response.data.messages[0].id };
+    
+  } catch (error) {
+    console.error('Error sending WhatsApp message:', error.response?.data || error.message);
+    return { success: false, error: error.response?.data || error.message };
+  }
+};
+
+const sendBranchNotification = async (appointmentData) => {
+  const { branch, fullName, mobileNumber, selectedDate, selectedTime, bookingType } = appointmentData;
+  
+  // Get the appropriate WhatsApp number for the branch
+  const branchNumber = WHATSAPP_CONFIG.BRANCH_NUMBERS[branch];
+  
+  if (!branchNumber) {
+    console.error(`No WhatsApp number configured for branch: ${branch}`);
+    return { success: false, error: 'Branch not configured' };
+  }
+  
+  // Format the date
+  const appointmentDate = new Date(selectedDate).toLocaleDateString('en-IN', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+  
+  // Create the message
+  const message = `🎉 *New Booking Alert - ${branch.toUpperCase()} Branch*
+
+👤 *Client Details:*
+• Name: ${fullName}
+• Phone: ${mobileNumber}
+• Booking Type: ${bookingType}
+
+📅 *Appointment Details:*
+• Date: ${appointmentDate}
+• Time: ${selectedTime}
+• Branch: ${branch === 'powai' ? 'Powai (Galleria)' : 'Thane (Anand Nagar)'}
+
+📱 *Contact Client:* ${mobileNumber}
+
+Please confirm this appointment with the client.
+
+---
+La Coiffure Salon - ${branch.toUpperCase()} Branch`;
+
+  // Send WhatsApp message to the branch
+  const result = await sendWhatsAppMessage(branchNumber, message, branch);
+  
+  // Also send confirmation to client (optional)
+  const clientMessage = `Thank you for booking with La Coiffure Salon!
+
+Your appointment is confirmed:
+📅 Date: ${appointmentDate}
+⏰ Time: ${selectedTime}
+📍 Branch: ${branch === 'powai' ? 'Powai (Galleria)' : 'Thane (Anand Nagar)'}
+
+We'll contact you soon to confirm the details.
+
+La Coiffure Salon Team`;
+
+  // Send confirmation to client
+  await sendWhatsAppMessage(mobileNumber, clientMessage, branch);
+  
+  return result;
+};
 
 // Mock data storage
 let appointments = [
@@ -19,7 +131,10 @@ let appointments = [
     time: '10:00 AM',
     status: 'confirmed',
     stylist: 'Emma Rodriguez',
-    price: 150
+    price: 150,
+    branch: 'powai',
+    mobileNumber: '+919876543210',
+    bookingType: 'appointment'
   },
   {
     id: 2,
@@ -29,7 +144,10 @@ let appointments = [
     time: '2:00 PM',
     status: 'pending',
     stylist: 'David Chen',
-    price: 250
+    price: 250,
+    branch: 'thane',
+    mobileNumber: '+919876543211',
+    bookingType: 'appointment'
   },
   {
     id: 3,
@@ -39,7 +157,10 @@ let appointments = [
     time: '11:30 AM',
     status: 'confirmed',
     stylist: 'James Wilson',
-    price: 85
+    price: 85,
+    branch: 'powai',
+    mobileNumber: '+919876543212',
+    bookingType: 'appointment'
   },
   {
     id: 4,
@@ -49,7 +170,10 @@ let appointments = [
     time: '9:00 AM',
     status: 'confirmed',
     stylist: 'Sophia Martinez',
-    price: 450
+    price: 450,
+    branch: 'thane',
+    mobileNumber: '+919876543213',
+    bookingType: 'appointment'
   }
 ];
 
@@ -822,7 +946,22 @@ app.delete('/api/admin/users/:id', (req, res) => {
 
 // Appointments endpoints
 app.get('/api/appointments', (req, res) => {
-  res.json(appointments);
+  const { branch } = req.query;
+  
+  let filteredAppointments = appointments;
+  
+  // Filter by branch if specified
+  if (branch) {
+    filteredAppointments = appointments.filter(appointment => 
+      appointment.branch === branch
+    );
+  }
+  
+  res.json({
+    appointments: filteredAppointments,
+    total: filteredAppointments.length,
+    branch: branch || 'all'
+  });
 });
 
 app.get('/api/appointments/:id', (req, res) => {
@@ -834,14 +973,49 @@ app.get('/api/appointments/:id', (req, res) => {
   }
 });
 
-app.post('/api/appointments', (req, res) => {
-  const newAppointment = {
-    id: Date.now(),
-    ...req.body,
-    status: 'pending'
-  };
-  appointments.push(newAppointment);
-  res.json(newAppointment);
+app.post('/api/appointments', async (req, res) => {
+  try {
+    const newAppointment = {
+      id: Date.now(),
+      ...req.body,
+      status: 'pending',
+      createdAt: new Date().toISOString()
+    };
+    
+    // Add the appointment to the array
+    appointments.push(newAppointment);
+    
+    // Send WhatsApp notification to the appropriate branch
+    if (newAppointment.branch && newAppointment.mobileNumber) {
+      console.log(`Sending WhatsApp notification for ${newAppointment.branch} branch...`);
+      const whatsappResult = await sendBranchNotification(newAppointment);
+      
+      if (whatsappResult.success) {
+        console.log('WhatsApp notification sent successfully');
+        // Update appointment with notification status
+        newAppointment.whatsappSent = true;
+        newAppointment.whatsappMessageId = whatsappResult.messageId;
+      } else {
+        console.error('Failed to send WhatsApp notification:', whatsappResult.error);
+        newAppointment.whatsappSent = false;
+        newAppointment.whatsappError = whatsappResult.error;
+      }
+    }
+    
+    res.json({
+      success: true,
+      appointment: newAppointment,
+      whatsappSent: newAppointment.whatsappSent || false
+    });
+    
+  } catch (error) {
+    console.error('Error creating appointment:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to create appointment',
+      details: error.message
+    });
+  }
 });
 
 app.put('/api/appointments/:id', (req, res) => {
@@ -1372,6 +1546,37 @@ app.get('/api/payments/analytics', (req, res) => {
     statusBreakdown,
     payments: filteredPayments
   });
+});
+
+// WhatsApp test endpoint
+app.post('/api/whatsapp/test', async (req, res) => {
+  try {
+    const { phoneNumber, branch = 'powai', message } = req.body;
+    
+    if (!phoneNumber) {
+      return res.status(400).json({
+        success: false,
+        error: 'Phone number is required'
+      });
+    }
+    
+    const testMessage = message || `Test message from La Coiffure Salon - ${branch.toUpperCase()} Branch`;
+    const result = await sendWhatsAppMessage(phoneNumber, testMessage, branch);
+    
+    res.json({
+      success: result.success,
+      message: result.success ? 'Test message sent successfully' : 'Failed to send test message',
+      details: result
+    });
+    
+  } catch (error) {
+    console.error('Error sending test WhatsApp message:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to send test message',
+      details: error.message
+    });
+  }
 });
 
 // Start server

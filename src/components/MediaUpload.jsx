@@ -9,6 +9,7 @@ const MediaUpload = ({
   maxSize = 50 * 1024 * 1024, // 50MB
   existingMedia = [],
   onRemoveMedia,
+  onUpdateMedia,
   className = ''
 }) => {
   const [dragActive, setDragActive] = useState(false);
@@ -220,6 +221,22 @@ const MediaUpload = ({
                   <p className="text-xs text-muted-foreground">
                     {formatFileSize(media.size)}
                   </p>
+                </div>
+                
+                {/* Alt Text Input */}
+                <div className="absolute inset-0 bg-background/95 opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-2">
+                  <div className="h-full flex flex-col justify-center">
+                    <label className="text-xs font-medium text-foreground mb-1">
+                      Alt Text (SEO)
+                    </label>
+                    <input
+                      type="text"
+                      value={media.altText || ''}
+                      onChange={(e) => onUpdateMedia && onUpdateMedia(media.id, { altText: e.target.value })}
+                      placeholder="Describe this image for SEO..."
+                      className="w-full text-xs bg-background border border-border rounded px-2 py-1 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-accent"
+                    />
+                  </div>
                 </div>
                 
                 {/* Remove Button */}

@@ -2,22 +2,19 @@ import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import Icon from "../AppIcon";
 import Button from "./Button";
+import { useUser } from "../../contexts/UserContext";
+import Image from "../AppImage";
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
-
-  // Mock authentication state - in a real app this would come from context/state management
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState({
-    name: "Sarah Johnson",
-    email: "sarah.johnson@email.com",
-    avatar:
-      "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=200&h=200&fit=crop&crop=face",
-  });
+  const { user, isLoading } = useUser();
 
   // Check authentication state from localStorage
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
   useEffect(() => {
     const admin = localStorage.getItem("admin");
     const regularUser = localStorage.getItem("user");
@@ -25,25 +22,7 @@ const Header = () => {
     if (admin || regularUser) {
       setIsAuthenticated(true);
       if (admin) {
-        const adminData = JSON.parse(admin);
-        setUser({
-          name: adminData.username || "Admin User",
-          email: adminData.email || "admin@lacoiffure.com",
-          avatar:
-            "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face",
-        });
-      } else if (regularUser) {
-        const userData = JSON.parse(regularUser);
-        const userName = `${userData.firstName || userData.name} ${
-          userData.lastName || ""
-        }`.trim();
-        const capitalizedName = userName.charAt(0).toUpperCase() + userName.slice(1);
-        setUser({
-          name: capitalizedName,
-          email: userData.email || "user@lacoiffure.com",
-          avatar:
-            "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=200&h=200&fit=crop&crop=face",
-        });
+        setIsAdmin(true);
       }
     }
   }, []);
@@ -171,16 +150,16 @@ const Header = () => {
               {isAuthenticated ? (
                 // Authenticated User - Direct Link to Dashboard
                 <Link
-                  to="/dashboard"
+                  to={isAdmin ? "/admin" : "/dashboard"}
                   className="flex items-center space-x-2 p-2 rounded-lg hover:bg-muted transition-luxury"
                 >
-                  <img
-                    src={user.avatar}
-                    alt={user.name}
-                    className="w-8 h-8 rounded-full"
+                  <Image
+                    src={user?.avatar || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"}
+                    alt={user?.name || "User"}
+                    className="w-8 h-8 rounded-full object-cover"
                   />
                   <span className="text-sm font-medium text-foreground">
-                    {user.name}
+                    {user?.name || "User"}
                   </span>
                 </Link>
               ) : (

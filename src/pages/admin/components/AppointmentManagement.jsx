@@ -38,7 +38,7 @@ const AppointmentManagement = ({ appointments, onAdd, onEdit, onDelete, adminRol
     '18:00', '18:30', '19:00', '19:30', '20:00'
   ];
 
-  const filteredAppointments = appointments.filter(appointment => {
+  const filteredAppointments = (appointments || []).filter(appointment => {
     const matchesSearch = appointment.clientName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          appointment.clientEmail?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          appointment.service?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -517,4 +517,5 @@ const AppointmentManagement = ({ appointments, onAdd, onEdit, onDelete, adminRol
 };
 
 export default AppointmentManagement;
+
 

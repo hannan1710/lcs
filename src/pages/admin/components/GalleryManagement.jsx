@@ -13,6 +13,7 @@ const GalleryManagement = ({ galleryItems, onAdd, onEdit, onDelete, adminRole })
   const [viewMode, setViewMode] = useState('grid');
   const [showModal, setShowModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
+
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -29,7 +30,7 @@ const GalleryManagement = ({ galleryItems, onAdd, onEdit, onDelete, adminRole })
     { value: 'video', label: 'Videos' }
   ];
 
-  const filteredItems = galleryItems.filter(item => {
+  const filteredItems = (galleryItems || []).filter(item => {
     const matchesSearch = item.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          item.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          item.tags?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -118,10 +119,19 @@ const GalleryManagement = ({ galleryItems, onAdd, onEdit, onDelete, adminRole })
     }));
   };
 
+  const handleUpdateMedia = (mediaId, updates) => {
+    setFormData(prev => ({
+      ...prev,
+      media: prev.media.map(media => 
+        media.id === mediaId ? { ...media, ...updates } : media
+      )
+    }));
+  };
+
   const handleRemoveMedia = (mediaId) => {
     setFormData(prev => ({
       ...prev,
-      media: prev.media.filter(media => media.id !== mediaId)
+      media: (prev.media || []).filter(media => media.id !== mediaId)
     }));
   };
 
@@ -139,7 +149,9 @@ const GalleryManagement = ({ galleryItems, onAdd, onEdit, onDelete, adminRole })
   };
 
   const getMediaPreview = (item) => {
-    if (!item.media || item.media.length === 0) return null;
+    if (!item.media || item.media.length === 0) {
+      return null;
+    }
     
     const firstMedia = item.media[0];
     if (firstMedia.type?.startsWith('image/')) {
@@ -448,6 +460,7 @@ const GalleryManagement = ({ galleryItems, onAdd, onEdit, onDelete, adminRole })
                   <MediaUpload
                     onFilesChange={handleMediaChange}
                     onRemoveMedia={handleRemoveMedia}
+                    onUpdateMedia={handleUpdateMedia}
                     existingMedia={formData.media}
                     maxFiles={20}
                     acceptedTypes="image/*,video/*"

@@ -71,7 +71,7 @@ const AdminDashboard = ({ stats, recentAppointments, services, stylists }) => {
           </div>
           
           <div className="space-y-4">
-            {recentAppointments?.slice(0, 5).map((appointment) => (
+            {(Array.isArray(recentAppointments) ? recentAppointments : [])?.slice(0, 5).map((appointment) => (
               <div key={appointment.id} className="flex items-center space-x-4 p-3 bg-muted/30 rounded-lg hover:bg-muted/50 transition-luxury">
                 <div className="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center">
                   <Icon name="Calendar" size={16} className="text-accent" />
@@ -127,7 +127,7 @@ const AdminDashboard = ({ stats, recentAppointments, services, stylists }) => {
           <h3 className="text-lg font-semibold text-foreground mb-6">Popular Services</h3>
           
           <div className="space-y-4">
-            {services?.slice(0, 4).map((service) => (
+            {(Array.isArray(services) ? services : [])?.slice(0, 4).map((service) => (
               <div key={service.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
                 <div className="flex items-center space-x-3">
                   <div className="w-8 h-8 bg-accent/10 rounded-lg flex items-center justify-center">
@@ -153,7 +153,7 @@ const AdminDashboard = ({ stats, recentAppointments, services, stylists }) => {
           <h3 className="text-lg font-semibold text-foreground mb-6">Active Stylists</h3>
           
           <div className="space-y-4">
-            {stylists?.slice(0, 4).map((stylist) => (
+            {(Array.isArray(stylists) ? stylists : [])?.slice(0, 4).map((stylist) => (
               <div key={stylist.id} className="flex items-center space-x-3 p-3 bg-muted/30 rounded-lg">
                 <div className="w-10 h-10 bg-accent/10 rounded-full flex items-center justify-center">
                   <span className="text-accent font-medium text-sm">

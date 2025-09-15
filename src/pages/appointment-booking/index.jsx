@@ -14,12 +14,35 @@ const AppointmentBooking = () => {
   const handleBookingSubmit = async (formData) => {
     setIsLoading(true);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    setBookingData(formData);
-    setIsLoading(false);
-    setIsConfirmed(true);
+    try {
+      // Make actual API call to create appointment
+      const response = await fetch('http://localhost:3001/api/appointments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        setBookingData({
+          ...formData,
+          id: result.appointment.id,
+          whatsappSent: result.whatsappSent
+        });
+        setIsConfirmed(true);
+      } else {
+        console.error('Booking failed:', result.error);
+        alert('Booking failed. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error creating booking:', error);
+      alert('Error creating booking. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleNewBooking = () => {

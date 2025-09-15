@@ -2,6 +2,10 @@ import React from "react";
 import { BrowserRouter, Routes as RouterRoutes, Route, Navigate } from "react-router-dom";
 import ScrollToTop from "components/ScrollToTop";
 import ErrorBoundary from "components/ErrorBoundary";
+import { GalleryProvider } from "./contexts/GalleryContext";
+import { ServiceProvider } from "./contexts/ServiceContext";
+import { CategoryProvider } from "./contexts/CategoryContext";
+import { UserProvider } from "./contexts/UserContext";
 import NotFound from "pages/NotFound";
 import AboutUs from './pages/about-us';
 import GalleryPortfolio from './pages/gallery-portfolio';
@@ -25,8 +29,12 @@ const Routes = () => {
   return (
     <BrowserRouter>
       <ErrorBoundary>
-      <ScrollToTop />
-      <RouterRoutes>
+        <GalleryProvider>
+          <ServiceProvider>
+            <CategoryProvider>
+              <UserProvider>
+                <ScrollToTop />
+            <RouterRoutes>
         {/* Main Pages */}
         <Route path="/" element={<Homepage />} />
         <Route path="/homepage" element={<Homepage />} />
@@ -58,7 +66,11 @@ const Routes = () => {
         
         {/* 404 */}
         <Route path="*" element={<NotFound />} />
-      </RouterRoutes>
+            </RouterRoutes>
+              </UserProvider>
+            </CategoryProvider>
+          </ServiceProvider>
+        </GalleryProvider>
       </ErrorBoundary>
     </BrowserRouter>
   );

@@ -5,16 +5,16 @@ import Button from '../../components/ui/Button';
 import Icon from '../../components/AppIcon';
 import Image from '../../components/AppImage';
 import ImageLightbox from './components/ImageLightbox';
-import FilterChips from './components/FilterChips';
+import { useGallery } from '../../contexts/GalleryContext';
 
 const GalleryPortfolio = () => {
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const { galleryData } = useGallery();
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [filteredImages, setFilteredImages] = useState([]);
 
-  // Mock gallery data
-  const galleryData = [
+  // Fallback mock gallery data for demo purposes
+  const mockGalleryData = [
     {
       id: 1,
       title: 'Elegant Updo',
@@ -80,21 +80,37 @@ const GalleryPortfolio = () => {
     }
   ];
 
-  const categories = [
-    { id: 'all', label: 'All Work' },
-    { id: 'bridal', label: 'Bridal' },
-    { id: 'cuts', label: 'Cuts & Styling' },
-    { id: 'color', label: 'Color & Highlights' },
-    { id: 'styling', label: 'Special Occasion' }
-  ];
 
   useEffect(() => {
-    if (selectedCategory === 'all') {
-      setFilteredImages(galleryData);
-    } else {
-      setFilteredImages(galleryData.filter(item => item.category === selectedCategory));
-    }
-  }, [selectedCategory]);
+    // Use context data if available, otherwise fall back to mock data
+    const dataToUse = galleryData && galleryData.length > 0 ? galleryData : mockGalleryData;
+    
+    // Transform data to ensure consistent structure for rendering
+    const transformedData = dataToUse.map(item => {
+      // If item has media array, prioritize images over videos
+      if (item.media && item.media.length > 0) {
+        const firstImage = item.media.find(media => media.type?.startsWith('image/'));
+        const firstVideo = item.media.find(media => media.type?.startsWith('video/'));
+        const firstMedia = firstImage || firstVideo || item.media[0];
+        
+        return {
+          ...item,
+          image: firstMedia ? firstMedia.url : item.image || '/assets/images/no_image.png',
+          mediaType: firstMedia ? firstMedia.type : 'image',
+          altText: firstMedia ? firstMedia.altText || item.title : item.title
+        };
+      }
+      // If item already has image property, use it as is
+      return {
+        ...item,
+        image: item.image || '/assets/images/no_image.png',
+        mediaType: 'image',
+        altText: item.title
+      };
+    });
+    
+    setFilteredImages(transformedData);
+  }, [galleryData]);
 
   const handleImageClick = (index) => {
     setCurrentImageIndex(index);
@@ -122,7 +138,7 @@ const GalleryPortfolio = () => {
       <Header />
       
       {/* Hero Section */}
-      <section className="pt-20 lg:pt-24 pb-12 bg-gradient-to-b from-muted/30 to-background">
+      <section className="pt-20 lg:pt-24 pb-12 border-0">
         <div className="container mx-auto px-6 lg:px-8">
           <div className="max-w-4xl mx-auto text-center">
             <div className="flex items-center justify-center space-x-3 mb-6">
@@ -161,16 +177,6 @@ const GalleryPortfolio = () => {
         </div>
       </section>
 
-      {/* Filter Section */}
-      <section className="py-8 border-b border-border">
-        <div className="container mx-auto px-6 lg:px-8">
-          <FilterChips
-            categories={categories}
-            selectedCategory={selectedCategory}
-            onCategoryChange={setSelectedCategory}
-          />
-        </div>
-      </section>
 
       {/* Gallery Grid */}
       <section className="py-10">
@@ -183,11 +189,26 @@ const GalleryPortfolio = () => {
                 onClick={() => handleImageClick(index)}
               >
                 <div className="relative aspect-[4/5] overflow-hidden">
-                  <Image
-                    src={item.image}
-                    alt={item.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-luxury-slow"
-                  />
+                  {item.mediaType && item.mediaType.startsWith('video/') ? (
+                    <video
+                      src={item.image}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-luxury-slow"
+                      controls
+                      muted
+                      loop
+                      playsInline
+                      preload="metadata"
+                    />
+                  ) : (
+                    <Image
+                      src={item.image}
+                      alt={item.altText || item.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-luxury-slow"
+                      onError={(e) => {
+                        e.target.src = '/assets/images/no_image.png';
+                      }}
+                    />
+                  )}
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-luxury" />
                   
                   {/* Overlay Content */}

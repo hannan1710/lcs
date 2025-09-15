@@ -7,17 +7,21 @@ import ServiceModal from './components/ServiceModal';
 import SearchBar from './components/SearchBar';
 import Breadcrumb from './components/Breadcrumb';
 import Icon from '../../components/AppIcon';
+import { useService } from '../../contexts/ServiceContext';
+import { useCategory } from '../../contexts/CategoryContext';
 
 const ServicesCatalog = () => {
   const navigate = useNavigate();
+  const { services } = useService();
+  const { categories } = useCategory();
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedService, setSelectedService] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
-  // Mock data for services
-  const services = [
+  // Fallback mock data for services (if context is empty)
+  const mockServices = [
     {
       id: 1,
       name: "Signature Hair Cut & Style",
@@ -207,14 +211,16 @@ const ServicesCatalog = () => {
   ];
 
   // Categories with service counts
-  const categories = [
-    { id: 'all', name: 'All Services', icon: 'Grid3X3', count: services?.length },
-    { id: 'hair', name: 'Hair Services', icon: 'Scissors', count: services?.filter(s => s?.category === 'hair')?.length },
-    { id: 'color', name: 'Color Treatments', icon: 'Palette', count: services?.filter(s => s?.category === 'color')?.length },
-    { id: 'styling', name: 'Styling', icon: 'Sparkles', count: services?.filter(s => s?.category === 'styling')?.length },
-    { id: 'treatments', name: 'Treatments', icon: 'Heart', count: services?.filter(s => s?.category === 'treatments')?.length },
-    { id: 'spa', name: 'Spa Services', icon: 'Flower', count: services?.filter(s => s?.category === 'spa')?.length }
-  ];
+  const categoriesWithCounts = useMemo(() => {
+    const servicesToUse = services || [];
+    return [
+      { id: 'all', name: 'All Services', icon: 'Grid3X3', count: servicesToUse?.length },
+      ...categories.map(category => ({
+        ...category,
+        count: servicesToUse?.filter(s => s?.category === category.id)?.length
+      }))
+    ];
+  }, [services, categories]);
 
   // Check if mobile on mount and resize
   useEffect(() => {
@@ -229,7 +235,12 @@ const ServicesCatalog = () => {
 
   // Filter services based on category and search term
   const filteredServices = useMemo(() => {
-    let filtered = services;
+    const servicesToUse = services || [];
+    console.log('ServicesCatalog - services:', services);
+    console.log('ServicesCatalog - servicesToUse:', servicesToUse);
+    console.log('ServicesCatalog - activeCategory:', activeCategory);
+    console.log('ServicesCatalog - searchTerm:', searchTerm);
+    let filtered = servicesToUse;
 
     // Filter by category
     if (activeCategory !== 'all') {
@@ -244,8 +255,9 @@ const ServicesCatalog = () => {
       );
     }
 
+    console.log('ServicesCatalog - final filtered result:', filtered);
     return filtered;
-  }, [activeCategory, searchTerm]);
+  }, [services, activeCategory, searchTerm]);
 
   const handleCategoryChange = (categoryId) => {
     setActiveCategory(categoryId);
@@ -270,7 +282,7 @@ const ServicesCatalog = () => {
   };
 
   const getCurrentCategoryName = () => {
-    const category = categories?.find(cat => cat?.id === activeCategory);
+    const category = categoriesWithCounts?.find(cat => cat?.id === activeCategory);
     return category && category?.id !== 'all' ? category?.name : null;
   };
 
@@ -297,7 +309,7 @@ const ServicesCatalog = () => {
             {!isMobile && (
               <div className="lg:col-span-1">
                 <CategoryFilter
-                  categories={categories}
+                  categories={categoriesWithCounts}
                   activeCategory={activeCategory}
                   onCategoryChange={handleCategoryChange}
                   isMobile={false}
@@ -310,7 +322,7 @@ const ServicesCatalog = () => {
               {/* Mobile Category Filter */}
               {isMobile && (
                 <CategoryFilter
-                  categories={categories}
+                  categories={categoriesWithCounts}
                   activeCategory={activeCategory}
                   onCategoryChange={handleCategoryChange}
                   isMobile={true}

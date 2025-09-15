@@ -29,7 +29,7 @@ const ProductManagement = ({ products, onAdd, onEdit, onDelete, adminRole }) => 
   const categories = ['shampoo', 'conditioner', 'treatment', 'styling', 'accessories', 'tools', 'other'];
   const sizes = ['50ml', '100ml', '150ml', '200ml', '250ml', '300ml', '500ml', '1L', 'Other'];
 
-  const filteredProducts = products.filter(product => {
+  const filteredProducts = (products || []).filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          product.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          product.brand?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -135,7 +135,7 @@ const ProductManagement = ({ products, onAdd, onEdit, onDelete, adminRole }) => 
   const handleRemoveMedia = (mediaId) => {
     setFormData(prev => ({
       ...prev,
-      media: prev.media.filter(media => media.id !== mediaId)
+      media: (prev.media || []).filter(media => media.id !== mediaId)
     }));
   };
 

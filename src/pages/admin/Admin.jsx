@@ -13,9 +13,16 @@ import ServiceManagement from './components/ServiceManagement';
 import ProductManagement from './components/ProductManagement';
 import AppointmentManagement from './components/AppointmentManagement';
 import GalleryManagement from './components/GalleryManagement';
+import WhatsAppTest from './components/WhatsAppTest';
+import CategoryManagement from './components/CategoryManagement';
+import ErrorBoundary from '../../components/ErrorBoundary';
+import { useGallery } from '../../contexts/GalleryContext';
+import { useService } from '../../contexts/ServiceContext';
 
 const Admin = () => {
   const navigate = useNavigate();
+  const { galleryData, addGalleryItem, updateGalleryItem, deleteGalleryItem } = useGallery();
+  const { services: contextServices, addService, updateService, deleteService } = useService();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isLoading, setIsLoading] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -79,30 +86,61 @@ const Admin = () => {
   const loadData = async () => {
     setIsLoading(true);
     try {
-      const [appointments, services, stylists, clients, analytics, settings, products] = await Promise.all([
-        appointmentsAPI.getAll(),
-        servicesAPI.getAll(),
-        stylistsAPI.getAll(),
-        clientsAPI.getAll(),
-        analyticsAPI.getDashboardStats(),
-        settingsAPI.get(),
-        productsAPI.getAll()
+      const [appointmentsResponse, services, stylists, clients, analytics, settings, products] = await Promise.all([
+        appointmentsAPI.getAll().catch(err => {
+          console.error('Error loading appointments:', err);
+          return { appointments: [] };
+        }),
+        servicesAPI.getAll().catch(err => {
+          console.error('Error loading services:', err);
+          return [];
+        }),
+        stylistsAPI.getAll().catch(err => {
+          console.error('Error loading stylists:', err);
+          return [];
+        }),
+        clientsAPI.getAll().catch(err => {
+          console.error('Error loading clients:', err);
+          return [];
+        }),
+        analyticsAPI.getDashboardStats().catch(err => {
+          console.error('Error loading analytics:', err);
+          return { stats: [] };
+        }),
+        settingsAPI.get().catch(err => {
+          console.error('Error loading settings:', err);
+          return {};
+        }),
+        productsAPI.getAll().catch(err => {
+          console.error('Error loading products:', err);
+          return [];
+        })
       ]);
 
       setData({
-        appointments,
-        services,
-        stylists,
-        clients,
-        stats: analytics.stats,
-        settings,
-        products
+        appointments: appointmentsResponse?.appointments || [],
+        services: services || [],
+        stylists: stylists || [],
+        clients: clients || [],
+        stats: analytics?.stats || [],
+        settings: settings || {},
+        products: products || []
       });
       // Merge categories discovered from products with defaults
       const discovered = Array.from(new Set((products || []).map(p => p.category).filter(Boolean)));
       setProductCategories(prev => Array.from(new Set([...(prev || []), ...discovered])));
     } catch (error) {
       console.error('Error loading data:', error);
+      // Set default data to prevent crashes
+      setData({
+        appointments: [],
+        services: [],
+        stylists: [],
+        clients: [],
+        stats: [],
+        settings: {},
+        products: []
+      });
     } finally {
       setIsLoading(false);
     }
@@ -207,7 +245,7 @@ const Admin = () => {
   };
 
   // Use data from API instead of mock data
-  const { stats, appointments: recentAppointments, services, stylists, products } = data;
+  const { stats = [], appointments: recentAppointments = [], services = [], stylists = [], products = [] } = data || {};
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -240,6 +278,8 @@ const Admin = () => {
     { id: 'clients', label: 'Clients', icon: 'User' },
     { id: 'payments', label: 'Payments', icon: 'CreditCard' },
     { id: 'analytics', label: 'Analytics', icon: 'BarChart' },
+    { id: 'categories', label: 'Categories', icon: 'Tags' },
+    { id: 'whatsapp', label: 'WhatsApp Test', icon: 'MessageCircle' },
     ...(adminRole === 'super_admin' ? [
       { id: 'settings', label: 'Settings', icon: 'Settings' },
       { id: 'admin', label: 'Admin', icon: 'Users' }
@@ -258,7 +298,8 @@ const Admin = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <ErrorBoundary>
+      <div className="min-h-screen bg-background flex">
       {/* Sidebar - Desktop Only */}
       <div className="hidden lg:block">
         <AdminSidebar 
@@ -334,6 +375,28 @@ const Admin = () => {
             </div>
           )}
 
+          {/* Categories Tab */}
+          {activeTab === 'categories' && (
+            <CategoryManagement adminRole={adminRole} />
+          )}
+
+          {/* WhatsApp Test Tab */}
+          {activeTab === 'whatsapp' && (
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-heading font-semibold text-foreground">WhatsApp Test</h2>
+              </div>
+              {isLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <Icon name="Loader2" size={24} className="animate-spin mr-2" />
+                  <span>Loading...</span>
+                </div>
+              ) : (
+                <WhatsAppTest />
+              )}
+            </div>
+          )}
+
           {/* Appointments Tab */}
           {activeTab === 'appointments' && (
             <AppointmentManagement
@@ -348,34 +411,10 @@ const Admin = () => {
           {/* Services Tab */}
           {activeTab === 'services' && (
             <ServiceManagement
-              services={services}
-              onAdd={async (data) => {
-                try {
-                  await servicesAPI.create(data);
-                  await loadData();
-                } catch (error) {
-                  console.error('Error adding service:', error);
-                  alert('Failed to add service');
-                }
-              }}
-              onEdit={async (id, data) => {
-                try {
-                  await servicesAPI.update(id, data);
-                  await loadData();
-                } catch (error) {
-                  console.error('Error updating service:', error);
-                  alert('Failed to update service');
-                }
-              }}
-              onDelete={async (id) => {
-                try {
-                  await servicesAPI.delete(id);
-                  await loadData();
-                } catch (error) {
-                  console.error('Error deleting service:', error);
-                  alert('Failed to delete service');
-                }
-              }}
+              services={contextServices}
+              onAdd={addService}
+              onEdit={updateService}
+              onDelete={deleteService}
               adminRole={adminRole}
             />
           )}
@@ -418,45 +457,10 @@ const Admin = () => {
           {/* Gallery Tab */}
           {activeTab === 'gallery' && (
             <GalleryManagement
-              galleryItems={data.gallery}
-              onAdd={async (data) => {
-                try {
-                  // For now, just add to local state since we don't have a gallery API
-                  setData(prev => ({
-                    ...prev,
-                    gallery: [...prev.gallery, { ...data, id: Date.now() }]
-                  }));
-                } catch (error) {
-                  console.error('Error adding gallery item:', error);
-                  alert('Failed to add gallery item');
-                }
-              }}
-              onEdit={async (id, data) => {
-                try {
-                  // For now, just update local state since we don't have a gallery API
-                  setData(prev => ({
-                    ...prev,
-                    gallery: prev.gallery.map(item => 
-                      item.id === id ? { ...item, ...data } : item
-                    )
-                  }));
-                } catch (error) {
-                  console.error('Error updating gallery item:', error);
-                  alert('Failed to update gallery item');
-                }
-              }}
-              onDelete={async (id) => {
-                try {
-                  // For now, just update local state since we don't have a gallery API
-                  setData(prev => ({
-                    ...prev,
-                    gallery: prev.gallery.filter(item => item.id !== id)
-                  }));
-                } catch (error) {
-                  console.error('Error deleting gallery item:', error);
-                  alert('Failed to delete gallery item');
-                }
-              }}
+              galleryItems={galleryData}
+              onAdd={addGalleryItem}
+              onEdit={updateGalleryItem}
+              onDelete={deleteGalleryItem}
               adminRole={adminRole}
             />
           )}
@@ -628,6 +632,7 @@ const Admin = () => {
         </main>
       </div>
     </div>
+    </ErrorBoundary>
   );
 };
 

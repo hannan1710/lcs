@@ -2,10 +2,13 @@ import React, { useState, useEffect } from 'react';
 import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
 import Select from '../../../components/ui/Select';
+import ImageUpload from '../../../components/ui/ImageUpload';
 import Icon from '../../../components/AppIcon';
-import MediaUpload from '../../../components/MediaUpload';
+import { useCategory } from '../../../contexts/CategoryContext';
+import CategoryManagement from './CategoryManagement';
 
 const ServiceManagement = ({ services, onAdd, onEdit, onDelete, adminRole }) => {
+  const { categories, getCategoriesForSelect } = useCategory();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
@@ -13,24 +16,25 @@ const ServiceManagement = ({ services, onAdd, onEdit, onDelete, adminRole }) => 
   const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'table'
   const [showModal, setShowModal] = useState(false);
   const [editingService, setEditingService] = useState(null);
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
+    fullDescription: '',
     duration: '',
     category: 'hair',
     status: 'active',
     image: '',
-    media: []
+    tags: '',
+    featured: false
   });
-
-  const categories = ['hair', 'nails', 'skincare', 'massage', 'makeup', 'other'];
   const statusOptions = [
     { value: 'active', label: 'Active', color: 'text-success' },
     { value: 'inactive', label: 'Inactive', color: 'text-muted-foreground' },
     { value: 'coming_soon', label: 'Coming Soon', color: 'text-warning' }
   ];
 
-  const filteredServices = services.filter(service => {
+  const filteredServices = (services || []).filter(service => {
     const matchesSearch = service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          service.description?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = filterCategory === 'all' || service.category === filterCategory;
@@ -70,11 +74,13 @@ const ServiceManagement = ({ services, onAdd, onEdit, onDelete, adminRole }) => 
     setFormData({
       name: service.name || '',
       description: service.description || '',
+      fullDescription: service.fullDescription || '',
       duration: service.duration || '',
       category: service.category || 'hair',
       status: service.status || 'active',
       image: service.image || '',
-      media: service.media || []
+      tags: service.tags || '',
+      featured: service.featured || false
     });
     setShowModal(true);
   };
@@ -91,11 +97,13 @@ const ServiceManagement = ({ services, onAdd, onEdit, onDelete, adminRole }) => 
       setFormData({
         name: '',
         description: '',
+        fullDescription: '',
         duration: '',
         category: 'hair',
         status: 'active',
         image: '',
-        media: []
+        tags: '',
+        featured: false
       });
       setEditingService(null);
       setShowModal(false);
@@ -112,19 +120,6 @@ const ServiceManagement = ({ services, onAdd, onEdit, onDelete, adminRole }) => 
     }));
   };
 
-  const handleMediaChange = (newMedia) => {
-    setFormData(prev => ({
-      ...prev,
-      media: [...prev.media, ...newMedia]
-    }));
-  };
-
-  const handleRemoveMedia = (mediaId) => {
-    setFormData(prev => ({
-      ...prev,
-      media: prev.media.filter(media => media.id !== mediaId)
-    }));
-  };
 
   const handleCloseModal = () => {
     setFormData({
@@ -153,10 +148,20 @@ const ServiceManagement = ({ services, onAdd, onEdit, onDelete, adminRole }) => 
           <h2 className="text-2xl font-heading font-bold text-foreground">Services Management</h2>
           <p className="text-muted-foreground">Manage your salon services and pricing</p>
         </div>
-        <Button onClick={handleAdd} className="w-fit">
-          <Icon name="Plus" size={16} className="mr-2" />
-          Add New Service
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            onClick={() => setShowCategoryModal(true)} 
+            className="w-fit"
+          >
+            <Icon name="Tags" size={16} className="mr-2" />
+            Manage Categories
+          </Button>
+          <Button onClick={handleAdd} className="w-fit">
+            <Icon name="Plus" size={16} className="mr-2" />
+            Add New Service
+          </Button>
+        </div>
       </div>
 
       {/* Filters and Search */}
@@ -172,15 +177,15 @@ const ServiceManagement = ({ services, onAdd, onEdit, onDelete, adminRole }) => 
           </div>
           <Select
             value={filterCategory}
-            onChange={(e) => setFilterCategory(e.target.value)}
+            onChange={(value) => setFilterCategory(value)}
             options={[
               { value: 'all', label: 'All Categories' },
-              ...categories.map(cat => ({ value: cat, label: cat.charAt(0).toUpperCase() + cat.slice(1) }))
+              ...getCategoriesForSelect()
             ]}
           />
           <Select
             value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
+            onChange={(value) => setFilterStatus(value)}
             options={[
               { value: 'all', label: 'All Status' },
               ...statusOptions
@@ -189,7 +194,7 @@ const ServiceManagement = ({ services, onAdd, onEdit, onDelete, adminRole }) => 
           <div className="flex items-center space-x-2">
             <Select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
+              onChange={(value) => setSortBy(value)}
               options={[
                 { value: 'name', label: 'Sort by Name' },
                 { value: 'duration', label: 'Sort by Duration' },
@@ -242,6 +247,19 @@ const ServiceManagement = ({ services, onAdd, onEdit, onDelete, adminRole }) => 
                   <span className="text-sm text-muted-foreground">Category:</span>
                   <span className="text-sm font-medium capitalize">{service.category}</span>
                 </div>
+                {service.tags && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">Tags:</span>
+                    <span className="text-sm font-medium">{service.tags}</span>
+                  </div>
+                )}
+                {service.featured && (
+                  <div className="flex items-center justify-center">
+                    <span className="text-xs px-2 py-1 rounded-full bg-accent text-accent-foreground">
+                      Featured
+                    </span>
+                  </div>
+                )}
               </div>
 
               <div className="flex items-center space-x-2">
@@ -362,14 +380,27 @@ const ServiceManagement = ({ services, onAdd, onEdit, onDelete, adminRole }) => 
 
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-foreground mb-2">
-                    Description
+                    Short Description
                   </label>
                   <textarea
                     value={formData.description}
                     onChange={(e) => handleInputChange('description', e.target.value)}
-                    placeholder="Enter service description"
+                    placeholder="Enter short service description"
                     className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent resize-none"
-                    rows={3}
+                    rows={2}
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    Full Description
+                  </label>
+                  <textarea
+                    value={formData.fullDescription}
+                    onChange={(e) => handleInputChange('fullDescription', e.target.value)}
+                    placeholder="Enter detailed service description"
+                    className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent resize-none"
+                    rows={4}
                   />
                 </div>
 
@@ -382,39 +413,61 @@ const ServiceManagement = ({ services, onAdd, onEdit, onDelete, adminRole }) => 
                   required
                 />
 
+
                 <Select
                   label="Category"
                   value={formData.category}
-                  onChange={(e) => handleInputChange('category', e.target.value)}
-                  options={categories.map(cat => ({ value: cat, label: cat.charAt(0).toUpperCase() + cat.slice(1) }))}
+                  onChange={(value) => handleInputChange('category', value)}
+                  options={getCategoriesForSelect()}
                 />
 
                 <Select
                   label="Status"
                   value={formData.status}
-                  onChange={(e) => handleInputChange('status', e.target.value)}
+                  onChange={(value) => handleInputChange('status', value)}
                   options={statusOptions}
                 />
 
                 <div className="md:col-span-2">
+                  <ImageUpload
+                    label="Thumbnail Image (required)"
+                    value={formData.image}
+                    onChange={(value) => handleInputChange('image', value)}
+                    placeholder="Upload service thumbnail"
+                    maxSize={5 * 1024 * 1024} // 5MB
+                  />
+                  <div className="mt-2 text-xs text-muted-foreground">
+                    Or enter image URL below:
+                  </div>
                   <Input
-                    label="Image URL (optional)"
                     value={formData.image}
                     onChange={(e) => handleInputChange('image', e.target.value)}
                     placeholder="https://example.com/image.jpg"
+                    className="mt-1"
                   />
                 </div>
 
                 <div className="md:col-span-2">
-                  <MediaUpload
-                    onFilesChange={handleMediaChange}
-                    onRemoveMedia={handleRemoveMedia}
-                    existingMedia={formData.media}
-                    maxFiles={10}
-                    acceptedTypes="image/*,video/*"
-                    maxSize={50 * 1024 * 1024} // 50MB
+                  <Input
+                    label="Tags (comma separated)"
+                    value={formData.tags}
+                    onChange={(e) => handleInputChange('tags', e.target.value)}
+                    placeholder="haircut, styling, premium"
                   />
                 </div>
+
+                <div className="md:col-span-2">
+                  <label className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      checked={formData.featured}
+                      onChange={(e) => handleInputChange('featured', e.target.checked)}
+                      className="rounded border-border text-accent focus:ring-accent"
+                    />
+                    <span className="text-sm font-medium text-foreground">Featured Service</span>
+                  </label>
+                </div>
+
               </div>
 
               <div className="flex justify-end space-x-3 pt-6 border-t border-border">
@@ -450,6 +503,33 @@ const ServiceManagement = ({ services, onAdd, onEdit, onDelete, adminRole }) => 
             <Icon name="Plus" size={16} className="mr-2" />
             Add Your First Service
           </Button>
+        </div>
+      )}
+
+      {/* Category Management Modal */}
+      {showCategoryModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div 
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => setShowCategoryModal(false)}
+          />
+          <div className="relative bg-card rounded-lg shadow-luxury-hover max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-card border-b border-border px-6 py-4 flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-foreground">
+                Manage Categories
+              </h3>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowCategoryModal(false)}
+              >
+                <Icon name="X" size={16} />
+              </Button>
+            </div>
+            <div className="p-6">
+              <CategoryManagement adminRole={adminRole} />
+            </div>
+          </div>
         </div>
       )}
     </div>
