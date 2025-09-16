@@ -13,6 +13,7 @@ import ServiceManagement from './components/ServiceManagement';
 import ProductManagement from './components/ProductManagement';
 import AppointmentManagement from './components/AppointmentManagement';
 import GalleryManagement from './components/GalleryManagement';
+import HomepageGallerySelector from './components/HomepageGallerySelector';
 import WhatsAppTest from './components/WhatsAppTest';
 import CategoryManagement from './components/CategoryManagement';
 import ErrorBoundary from '../../components/ErrorBoundary';
@@ -27,6 +28,11 @@ import ClientManagement from './components/ClientManagement';
 const Admin = () => {
   const navigate = useNavigate();
   const { galleryData, addGalleryItem, updateGalleryItem, deleteGalleryItem } = useGallery();
+  
+  // Debug gallery data changes
+  useEffect(() => {
+    console.log('Admin - Gallery data updated:', galleryData);
+  }, [galleryData]);
   const { services: contextServices, addService, updateService, deleteService } = useService();
   const { currentBranch, getCurrentBranchData, isSuperAdmin } = useBranch();
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -475,6 +481,11 @@ const Admin = () => {
               onDelete={deleteGalleryItem}
               adminRole={adminRole}
             />
+          )}
+
+          {/* Homepage Gallery Tab */}
+          {activeTab === 'homepage-gallery' && (
+            <HomepageGallerySelector adminRole={adminRole} />
           )}
 
           {/* Clients Tab */}

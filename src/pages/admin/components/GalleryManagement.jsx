@@ -7,7 +7,6 @@ import MediaUpload from '../../../components/MediaUpload';
 
 const GalleryManagement = ({ galleryItems, onAdd, onEdit, onDelete, adminRole }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterCategory, setFilterCategory] = useState('all');
   const [filterType, setFilterType] = useState('all');
   const [sortBy, setSortBy] = useState('date');
   const [viewMode, setViewMode] = useState('grid');
@@ -17,13 +16,12 @@ const GalleryManagement = ({ galleryItems, onAdd, onEdit, onDelete, adminRole })
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    category: 'hair',
     tags: '',
     featured: false,
     media: []
   });
 
-  const categories = ['hair', 'nails', 'skincare', 'makeup', 'styling', 'before_after', 'other'];
+  // No category filtering - removed
   const typeOptions = [
     { value: 'all', label: 'All Types' },
     { value: 'image', label: 'Images' },
@@ -34,11 +32,10 @@ const GalleryManagement = ({ galleryItems, onAdd, onEdit, onDelete, adminRole })
     const matchesSearch = item.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          item.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          item.tags?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = filterCategory === 'all' || item.category === filterCategory;
     const matchesType = filterType === 'all' || 
                        (filterType === 'image' && item.media?.some(media => media.type?.startsWith('image/'))) ||
                        (filterType === 'video' && item.media?.some(media => media.type?.startsWith('video/')));
-    return matchesSearch && matchesCategory && matchesType;
+    return matchesSearch && matchesType;
   });
 
   const sortedItems = [...filteredItems].sort((a, b) => {
@@ -47,8 +44,7 @@ const GalleryManagement = ({ galleryItems, onAdd, onEdit, onDelete, adminRole })
         return a.title?.localeCompare(b.title) || 0;
       case 'date':
         return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
-      case 'category':
-        return a.category?.localeCompare(b.category) || 0;
+      // Category sorting removed
       default:
         return 0;
     }
@@ -59,7 +55,6 @@ const GalleryManagement = ({ galleryItems, onAdd, onEdit, onDelete, adminRole })
     setFormData({
       title: '',
       description: '',
-      category: 'hair',
       tags: '',
       featured: false,
       media: []
@@ -72,7 +67,6 @@ const GalleryManagement = ({ galleryItems, onAdd, onEdit, onDelete, adminRole })
     setFormData({
       title: item.title || '',
       description: item.description || '',
-      category: item.category || 'hair',
       tags: item.tags || '',
       featured: item.featured || false,
       media: item.media || []
@@ -82,23 +76,26 @@ const GalleryManagement = ({ galleryItems, onAdd, onEdit, onDelete, adminRole })
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('GalleryManagement - Submitting form data:', formData);
     try {
       if (editingItem) {
+        console.log('GalleryManagement - Editing item:', editingItem.id);
         await onEdit(editingItem.id, formData);
       } else {
+        console.log('GalleryManagement - Adding new item');
         await onAdd(formData);
       }
       // Reset form data after successful submission
       setFormData({
         title: '',
         description: '',
-        category: 'hair',
         tags: '',
         featured: false,
         media: []
       });
       setEditingItem(null);
       setShowModal(false);
+      console.log('GalleryManagement - Form submitted successfully');
     } catch (error) {
       console.error('Error saving gallery item:', error);
       alert('Failed to save gallery item. Please try again.');
@@ -139,7 +136,6 @@ const GalleryManagement = ({ galleryItems, onAdd, onEdit, onDelete, adminRole })
     setFormData({
       title: '',
       description: '',
-      category: 'hair',
       tags: '',
       featured: false,
       media: []
@@ -195,7 +191,7 @@ const GalleryManagement = ({ galleryItems, onAdd, onEdit, onDelete, adminRole })
 
       {/* Filters and Search */}
       <div className="bg-card border border-border rounded-xl p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div className="lg:col-span-2">
             <Input
               placeholder="Search gallery..."
@@ -204,14 +200,6 @@ const GalleryManagement = ({ galleryItems, onAdd, onEdit, onDelete, adminRole })
               icon="Search"
             />
           </div>
-          <Select
-            value={filterCategory}
-            onChange={(e) => setFilterCategory(e.target.value)}
-            options={[
-              { value: 'all', label: 'All Categories' },
-              ...categories.map(cat => ({ value: cat, label: cat.charAt(0).toUpperCase() + cat.slice(1).replace('_', ' ') }))
-            ]}
-          />
           <Select
             value={filterType}
             onChange={(e) => setFilterType(e.target.value)}
@@ -224,7 +212,6 @@ const GalleryManagement = ({ galleryItems, onAdd, onEdit, onDelete, adminRole })
               options={[
                 { value: 'date', label: 'Sort by Date' },
                 { value: 'title', label: 'Sort by Title' },
-                { value: 'category', label: 'Sort by Category' }
               ]}
             />
             <div className="flex border border-border rounded-lg">
@@ -295,7 +282,6 @@ const GalleryManagement = ({ galleryItems, onAdd, onEdit, onDelete, adminRole })
                 <h3 className="font-semibold text-foreground text-lg mb-1">{item.title}</h3>
                 <p className="text-sm text-muted-foreground line-clamp-2 mb-2">{item.description}</p>
                 <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <span className="capitalize">{item.category.replace('_', ' ')}</span>
                   <span>{item.media?.length || 0} media</span>
                 </div>
                 {item.tags && (
@@ -344,7 +330,6 @@ const GalleryManagement = ({ galleryItems, onAdd, onEdit, onDelete, adminRole })
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="text-sm capitalize">{item.category.replace('_', ' ')}</span>
                     </td>
                     <td className="px-6 py-4">
                       <span className="text-sm">{item.media?.length || 0}</span>
@@ -430,12 +415,7 @@ const GalleryManagement = ({ galleryItems, onAdd, onEdit, onDelete, adminRole })
                   />
                 </div>
 
-                <Select
-                  label="Category"
-                  value={formData.category}
-                  onChange={(e) => handleInputChange('category', e.target.value)}
-                  options={categories.map(cat => ({ value: cat, label: cat.charAt(0).toUpperCase() + cat.slice(1).replace('_', ' ') }))}
-                />
+                {/* Category field removed */}
 
                 <Input
                   label="Tags (comma separated)"

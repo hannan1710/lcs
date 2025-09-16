@@ -107,3 +107,5 @@ export const CategoryProvider = ({ children }) => {
 // Add display name for better debugging and HMR
 CategoryProvider.displayName = 'CategoryProvider';
 
+
+

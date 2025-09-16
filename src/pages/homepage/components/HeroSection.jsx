@@ -27,7 +27,7 @@ const HeroSection = () => {
             className="w-full h-full object-cover"
             onEnded={() => setIsVideoPlaying(false)}
           >
-            <source src="/videos/lcss.mp4" type="video/mp4" />
+            <source src="/lcss.mp4" type="video/mp4" />
           </video>
           <div className="absolute inset-0 bg-background/20" />
         </div>

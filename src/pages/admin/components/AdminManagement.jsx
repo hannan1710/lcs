@@ -174,7 +174,7 @@ const AdminManagement = () => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-heading font-bold text-foreground">Admin Management</h2>
-          <p className="text-muted-foreground">Manage admin users and their permissions</p>
+          <p className="text-muted-foreground">La-Coiffure's admin and their permissions</p>
         </div>
         <Button onClick={() => openModal('add')}>
           <Icon name="Plus" size={16} className="mr-2" />

@@ -17,16 +17,18 @@ const MediaUpload = ({
   const [uploadProgress, setUploadProgress] = useState({});
   const fileInputRef = useRef(null);
 
-  const handleFiles = useCallback((files) => {
+  const handleFiles = useCallback(async (files) => {
     const fileArray = Array.from(files);
     const validFiles = [];
     const errors = [];
 
-    fileArray.forEach((file, index) => {
+    for (let index = 0; index < fileArray.length; index++) {
+      const file = fileArray[index];
+      
       // Check file size
       if (file.size > maxSize) {
         errors.push(`${file.name} is too large. Maximum size is ${Math.round(maxSize / 1024 / 1024)}MB`);
-        return;
+        continue;
       }
 
       // Check file type
@@ -36,32 +38,45 @@ const MediaUpload = ({
       
       if (!isImage && !isVideo) {
         errors.push(`${file.name} is not a supported file type`);
-        return;
+        continue;
       }
 
       // Check if we haven't exceeded max files
       if (existingMedia.length + validFiles.length >= maxFiles) {
         errors.push(`Maximum ${maxFiles} files allowed`);
-        return;
+        break;
       }
 
-      validFiles.push({
-        id: `temp-${Date.now()}-${index}`,
-        file,
-        name: file.name,
-        size: file.size,
-        type: fileType,
-        url: URL.createObjectURL(file),
-        isUploading: false // Set to false initially
-      });
-    });
+      try {
+        // Convert file to base64 data URL for persistence
+        const base64Url = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+
+        validFiles.push({
+          id: `gallery-${Date.now()}-${index}`,
+          name: file.name,
+          size: file.size,
+          type: fileType,
+          url: base64Url, // Use base64 data URL instead of blob URL
+          altText: file.name.replace(/\.[^/.]+$/, ""), // Use filename without extension as default alt text
+          isUploading: false
+        });
+      } catch (error) {
+        console.error('Error processing file:', file.name, error);
+        errors.push(`Failed to process ${file.name}`);
+      }
+    }
 
     if (errors.length > 0) {
       alert(errors.join('\n'));
     }
 
     if (validFiles.length > 0) {
-      // Immediately add files without simulation
+      // Add files to gallery
       onFilesChange(validFiles);
     }
   }, [maxFiles, maxSize, existingMedia.length, onFilesChange]);

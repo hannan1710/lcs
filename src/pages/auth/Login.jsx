@@ -50,9 +50,7 @@ const Login = () => {
     }
 
     if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Please enter a valid email";
+      newErrors.email = "Email or username is required";
     }
 
     if (!formData.password.trim()) {
@@ -100,6 +98,7 @@ const Login = () => {
 
         const response = await authAPI.login({
           email: formData.email,
+          username: formData.email, // Support both email and username
           password: formData.password,
         });
 
@@ -252,15 +251,15 @@ const Login = () => {
                   </div>
                 )}
 
-                {/* Email */}
+                {/* Email/Username */}
                 <div>
                   <Input
-                    type="email"
-                    label="Email Address"
+                    type="text"
+                    label="Email or Username"
                     value={formData.email}
                     onChange={(e) => handleInputChange("email", e.target.value)}
                     error={errors.email}
-                    placeholder="Enter your email"
+                    placeholder="Enter your email or username"
                     required
                   />
                 </div>
@@ -422,30 +421,6 @@ const Login = () => {
               </p>
             </div>
 
-            {/* Admin Access Info */}
-            {isLoginMode && (
-              <div className="mt-6 text-center">
-                <div className="bg-muted/30 border border-border rounded-lg p-4">
-                  <div className="flex items-center justify-center space-x-2 mb-2">
-                    <Icon name="Shield" size={16} className="text-accent" />
-                    <span className="text-sm font-medium text-foreground">Admin Access</span>
-                  </div>
-                  <p className="text-xs text-muted-foreground mb-3">
-                    Use admin credentials to access the management dashboard
-                  </p>
-                  <details className="text-xs text-muted-foreground">
-                    <summary className="cursor-pointer hover:text-foreground transition-luxury mb-2">
-                      Demo Admin Credentials
-                    </summary>
-                    <div className="space-y-1 text-left bg-muted/20 rounded p-3 mt-2">
-                      <div><strong>Super Admin:</strong> admin / admin123</div>
-                      <div><strong>Admin:</strong> lacoiffure / orhan110</div>
-                      <div><strong>Super Admin:</strong> hannan / a.hannan123</div>
-                    </div>
-                  </details>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </main>

@@ -11,10 +11,11 @@ const Register = () => {
     firstName: '',
     lastName: '',
     email: '',
+    username: '',
     phone: '',
     password: '',
     confirmPassword: '',
-    dateOfBirth: '',
+  
     hairType: '',
     allergies: '',
     agreeToTerms: false,
@@ -56,6 +57,12 @@ const Register = () => {
       newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Please enter a valid email';
+    }
+    
+    if (!formData.username.trim()) {
+      newErrors.username = 'Username is required';
+    } else if (formData.username.length < 3) {
+      newErrors.username = 'Username must be at least 3 characters';
     }
     
     if (!formData.phone.trim()) {
@@ -172,6 +179,17 @@ const Register = () => {
                       onChange={(e) => handleInputChange('email', e.target.value)}
                       error={errors.email}
                       placeholder="Enter your email"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Input
+                      type="text"
+                      label="Username"
+                      value={formData.username}
+                      onChange={(e) => handleInputChange('username', e.target.value)}
+                      error={errors.username}
+                      placeholder="Choose a username"
                       required
                     />
                   </div>

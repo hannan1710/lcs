@@ -1,83 +1,112 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import Image from '../../../components/AppImage';
 import Button from '../../../components/ui/Button';
 import Icon from '../../../components/AppIcon';
+import { useService } from '../../../contexts/ServiceContext';
 
 const FeaturedServices = () => {
-  const [currentSlide, setCurrentSlide] = useState(0);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const { services: contextServices, refreshServices } = useService();
 
-  const services = [
-    {
-      id: 1,
-      name: "Signature Hair Cut & Style",
-      description: "Personalized cutting and styling consultation with our master stylists, tailored to enhance your unique features and lifestyle.",
-      image: "https://images.pexels.com/photos/3993449/pexels-photo-3993449.jpeg?auto=compress&cs=tinysrgb&w=800",
-      duration: "90 min",
-      category: "Hair"
-    },
-    {
-      id: 2,
-      name: "Premium Color Treatment",
-      description: "Advanced color techniques including balayage, highlights, and full color transformations using luxury professional products.",
-      image: "https://images.pixabay.com/photos/2016/03/26/22/13/woman-1281826_960_720.jpg",
-      duration: "3 hours",
-      category: "Color"
-    },
-    {
-      id: 3,
-      name: "Luxury Facial Treatment",
-      description: "Rejuvenating facial treatments with premium skincare products, customized to your skin type and concerns.",
-      image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      duration: "75 min",
-      category: "Skincare"
-    },
-    {
-      id: 4,
-      name: "Bridal Beauty Package",
-      description: "Complete bridal preparation including hair styling, makeup application, and skincare treatments for your special day.",
-      image: "https://images.pexels.com/photos/1043474/pexels-photo-1043474.jpeg?auto=compress&cs=tinysrgb&w=800",
-      duration: "4 hours",
-      category: "Bridal"
-    },
-    {
-      id: 5,
-      name: "Keratin Treatment",
-      description: "Professional keratin smoothing treatment to eliminate frizz and create silky, manageable hair that lasts for months.",
-      image: "https://images.pixabay.com/photos/2017/07/31/11/22/people-2557396_960_720.jpg",
-      duration: "2.5 hours",
-      category: "Treatment"
-    },
-    {
-      id: 6,
-      name: "Men's Grooming Service",
-      description: "Complete men's grooming experience including precision cuts, beard styling, and premium skincare treatments.",
-      image: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      duration: "60 min",
-      category: "Men's"
-    },
-     {
-      id: 7,
-      name: "woMen's Grooming Service",
-      description: "Complete men's grooming experience including precision cuts, beard styling, and premium skincare treatments.",
-      image: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      duration: "60 min",
-      category: "Men's"
-    }
-  ];
+  // Use real service data from context
+  const services = contextServices || [];
 
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % Math.ceil(services?.length / 4));
-  };
+  // Debug services loading
+  useEffect(() => {
+    console.log('FeaturedServices - contextServices:', contextServices);
+    console.log('FeaturedServices - services:', services);
+    console.log('FeaturedServices - services length:', services.length);
+  }, [contextServices, services]);
 
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + Math.ceil(services?.length / 4)) % Math.ceil(services?.length / 3));
-  };
-const getVisibleServices = () => {
+  // Refresh services when component mounts
+  useEffect(() => {
+    console.log('FeaturedServices - Refreshing services...');
+    refreshServices();
+  }, [refreshServices]);
+
+  // Transform service data to match expected format
+  const transformService = useCallback((service) => ({
+    id: service.id,
+    name: service.name || 'Service',
+    description: service.description || 'Professional service',
+    image: service.image || '/assets/images/no_image.png',
+    duration: service.duration ? (service.duration.includes('min') ? service.duration : `${service.duration} min`) : '60 min',
+    category: service.category === 'other' ? 'Hair' : (service.category || 'Hair')
+  }), []);
+
+  const transformedServices = useMemo(() => 
+    services?.map(transformService) || [], 
+    [services, transformService]
+  );
+
+  const nextSlide = useCallback(() => {
+    const maxSlides = Math.ceil(transformedServices?.length / 4);
+    setCurrentSlide((prev) => (prev + 1) % maxSlides);
+  }, [transformedServices?.length]);
+
+  const prevSlide = useCallback(() => {
+    const maxSlides = Math.ceil(transformedServices?.length / 4);
+    setCurrentSlide((prev) => (prev - 1 + maxSlides) % maxSlides);
+  }, [transformedServices?.length]);
+
+  const getVisibleServices = useCallback(() => {
     const startIndex = currentSlide * 4;
-    return services?.slice(startIndex, startIndex + 4);
-};
+    return transformedServices?.slice(startIndex, startIndex + 4);
+  }, [currentSlide, transformedServices]);
+
+  // Show fallback if no services
+  if (!transformedServices || transformedServices.length === 0) {
+    // Check if we're in admin mode
+    const isAdmin = localStorage.getItem('admin');
+    
+    return (
+      <section className="py-16 lg:py-24 bg-background">
+        <div className="container mx-auto px-6 lg:px-8">
+          <div className="text-center">
+            <h2 className="font-heading text-3xl lg:text-4xl xl:text-5xl font-bold text-foreground mb-4">
+              Featured Services
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
+              {isAdmin 
+                ? 'No services available yet. Please add services through the admin panel or import them from Excel/CSV.'
+                : 'Services are being loaded. Please check back in a moment.'
+              }
+            </p>
+            {isAdmin && (
+              <div className="flex gap-4 justify-center">
+                <Link to="/admin">
+                  <Button variant="outline">
+                    <Icon name="Settings" size={16} className="mr-2" />
+                    Manage Services
+                  </Button>
+                </Link>
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    console.log('Manual refresh triggered');
+                    refreshServices();
+                    // Force re-render
+                    window.location.reload();
+                  }}
+                >
+                  <Icon name="RotateCcw" size={16} className="mr-2" />
+                  Refresh Services
+                </Button>
+              </div>
+            )}
+            {!isAdmin && (
+              <div className="flex items-center justify-center">
+                <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin mr-2"></div>
+                <span className="text-muted-foreground">Loading services...</span>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-16 lg:py-24 bg-background">
@@ -100,7 +129,7 @@ const getVisibleServices = () => {
                 className="flex transition-transform duration-300 ease-in-out"
                 style={{ transform: `translateX(-${currentSlide * 100}%)` }}
               >
-                {services?.map((service) => (
+                {transformedServices?.map((service) => (
                   <div key={service?.id} className="w-full flex-shrink-0 px-2">
                     <div className="bg-card rounded-lg shadow-luxury overflow-hidden border border-border">
                       <div className="relative h-24 overflow-hidden">

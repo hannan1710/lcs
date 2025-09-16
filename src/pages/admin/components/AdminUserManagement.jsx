@@ -18,31 +18,29 @@ const AdminUserManagement = () => {
     isActive: true
   });
 
-  // Load admins from localStorage
+  // Load admins from API
   useEffect(() => {
-    const loadAdmins = () => {
+    const loadAdmins = async () => {
       try {
-        const savedAdmins = localStorage.getItem('salon_admins_data');
-        if (savedAdmins) {
-          setAdmins(JSON.parse(savedAdmins));
+        const response = await fetch('http://localhost:3001/api/admin/users');
+        if (response.ok) {
+          const adminsData = await response.json();
+          setAdmins(adminsData);
         } else {
-          // Create default super admin
-          const defaultAdmins = [
-            {
-              id: 1,
-              username: 'superadmin',
-              email: 'superadmin@lacoiffure.com',
-              role: 'super_admin',
-              branches: ['powai', 'thane'],
-              isActive: true,
-              createdAt: new Date().toISOString()
-            }
-          ];
-          setAdmins(defaultAdmins);
-          localStorage.setItem('salon_admins_data', JSON.stringify(defaultAdmins));
+          console.error('Error loading admins from API');
+          // Fallback to localStorage if API fails
+          const savedAdmins = localStorage.getItem('salon_admins_data');
+          if (savedAdmins) {
+            setAdmins(JSON.parse(savedAdmins));
+          }
         }
       } catch (error) {
         console.error('Error loading admins:', error);
+        // Fallback to localStorage if API fails
+        const savedAdmins = localStorage.getItem('salon_admins_data');
+        if (savedAdmins) {
+          setAdmins(JSON.parse(savedAdmins));
+        }
       }
     };
 
@@ -98,7 +96,7 @@ const AdminUserManagement = () => {
     setShowAddModal(true);
   };
 
-  const handleSaveAdmin = (e) => {
+  const handleSaveAdmin = async (e) => {
     e.preventDefault();
     
     if (!formData.username || !formData.email || (!editingAdmin && !formData.password)) {
@@ -111,35 +109,138 @@ const AdminUserManagement = () => {
       return;
     }
 
-    const adminData = {
-      ...formData,
-      id: editingAdmin ? editingAdmin.id : Date.now(),
-      updatedAt: new Date().toISOString()
-    };
+    try {
+      const adminData = {
+        ...formData,
+        id: editingAdmin ? editingAdmin.id : Date.now(),
+        updatedAt: new Date().toISOString()
+      };
 
-    if (editingAdmin) {
-      setAdmins(prev => prev.map(admin => 
-        admin.id === editingAdmin.id ? adminData : admin
-      ));
-    } else {
-      setAdmins(prev => [...prev, adminData]);
+      if (editingAdmin) {
+        // Update existing admin via API
+        const response = await fetch(`http://localhost:3001/api/admin/users/${editingAdmin.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            username: adminData.username,
+            email: adminData.email,
+            role: adminData.role,
+            branches: adminData.branches
+          })
+        });
+
+        if (response.ok) {
+          setAdmins(prev => prev.map(admin => 
+            admin.id === editingAdmin.id ? adminData : admin
+          ));
+          alert('Admin updated successfully!');
+        } else {
+          const error = await response.json();
+          alert(`Error updating admin: ${error.message}`);
+          return;
+        }
+      } else {
+        // Create new admin via API
+        console.log('Sending admin data:', {
+          username: adminData.username,
+          email: adminData.email,
+          password: adminData.password,
+          role: adminData.role,
+          branches: adminData.branches
+        });
+        
+        const response = await fetch('http://localhost:3001/api/admin/users', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            username: adminData.username,
+            email: adminData.email,
+            password: adminData.password,
+            role: adminData.role,
+            branches: adminData.branches
+          })
+        });
+        
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
+
+        if (response.ok) {
+          const responseText = await response.text();
+          console.log('Response text:', responseText);
+          
+          let result;
+          try {
+            result = JSON.parse(responseText);
+          } catch (parseError) {
+            console.error('JSON parse error:', parseError);
+            alert('Error: Server returned invalid response. Please try again.');
+            return;
+          }
+          
+          const newAdmin = {
+            ...adminData,
+            id: result.user.id,
+            createdAt: result.user.createdAt
+          };
+          setAdmins(prev => [...prev, newAdmin]);
+          console.log('New admin created:', newAdmin);
+          alert(`Admin created successfully!\n\nUsername: ${adminData.username}\nEmail: ${adminData.email}\nPassword: ${adminData.password}\n\nThey can now login with these credentials.`);
+        } else {
+          const responseText = await response.text();
+          console.error('Server error response text:', responseText);
+          
+          let error;
+          try {
+            error = JSON.parse(responseText);
+          } catch (parseError) {
+            console.error('Error response JSON parse error:', parseError);
+            alert(`Error creating admin: Server returned invalid response (Status: ${response.status})`);
+            return;
+          }
+          
+          alert(`Error creating admin: ${error.message || 'Unknown error occurred'}`);
+          return;
+        }
+      }
+
+      setShowAddModal(false);
+      setFormData({
+        username: '',
+        email: '',
+        password: '',
+        role: 'admin',
+        branches: [],
+        isActive: true
+      });
+      setEditingAdmin(null);
+    } catch (error) {
+      console.error('Error saving admin:', error);
+      alert(`Error saving admin: ${error.message || 'Please try again.'}`);
     }
-
-    setShowAddModal(false);
-    setFormData({
-      username: '',
-      email: '',
-      password: '',
-      role: 'admin',
-      branches: [],
-      isActive: true
-    });
-    setEditingAdmin(null);
   };
 
-  const handleDeleteAdmin = (adminId) => {
+  const handleDeleteAdmin = async (adminId) => {
     if (window.confirm('Are you sure you want to delete this admin?')) {
-      setAdmins(prev => prev.filter(admin => admin.id !== adminId));
+      try {
+        const response = await fetch(`/api/admin/users/${adminId}`, {
+          method: 'DELETE'
+        });
+
+        if (response.ok) {
+          setAdmins(prev => prev.filter(admin => admin.id !== adminId));
+          alert('Admin deleted successfully!');
+        } else {
+          const error = await response.json();
+          alert(`Error deleting admin: ${error.message}`);
+        }
+      } catch (error) {
+        console.error('Error deleting admin:', error);
+        alert('Error deleting admin. Please try again.');
+      }
     }
   };
 
@@ -407,4 +508,5 @@ const AdminUserManagement = () => {
 };
 
 export default AdminUserManagement;
+
 

@@ -84,24 +84,14 @@ const ImageLightbox = ({
       {/* Main Media */}
       <div className="flex items-center justify-center h-full p-4 lg:p-8">
         <div className="relative max-w-4xl max-h-full">
-          {currentImage?.mediaType && currentImage?.mediaType.startsWith('video/') ? (
-            <video
-              src={currentImage?.image}
-              className="max-w-full max-h-full object-contain rounded-lg"
-              controls
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="metadata"
-            />
-          ) : (
-            <Image
-              src={currentImage?.image}
-              alt={currentImage?.title}
-              className="max-w-full max-h-full object-contain rounded-lg"
-            />
-          )}
+          <Image
+            src={currentImage?.image}
+            alt={currentImage?.title}
+            className="max-w-full max-h-full object-contain rounded-lg"
+            onError={(e) => {
+              e.target.src = '/assets/images/no_image.png';
+            }}
+          />
           
           {/* Before/After Indicator */}
           {currentImage?.isBeforeAfter && (

@@ -1,117 +1,58 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import Image from "../../../components/AppImage";
 import Button from "../../../components/ui/Button";
 import Icon from "../../../components/AppIcon";
+import { useGallery } from "../../../contexts/GalleryContext";
 
 const SalonGallery = () => {
-  const [selectedCategory, setSelectedCategory] = useState("all");
+  const { homepageGallery, refreshGalleryData } = useGallery();
 
-  const categories = [
-    { id: "all", name: "All", icon: "Grid3X3" },
-    { id: "salon", name: "Salon", icon: "Building" },
-    { id: "hair", name: "Hair Work", icon: "Scissors" },
-    { id: "color", name: "Color", icon: "Palette" },
-    { id: "bridal", name: "Bridal", icon: "Heart" },
-  ];
+  // Refresh gallery data when component mounts to ensure latest data
+  useEffect(() => {
+    refreshGalleryData();
+  }, [refreshGalleryData]);
 
-  const galleryImages = [
-    {
-      id: 1,
-      src: "https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      alt: "Luxury salon interior with elegant styling chairs",
-      category: "salon",
-      title: "Main Styling Floor",
-    },
-    {
-      id: 2,
-      src: "https://images.pexels.com/photos/3993449/pexels-photo-3993449.jpeg?auto=compress&cs=tinysrgb&w=800",
-      alt: "Professional hair cutting and styling session",
-      category: "hair",
-      title: "Precision Cut",
-    },
-    {
-      id: 3,
-      src: "https://images.pixabay.com/photos/2016/03/26/22/13/woman-1281826_960_720.jpg",
-      alt: "Beautiful hair color transformation",
-      category: "color",
-      title: "Color Transformation",
-    },
-    {
-      id: 4,
-      src: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      alt: "Relaxing facial treatment room",
-      category: "salon",
-      title: "Treatment Room",
-    },
-    {
-      id: 5,
-      src: "https://images.pexels.com/photos/1043474/pexels-photo-1043474.jpeg?auto=compress&cs=tinysrgb&w=800",
-      alt: "Elegant bridal hair styling",
-      category: "bridal",
-      title: "Bridal Elegance",
-    },
-    {
-      id: 6,
-      src: "https://images.pixabay.com/photos/2017/07/31/11/22/people-2557396_960_720.jpg",
-      alt: "Professional hair treatment application",
-      category: "hair",
-      title: "Keratin Treatment",
-    },
-    {
-      id: 7,
-      src: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      alt: "Men's grooming and styling service",
-      category: "hair",
-      title: "Men's Styling",
-    },
-    {
-      id: 8,
-      src: "https://images.pexels.com/photos/3764011/pexels-photo-3764011.jpeg?auto=compress&cs=tinysrgb&w=800",
-      alt: "Luxury salon reception area",
-      category: "salon",
-      title: "Reception Area",
-    },
-    {
-      id: 9,
-      src: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      alt: "Beautiful balayage color work",
-      category: "color",
-      title: "Balayage Artistry",
-    },
-    {
-      id: 10,
-      src: "https://images.pixabay.com/photos/2016/11/19/15/32/woman-1840517_960_720.jpg",
-      alt: "Stunning bridal updo hairstyle",
-      category: "bridal",
-      title: "Bridal Updo",
-    },
-    {
-      id: 11,
-      src: "https://images.unsplash.com/photo-1562322140-8baeececf3df?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      alt: "Modern salon workspace",
-      category: "salon",
-      title: "Styling Station",
-    },
-    {
-      id: 12,
-      src: "https://images.pexels.com/photos/3065209/pexels-photo-3065209.jpeg?auto=compress&cs=tinysrgb&w=800",
-      alt: "Creative hair color design",
-      category: "color",
-      title: "Creative Color",
-    },
-  ];
+  // Get homepage gallery selection - use state directly for reactivity
+  const homepageImages = homepageGallery;
 
-  const filteredImages =
-    selectedCategory === "all"
-      ? galleryImages
-      : galleryImages?.filter((img) => img?.category === selectedCategory);
+  // Transform gallery data to match the expected format
+  const galleryImages = (homepageImages || []).map(item => ({
+    id: item.id,
+    src: item.media?.[0]?.url || "/assets/images/no_image.png",
+    alt: item.media?.[0]?.altText || item.title || "Gallery Image",
+    category: item.category || "hair",
+    title: item.title || "Untitled",
+    description: item.description || "",
+    tags: item.tags || "",
+    featured: item.featured || false
+  }));
 
-  const displayedImages = filteredImages?.slice(0, 8);
+  // Show selected images for homepage
+  const displayedImages = galleryImages?.slice(0, 8);
 
   return (
     <section className="py-16 lg:py-24 bg-muted/30">
       <div className="container mx-auto px-6 lg:px-8">
+        {/* Structured Data for SEO */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "ImageGallery",
+              "name": "La Coiffure Salon Gallery",
+              "description": "Professional hair styling, cutting, and beauty services gallery at La Coiffure Salon",
+              "url": window.location.href,
+              "image": galleryImages.slice(0, 8).map(img => ({
+                "@type": "ImageObject",
+                "url": img.src,
+                "name": img.title,
+                "description": img.alt
+              }))
+            })
+          }}
+        />
         {/* Section Header */}
         <div className="text-center mb-12 lg:mb-16">
           <h2 className="font-heading text-3xl lg:text-4xl xl:text-5xl font-bold text-foreground mb-4">
@@ -122,55 +63,51 @@ const SalonGallery = () => {
             work through our curated gallery of transformations.
           </p>
         </div>
-      {/* Category Filter */}
-<div className="flex overflow-x-auto flex-nowrap gap-3 mb-10 pb-2 hide-scrollbar">
-  {categories?.map((category) => (
-    <button
-      key={category?.id}
-      onClick={() => setSelectedCategory(category?.id)}
-      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm flex-shrink-0 transition-luxury ${
-        selectedCategory === category?.id
-          ? "bg-accent text-accent-foreground"
-          : "bg-card text-foreground hover:bg-muted border border-border"
-      }`}
-    >
-      <Icon name={category?.icon} size={12} />
-      <span className="font-medium">{category?.name}</span>
-    </button>
-  ))}
-</div>
+      {/* No category filter - removed */}
 
 
         {/* Gallery Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-12">
-          {displayedImages?.map((image, index) => (
+          {displayedImages && displayedImages.length > 0 ? displayedImages.map((image, index) => (
             <div
               key={image?.id}
               className={`group relative overflow-hidden rounded-2xl shadow-luxury hover:shadow-luxury-hover transition-luxury cursor-pointer`}
             >
               <div className={`relative h-20 sm:h-32 md:h-48`}>
-                <Image
-                  src={image?.src}
-                  alt={image?.alt}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                />
+                  <Image
+                    src={image?.src}
+                    alt={image?.alt}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    loading="lazy"
+                    onError={(e) => {
+                      e.target.src = '/assets/images/no_image.png';
+                    }}
+                  />
 
                 {/* Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-                {/* Content */}
-                <div className="absolute bottom-0 left-0 right-0 p-6 text-white transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                  <h3 className="font-heading text-lg font-semibold mb-2">
+                {/* Content - Always visible at bottom */}
+                <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
+                  <h3 className="font-heading text-sm font-semibold truncate">
                     {image?.title}
                   </h3>
-                  <div className="flex items-center gap-2">
-                    <Icon name="Eye" size={16} />
-                    <span className="text-sm">View Details</span>
-                  </div>
                 </div>
               </div>
             </div>
-          ))}
+          )) : (
+            <div className="col-span-full flex flex-col items-center justify-center py-16">
+              <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
+                <Icon name="Image" size={32} className="text-muted-foreground" />
+              </div>
+              <h3 className="font-heading text-xl font-semibold text-foreground mb-2">
+                No Images Found
+              </h3>
+              <p className="text-muted-foreground text-center max-w-md">
+                Gallery images are loading. Please check back in a moment.
+              </p>
+            </div>
+          )}
         </div>
 
         {/* View More Button */}

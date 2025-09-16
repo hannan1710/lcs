@@ -139,7 +139,7 @@ const AdminLogin = () => {
               Admin Login
             </h1>
             <p className="text-muted-foreground">
-              Access your salon management dashboard
+              La-Coiffure Salon dashboard
             </p>
           </div>
 
@@ -188,15 +188,7 @@ const AdminLogin = () => {
               )}
             </Button>
           </form>
-
-          <div className="mt-6 text-center">
-            <p className="text-sm text-muted-foreground">
-              Demo credentials: username: <code className="bg-muted px-1 rounded">superadmin</code>, password: <code className="bg-muted px-1 rounded">admin</code>
-            </p>
-            <p className="text-xs text-muted-foreground mt-1">
-              Branch access is determined by super admin assignment
-            </p>
-          </div>
+           
         </div>
       </div>
     </div>

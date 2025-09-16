@@ -13,6 +13,7 @@ const AdminSidebar = ({ activeTab, setActiveTab, adminRole, onLogout }) => {
     { id: 'services', label: 'Services', icon: 'Scissors', description: 'Service catalog' },
     { id: 'products', label: 'Products', icon: 'Package', description: 'Product inventory' },
     { id: 'gallery', label: 'Gallery', icon: 'Image', description: 'Photo & video gallery' },
+    { id: 'homepage-gallery', label: 'Homepage Gallery', icon: 'Layout', description: 'Select homepage photos' },
     { id: 'stylists', label: 'Stylists', icon: 'Users', description: 'Team management' },
     { id: 'clients', label: 'Clients', icon: 'User', description: 'Customer database' },
     { id: 'payments', label: 'Payments', icon: 'CreditCard', description: 'Payment & refunds' },

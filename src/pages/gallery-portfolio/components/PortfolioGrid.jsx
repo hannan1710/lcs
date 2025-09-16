@@ -39,20 +39,15 @@ const PortfolioGrid = ({ images, onImageClick }) => {
               />
               
               {/* Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-luxury">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-luxury">
                 <div className="absolute bottom-0 left-0 right-0 p-3">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-white text-sm font-medium truncate">
-                        {image?.title}
-                      </p>
-                      <p className="text-white/80 text-xs">
-                        {image?.category}
-                      </p>
-                    </div>
-                    <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
-                      <Icon name="Eye" size={16} color="white" />
-                    </div>
+                  <div>
+                    <p className="text-white text-sm font-medium truncate">
+                      {image?.title}
+                    </p>
+                    <p className="text-white/80 text-xs">
+                      {image?.category}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -83,28 +78,18 @@ const PortfolioGrid = ({ images, onImageClick }) => {
               />
               
               {/* Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-luxury">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-luxury">
                 <div className="absolute bottom-0 left-0 right-0 p-4">
-                  <div className="space-y-2">
-                    <h4 className="text-white font-medium">
+                  <div className="space-y-1">
+                    <h4 className="text-white font-medium text-sm truncate">
                       {image?.title}
                     </h4>
-                    <p className="text-white/80 text-sm">
+                    <p className="text-white/80 text-xs">
                       {image?.category} • By {image?.stylist}
                     </p>
-                    <div className="flex items-center justify-between pt-2">
-                      <span className="text-white/60 text-xs">
-                        {image?.duration}
-                      </span>
-                      <div className="flex space-x-2">
-                        <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white/30 transition-luxury">
-                          <Icon name="Eye" size={16} color="white" />
-                        </div>
-                        <div className="w-8 h-8 bg-accent/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-accent transition-luxury">
-                          <Icon name="Calendar" size={16} color="white" />
-                        </div>
-                      </div>
-                    </div>
+                    <span className="text-white/60 text-xs">
+                      {image?.duration}
+                    </span>
                   </div>
                 </div>
               </div>

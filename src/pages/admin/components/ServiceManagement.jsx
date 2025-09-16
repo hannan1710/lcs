@@ -150,31 +150,75 @@ const ServiceManagement = ({ services, onAdd, onEdit, onDelete, adminRole }) => 
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
     if (file) {
+      console.log('File selected:', file.name, 'Size:', file.size, 'Type:', file.type);
       setImportFile(file);
       const extension = file.name.split('.').pop().toLowerCase();
+      console.log('File extension detected:', extension);
+      
       if (['csv'].includes(extension)) {
+        console.log('Setting import type to CSV');
         setImportType('csv');
       } else if (['xlsx', 'xls'].includes(extension)) {
+        console.log('Setting import type to Excel');
         setImportType('excel');
       } else if (['pdf'].includes(extension)) {
+        console.log('Setting import type to PDF');
         setImportType('pdf');
+      } else {
+        console.log('Unknown file type, defaulting to Excel');
+        setImportType('excel');
       }
     }
   };
 
   const parseCSV = (csvText) => {
-    const lines = csvText.split('\n');
+    console.log('CSV Parser - Raw text:', csvText);
+    
+    const lines = csvText.split('\n').filter(line => line.trim());
+    console.log('CSV Parser - Lines:', lines);
+    
+    if (lines.length < 2) {
+      console.log('CSV Parser - Not enough lines');
+      return [];
+    }
+    
     const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+    console.log('CSV Parser - Headers:', headers);
+    
     const services = [];
     
     for (let i = 1; i < lines.length; i++) {
-      if (lines[i].trim()) {
-        const values = lines[i].split(',').map(v => v.trim());
+      const line = lines[i].trim();
+      if (line) {
+        console.log(`CSV Parser - Processing line ${i}:`, line);
+        
+        // Handle CSV parsing more robustly - split by comma but handle quoted values
+        const values = [];
+        let current = '';
+        let inQuotes = false;
+        
+        for (let j = 0; j < line.length; j++) {
+          const char = line[j];
+          if (char === '"') {
+            inQuotes = !inQuotes;
+          } else if (char === ',' && !inQuotes) {
+            values.push(current.trim());
+            current = '';
+          } else {
+            current += char;
+          }
+        }
+        values.push(current.trim());
+        
+        console.log('CSV Parser - Parsed values:', values);
+        
         const service = {};
         
         headers.forEach((header, index) => {
           const value = values[index] || '';
           const headerLower = header.toLowerCase();
+          
+          console.log(`CSV Parser - Processing header "${header}" with value "${value}"`);
           
           if (headerLower.includes('name')) {
             service.name = value;
@@ -183,7 +227,7 @@ const ServiceManagement = ({ services, onAdd, onEdit, onDelete, adminRole }) => 
           } else if (headerLower.includes('duration')) {
             service.duration = value || '';
           } else if (headerLower.includes('category')) {
-            service.category = value || '';
+            service.category = value || 'hair'; // Default to 'hair' if no category
           } else if (headerLower.includes('description')) {
             service.description = value || '';
           } else if (headerLower.includes('status')) {
@@ -191,24 +235,30 @@ const ServiceManagement = ({ services, onAdd, onEdit, onDelete, adminRole }) => 
           }
         });
         
+        console.log('CSV Parser - Parsed service:', service);
+        
         if (service.name) {
           // Ensure all fields are present, even if empty
           const completeService = {
             name: service.name || '',
-            price: service.price || '',
-            duration: service.duration || '',
-            category: service.category || 'other', // Default to 'other' category if empty
-            description: service.description || '',
+            price: service.price || 0, // Default to 0 if no price
+            duration: service.duration || '30 min', // Default duration
+            category: service.category || 'hair', // Default to 'hair' category
+            description: service.description || service.name, // Use name as description if none provided
             status: service.status || 'active',
             image: '',
             tags: '',
             featured: false
           };
           services.push(completeService);
+          console.log('CSV Parser - Added service:', completeService);
+        } else {
+          console.log('CSV Parser - Skipping row - no name found');
         }
       }
     }
     
+    console.log('CSV Parser - Final services:', services);
     return services;
   };
 
@@ -217,11 +267,16 @@ const ServiceManagement = ({ services, onAdd, onEdit, onDelete, adminRole }) => 
       const reader = new FileReader();
       reader.onload = (e) => {
         try {
+          console.log('Reading Excel file...');
           const data = new Uint8Array(e.target.result);
           const workbook = XLSX.read(data, { type: 'array' });
+          console.log('Workbook sheets:', workbook.SheetNames);
+          
           const sheetName = workbook.SheetNames[0];
           const worksheet = workbook.Sheets[sheetName];
           const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+          
+          console.log('Raw Excel data:', jsonData);
           
           if (jsonData.length < 2) {
             reject(new Error('Excel file must have at least a header row and one data row'));
@@ -229,10 +284,13 @@ const ServiceManagement = ({ services, onAdd, onEdit, onDelete, adminRole }) => 
           }
           
           const headers = jsonData[0].map(h => h ? h.toString().trim().toLowerCase() : '');
+          console.log('Headers found:', headers);
           const services = [];
           
           for (let i = 1; i < jsonData.length; i++) {
             const row = jsonData[i];
+            console.log(`Processing row ${i}:`, row);
+            
             if (row.some(cell => cell !== undefined && cell !== '')) {
               const service = {};
               
@@ -247,7 +305,7 @@ const ServiceManagement = ({ services, onAdd, onEdit, onDelete, adminRole }) => 
                 } else if (headerLower.includes('duration')) {
                   service.duration = value;
                 } else if (headerLower.includes('category')) {
-                  service.category = value;
+                  service.category = value || 'hair'; // Default to 'hair' if no category
                 } else if (headerLower.includes('description')) {
                   service.description = value;
                 } else if (headerLower.includes('status')) {
@@ -255,26 +313,33 @@ const ServiceManagement = ({ services, onAdd, onEdit, onDelete, adminRole }) => 
                 }
               });
               
+              console.log('Parsed service:', service);
+              
               if (service.name) {
                 // Ensure all fields are present, even if empty
                 const completeService = {
                   name: service.name || '',
-                  price: service.price || '',
-                  duration: service.duration || '',
-                  category: service.category || 'other', // Default to 'other' category if empty
-                  description: service.description || '',
+                  price: service.price || 0, // Default to 0 if no price
+                  duration: service.duration || '30 min', // Default duration
+                  category: service.category || 'hair', // Default to 'hair' category
+                  description: service.description || service.name, // Use name as description if none provided
                   status: service.status || 'active',
                   image: '',
                   tags: '',
                   featured: false
                 };
                 services.push(completeService);
+                console.log('Added service to list:', completeService);
+              } else {
+                console.log('Skipping row - no name found');
               }
             }
           }
           
+          console.log('Final services array:', services);
           resolve(services);
         } catch (error) {
+          console.error('Error parsing Excel:', error);
           reject(error);
         }
       };
@@ -284,43 +349,83 @@ const ServiceManagement = ({ services, onAdd, onEdit, onDelete, adminRole }) => 
   };
 
   const handleImport = async () => {
-    if (!importFile) return;
+    if (!importFile) {
+      alert('Please select a file first!');
+      return;
+    }
     
     setIsImporting(true);
     try {
       let servicesToImport = [];
       
+      console.log('=== IMPORT DEBUG START ===');
+      console.log('Import type:', importType);
+      console.log('File name:', importFile.name);
+      console.log('File size:', importFile.size);
+      console.log('File type:', importFile.type);
+      
       if (importType === 'csv') {
+        console.log('Processing CSV file...');
         const text = await importFile.text();
+        console.log('CSV content (first 500 chars):', text.substring(0, 500));
+        console.log('CSV content (full):', text);
         servicesToImport = parseCSV(text);
+        console.log('CSV parsed result:', servicesToImport);
       } else if (importType === 'excel') {
+        console.log('Processing Excel file...');
         servicesToImport = await parseExcel(importFile);
+        console.log('Excel parsed result:', servicesToImport);
       } else if (importType === 'pdf') {
-        // For PDF files, show instructions for manual entry
         alert('PDF files cannot be automatically parsed. Please convert your PDF to Excel or CSV format, or manually add services using the "Add New Service" button.');
+        setIsImporting(false);
+        return;
+      }
+      
+      console.log('Total services to import:', servicesToImport.length);
+      
+      if (servicesToImport.length === 0) {
+        alert('No valid services found in the file. Please check the format and try again.');
         setIsImporting(false);
         return;
       }
       
       // Validate and clean up services before importing
       const validCategoryIds = categories.map(cat => cat.id);
+      console.log('Valid categories:', validCategoryIds);
+      
       const cleanedServices = servicesToImport.map(service => ({
         ...service,
         category: validCategoryIds.includes(service.category) ? service.category : 'other'
       }));
       
+      console.log('Cleaned services:', cleanedServices);
+      
       // Import services one by one
+      let successCount = 0;
+      let errorCount = 0;
+      
       for (const service of cleanedServices) {
         try {
-          await onAdd(service);
+          console.log('Attempting to add service:', service);
+          const result = await onAdd(service);
+          console.log('Service added successfully:', result);
+          successCount++;
         } catch (error) {
           console.error('Error importing service:', service.name, error);
+          errorCount++;
         }
       }
       
-      alert(`Successfully imported ${cleanedServices.length} services!`);
-      setShowImportModal(false);
-      setImportFile(null);
+      console.log(`Import complete: ${successCount} successful, ${errorCount} failed`);
+      console.log('=== IMPORT DEBUG END ===');
+      
+      if (successCount > 0) {
+        alert(`Successfully imported ${successCount} services!${errorCount > 0 ? ` (${errorCount} failed)` : ''}`);
+        setShowImportModal(false);
+        setImportFile(null);
+      } else {
+        alert('No services were imported. Please check the file format and try again.');
+      }
     } catch (error) {
       console.error('Error importing file:', error);
       alert(`Error importing file: ${error.message}. Please check the format and try again.`);
@@ -328,6 +433,7 @@ const ServiceManagement = ({ services, onAdd, onEdit, onDelete, adminRole }) => 
       setIsImporting(false);
     }
   };
+
 
   // Function to fix existing services with invalid categories
   const fixInvalidCategories = () => {
@@ -776,13 +882,19 @@ const ServiceManagement = ({ services, onAdd, onEdit, onDelete, adminRole }) => 
                 <label className="block text-sm font-medium text-foreground mb-2">File Type</label>
                 <select
                   value={importType}
-                  onChange={(e) => setImportType(e.target.value)}
+                  onChange={(e) => {
+                    console.log('Manual file type change to:', e.target.value);
+                    setImportType(e.target.value);
+                  }}
                   className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                 >
                   <option value="excel">Excel File (.xlsx)</option>
                   <option value="csv">CSV File</option>
                   <option value="pdf">PDF File</option>
                 </select>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Current type: {importType} | File: {importFile?.name || 'None selected'}
+                </p>
               </div>
               
               <div>
@@ -805,18 +917,18 @@ const ServiceManagement = ({ services, onAdd, onEdit, onDelete, adminRole }) => 
                 <div className="bg-muted/50 p-3 rounded-lg">
                   <h4 className="text-sm font-medium text-foreground mb-2">Excel File Support:</h4>
                   <p className="text-xs text-muted-foreground mb-2">
-                    Your Excel file should have these columns (in any order):
+                    Your Excel file should have at least a Name column. Other columns are optional:
                   </p>
                   <ul className="text-xs text-muted-foreground space-y-1">
-                    <li>• <strong>Name</strong> (required)</li>
-                    <li>• Price (optional)</li>
-                    <li>• Duration (optional)</li>
-                    <li>• Category (optional)</li>
-                    <li>• Description (optional)</li>
-                    <li>• Status (optional)</li>
+                    <li>• <strong>Name</strong> (required) - Service name</li>
+                    <li>• Price (optional) - Defaults to 0 if not provided</li>
+                    <li>• Duration (optional) - Defaults to "30 min" if not provided</li>
+                    <li>• Category (optional) - Defaults to "hair" if not provided</li>
+                    <li>• Description (optional) - Uses service name if not provided</li>
+                    <li>• Status (optional) - Defaults to "active" if not provided</li>
                   </ul>
                   <p className="text-xs text-muted-foreground mt-2">
-                    Only Name is required. All other columns are optional.
+                    <strong>Simple format:</strong> Just create an Excel file with one column "Name" and list your services.
                   </p>
                 </div>
               )}
@@ -825,18 +937,18 @@ const ServiceManagement = ({ services, onAdd, onEdit, onDelete, adminRole }) => 
                 <div className="bg-muted/50 p-3 rounded-lg">
                   <h4 className="text-sm font-medium text-foreground mb-2">CSV Format Requirements:</h4>
                   <p className="text-xs text-muted-foreground mb-2">
-                    Your CSV should have these columns (in any order):
+                    Your CSV should have at least a Name column. Other columns are optional:
                   </p>
                   <ul className="text-xs text-muted-foreground space-y-1">
-                    <li>• <strong>Name</strong> (required)</li>
-                    <li>• Price (optional)</li>
-                    <li>• Duration (optional)</li>
-                    <li>• Category (optional)</li>
-                    <li>• Description (optional)</li>
-                    <li>• Status (optional)</li>
+                    <li>• <strong>Name</strong> (required) - Service name</li>
+                    <li>• Price (optional) - Defaults to 0 if not provided</li>
+                    <li>• Duration (optional) - Defaults to "30 min" if not provided</li>
+                    <li>• Category (optional) - Defaults to "hair" if not provided</li>
+                    <li>• Description (optional) - Uses service name if not provided</li>
+                    <li>• Status (optional) - Defaults to "active" if not provided</li>
                   </ul>
                   <p className="text-xs text-muted-foreground mt-2">
-                    Only Name is required. All other columns are optional.
+                    <strong>Simple format:</strong> Just create a CSV with one column "Name" and list your services.
                   </p>
                 </div>
               )}

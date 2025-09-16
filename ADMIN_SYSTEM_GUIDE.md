@@ -223,3 +223,5 @@ const analytics = await analyticsAPI.getDashboardStats(currentBranch);
 
 This system provides a robust foundation for managing multi-branch salon operations with proper access control and data isolation.
 
+
+

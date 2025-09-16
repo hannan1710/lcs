@@ -126,492 +126,68 @@ La Coiffure Salon Team`;
   return result;
 };
 
-// Mock data storage
-let appointments = [
-  {
-    id: 1,
-    client: 'Sarah Johnson',
-    service: 'Hair Cut & Style',
-    date: '2024-01-15',
-    time: '10:00 AM',
-    status: 'confirmed',
-    stylist: 'Emma Rodriguez',
-    price: 150,
-    branch: 'powai',
-    mobileNumber: '+919876543210',
-    bookingType: 'appointment'
-  },
-  {
-    id: 2,
-    client: 'Emily Davis',
-    service: 'Color Treatment',
-    date: '2024-01-15',
-    time: '2:00 PM',
-    status: 'pending',
-    stylist: 'David Chen',
-    price: 250,
-    branch: 'thane',
-    mobileNumber: '+919876543211',
-    bookingType: 'appointment'
-  },
-  {
-    id: 3,
-    client: 'Michael Brown',
-    service: 'Men\'s Grooming',
-    date: '2024-01-16',
-    time: '11:30 AM',
-    status: 'confirmed',
-    stylist: 'James Wilson',
-    price: 85,
-    branch: 'powai',
-    mobileNumber: '+919876543212',
-    bookingType: 'appointment'
-  },
-  {
-    id: 4,
-    client: 'Lisa Wilson',
-    service: 'Bridal Package',
-    date: '2024-01-16',
-    time: '9:00 AM',
-    status: 'confirmed',
-    stylist: 'Sophia Martinez',
-    price: 450,
-    branch: 'thane',
-    mobileNumber: '+919876543213',
-    bookingType: 'appointment'
-  }
-];
+// Data storage - Start with empty arrays
+let appointments = [];
 
-// Admin users storage
+// Admin users storage - Start with default admin users
 let admins = [
   {
     id: 1,
     username: 'admin',
+    email: 'admin@lacoiffure.com',
     password: 'admin123',
-    email: 'admin@lacoiffuresalon.com',
     role: 'super_admin',
-    createdAt: '2024-01-01',
+    branches: ['powai', 'thane'],
+    isActive: true,
+    createdAt: new Date().toISOString(),
     lastLogin: null
   },
   {
     id: 2,
     username: 'lacoiffure',
+    email: 'lacoiffure@lacoiffure.com',
     password: 'orhan110',
-    email: 'admin@lacoiffuresalon.in',
     role: 'admin',
-    createdAt: '2024-01-01',
+    branches: ['powai', 'thane'],
+    isActive: true,
+    createdAt: new Date().toISOString(),
     lastLogin: null
   },
   {
     id: 3,
     username: 'hannan',
+    email: 'hannan@lacoiffure.com',
     password: 'a.hannan123',
-    email: 'hannan@lacoiffuresalon.in',
     role: 'super_admin',
-    createdAt: '2024-01-01',
-    lastLogin: null
-  },
-  {
-    id: 4,
-    username: 'imran',
-    password: 'imran123',
-    email: 'imran@lacoiffuresalon.in',
-    role: 'super_admin',
-    createdAt: '2024-01-01',
-    lastLogin: null
+    branches: ['powai', 'thane'],
+    isActive: true,
+    createdAt: new Date().toISOString()
   }
 ];
 
-let services = [
-  {
-    id: 1,
-    name: 'Signature Hair Cut & Style',
-    price: 150,
-    duration: '90 min',
-    category: 'Hair',
-    status: 'active',
-    description: 'Premium precision cut with personalized styling consultation and luxury finish',
-    image: 'https://images.pexels.com/photos/3993449/pexels-photo-3993449.jpeg?auto=compress&cs=tinysrgb&w=800'
-  },
-  {
-    id: 2,
-    name: 'Premium Color Treatment',
-    price: 250,
-    duration: '3 hours',
-    category: 'Color',
-    status: 'active',
-    description: 'Advanced color techniques including balayage, highlights, and full color transformations',
-    image: 'https://images.pixabay.com/photos/2016/03/26/22/13/woman-1281826_960_720.jpg'
-  },
-  {
-    id: 3,
-    name: 'Luxury Facial Treatment',
-    price: 120,
-    duration: '75 min',
-    category: 'Skincare',
-    status: 'active',
-    description: 'Rejuvenating facial treatments with premium skincare products',
-    image: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
-  },
-  {
-    id: 4,
-    name: 'Bridal Beauty Package',
-    price: 450,
-    duration: '4 hours',
-    category: 'Bridal',
-    status: 'active',
-    description: 'Complete bridal preparation including hair styling, makeup application, and skincare treatments',
-    image: 'https://images.pexels.com/photos/1043474/pexels-photo-1043474.jpeg?auto=compress&cs=tinysrgb&w=800'
-  }
-];
+let services = [];
 
-let stylists = [
-  // Powai Branch Stylists
-  {
-    id: 1,
-    name: 'Emma Rodriguez',
-    specialty: 'Color Specialist',
-    experience: '8 years',
-    status: 'active',
-    branch: 'powai',
-    image: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=200&h=200&fit=crop&crop=face',
-    rating: 4.9,
-    reviewCount: 127,
-    bio: 'Emma specializes in color transformations and has been with La Coiffure for 8 years.',
-    services: ['Hair Coloring', 'Highlights', 'Balayage', 'Color Correction'],
-    availability: 'Monday-Friday, 9AM-6PM'
-  },
-  {
-    id: 2,
-    name: 'David Chen',
-    specialty: 'Cutting Expert',
-    experience: '12 years',
-    status: 'active',
-    branch: 'powai',
-    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face',
-    rating: 4.8,
-    reviewCount: 89,
-    bio: 'David is our master cutter with 12 years of experience in precision cutting.',
-    services: ['Hair Cutting', 'Styling', 'Men\'s Grooming', 'Beard Trimming'],
-    availability: 'Tuesday-Saturday, 10AM-7PM'
-  },
-  {
-    id: 3,
-    name: 'Sophia Martinez',
-    specialty: 'Bridal Specialist',
-    experience: '6 years',
-    status: 'active',
-    branch: 'powai',
-    image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop&crop=face',
-    rating: 4.7,
-    reviewCount: 156,
-    bio: 'Sophia creates magical bridal looks and specializes in special occasion styling.',
-    services: ['Bridal Hair', 'Makeup', 'Special Occasion', 'Hair Styling'],
-    availability: 'Monday-Sunday, 8AM-8PM'
-  },
-  // Thane Branch Stylists
-  {
-    id: 4,
-    name: 'James Wilson',
-    specialty: 'Men\'s Grooming',
-    experience: '10 years',
-    status: 'active',
-    branch: 'thane',
-    image: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=200&h=200&fit=crop&crop=face',
-    rating: 4.9,
-    reviewCount: 203,
-    bio: 'James is our men\'s grooming expert with a focus on modern cuts and styling.',
-    services: ['Men\'s Haircut', 'Beard Styling', 'Hair Styling', 'Grooming'],
-    availability: 'Monday-Friday, 9AM-6PM'
-  },
-  // Additional Powai Stylists
-  {
-    id: 5,
-    name: 'Priya Sharma',
-    specialty: 'Hair Treatments',
-    experience: '5 years',
-    status: 'active',
-    branch: 'powai',
-    image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop&crop=face',
-    rating: 4.6,
-    reviewCount: 67,
-    bio: 'Priya specializes in hair treatments and scalp care for healthy, beautiful hair.',
-    services: ['Hair Treatments', 'Scalp Care', 'Hair Masks', 'Keratin Treatment'],
-    availability: 'Monday-Friday, 9AM-5PM'
-  },
-  // Additional Thane Stylists
-  {
-    id: 6,
-    name: 'Rajesh Kumar',
-    specialty: 'Hair Cutting',
-    experience: '11 years',
-    status: 'active',
-    branch: 'thane',
-    image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop&crop=face',
-    rating: 4.7,
-    reviewCount: 89,
-    bio: 'Rajesh is our senior stylist with expertise in all types of hair cutting techniques.',
-    services: ['Hair Cutting', 'Hair Styling', 'Hair Consultation', 'Hair Care'],
-    availability: 'Monday-Saturday, 9AM-7PM'
-  }
-];
+let stylists = [];
 
-let clients = [
-  {
-    id: 1,
-    name: 'Sarah Johnson',
-    email: 'sarah.johnson@email.com',
-    phone: '(555) 123-4567',
-    joinDate: '2023-01-15',
-    totalSpent: 1250,
-    appointmentsCount: 8
-  },
-  {
-    id: 2,
-    name: 'Emily Davis',
-    email: 'emily.davis@email.com',
-    phone: '(555) 234-5678',
-    joinDate: '2023-03-22',
-    totalSpent: 890,
-    appointmentsCount: 5
-  },
-  {
-    id: 3,
-    name: 'Michael Brown',
-    email: 'michael.brown@email.com',
-    phone: '(555) 345-6789',
-    joinDate: '2023-02-10',
-    totalSpent: 425,
-    appointmentsCount: 3
-  }
-];
+let clients = [];
 
-let blogPosts = [
-  {
-    id: 1,
-    title: 'Summer Hair Care Tips for Healthy Locks',
-    excerpt: 'Discover the best practices for maintaining healthy hair during the summer months.',
-    content: 'Summer can be harsh on your hair...',
-    author: 'Emma Rodriguez',
-    authorAvatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=50&h=50&fit=crop&crop=face',
-    publishDate: '2024-01-10',
-    category: 'hair-care',
-    image: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=800&h=400&fit=crop',
-    readTime: '5 min read'
-  },
-  {
-    id: 2,
-    title: 'The Latest Hair Color Trends for 2024',
-    excerpt: 'Explore the hottest hair color trends that will dominate this year.',
-    content: '2024 brings exciting new color trends...',
-    author: 'David Chen',
-    authorAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=50&h=50&fit=crop&crop=face',
-    publishDate: '2024-01-08',
-    category: 'trends',
-    image: 'https://images.pixabay.com/photos/2016/03/26/22/13/woman-1281826_960_720.jpg',
-    readTime: '7 min read'
-  }
-];
+let blogPosts = [];
 
-let products = [
-  {
-    id: 1,
-    name: "La Coiffure Luxury Shampoo",
-    description: "Premium salon-grade shampoo enriched with argan oil and keratin for deep cleansing and nourishment.",
-    price: 28.00,
-    originalPrice: 35.00,
-    category: 'shampoo',
-    image: "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=400&h=400&fit=crop",
-    rating: 4.8,
-    reviews: 124,
-    inStock: true,
-    featured: true,
-    bestSeller: true,
-    ingredients: ["Argan Oil", "Keratin", "Vitamin E", "Natural Extracts"],
-    size: "250ml",
-    benefits: ["Deep Cleansing", "Strengthening", "Nourishing", "Color Safe"]
-  },
-  {
-    id: 2,
-    name: "La Coiffure Nourishing Conditioner",
-    description: "Intensive conditioning treatment that restores moisture and leaves hair silky smooth.",
-    price: 32.00,
-    originalPrice: 40.00,
-    category: 'conditioner',
-    image: "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400&h=400&fit=crop",
-    rating: 4.9,
-    reviews: 89,
-    inStock: true,
-    featured: true,
-    bestSeller: false,
-    ingredients: ["Shea Butter", "Coconut Oil", "Proteins", "Natural Oils"],
-    size: "250ml",
-    benefits: ["Intensive Moisture", "Detangling", "Smooth Texture", "Long-lasting"]
-  },
-  {
-    id: 3,
-    name: "La Coiffure Keratin Treatment",
-    description: "Professional-grade keratin treatment for smooth, frizz-free hair with lasting results.",
-    price: 85.00,
-    originalPrice: 120.00,
-    category: 'treatment',
-    image: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400&h=400&fit=crop",
-    rating: 4.7,
-    reviews: 67,
-    inStock: true,
-    featured: true,
-    bestSeller: false,
-    ingredients: ["Keratin", "Natural Proteins", "Vitamins", "Antioxidants"],
-    size: "200ml",
-    benefits: ["Frizz Control", "Smoothing", "Damage Repair", "Heat Protection"]
-  },
-  {
-    id: 4,
-    name: "La Coiffure Styling Gel",
-    description: "Professional styling gel that provides strong hold while maintaining natural movement.",
-    price: 24.00,
-    originalPrice: 30.00,
-    category: 'styling',
-    image: "https://images.unsplash.com/photo-1588359348347-9bc6cbbb689e?w=400&h=400&fit=crop",
-    rating: 4.6,
-    reviews: 156,
-    inStock: true,
-    featured: false,
-    bestSeller: true,
-    ingredients: ["Natural Polymers", "Aloe Vera", "Vitamin B5", "Moisturizers"],
-    size: "150ml",
-    benefits: ["Strong Hold", "Natural Look", "No Residue", "Easy Wash Out"]
-  },
-  {
-    id: 5,
-    name: "La Coiffure Heat Protection Spray",
-    description: "Advanced heat protection spray that shields hair from damage up to 450°F.",
-    price: 35.00,
-    originalPrice: 45.00,
-    category: 'styling',
-    image: "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400&h=400&fit=crop",
-    rating: 4.8,
-    reviews: 203,
-    inStock: true,
-    featured: false,
-    bestSeller: true,
-    ingredients: ["Silicones", "Proteins", "Antioxidants", "UV Protection"],
-    size: "200ml",
-    benefits: ["Heat Protection", "UV Shield", "Damage Prevention", "Lightweight"]
-  },
-  {
-    id: 6,
-    name: "La Coiffure Hair Brush Set",
-    description: "Professional hair brush set designed for different hair types and styling needs.",
-    price: 45.00,
-    originalPrice: 60.00,
-    category: 'accessories',
-    image: "https://images.unsplash.com/photo-1522338242992-e1a54906a8da?w=400&h=400&fit=crop",
-    rating: 4.9,
-    reviews: 78,
-    inStock: true,
-    featured: false,
-    bestSeller: false,
-    ingredients: ["Natural Bristles", "Wooden Handles", "Ergonomic Design"],
-    size: "3-piece set",
-    benefits: ["Gentle Detangling", "Volume Enhancement", "Smooth Finish"]
-  },
-  {
-    id: 7,
-    name: "La Coiffure Deep Conditioning Mask",
-    description: "Weekly deep conditioning mask for intense hydration and repair.",
-    price: 38.00,
-    originalPrice: 48.00,
-    category: 'treatment',
-    image: "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=400&h=400&fit=crop",
-    rating: 4.7,
-    reviews: 92,
-    inStock: true,
-    featured: false,
-    bestSeller: false,
-    ingredients: ["Hyaluronic Acid", "Ceramides", "Natural Oils", "Proteins"],
-    size: "200ml",
-    benefits: ["Intense Hydration", "Damage Repair", "Smooth Texture", "Weekly Treatment"]
-  },
-  {
-    id: 8,
-    name: "La Coiffure Color-Safe Shampoo",
-    description: "Sulfate-free shampoo specifically formulated to preserve hair color and vibrancy.",
-    price: 30.00,
-    originalPrice: 38.00,
-    category: 'shampoo',
-    image: "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400&h=400&fit=crop",
-    rating: 4.8,
-    reviews: 145,
-    inStock: true,
-    featured: false,
-    bestSeller: true,
-    ingredients: ["Sulfate-Free", "Color-Lock Technology", "Natural Extracts", "Antioxidants"],
-    size: "250ml",
-    benefits: ["Color Preservation", "Gentle Cleansing", "Vibrancy Protection", "Moisture Balance"]
-  }
-];
+let products = [];
 
 let settings = {
-  salonName: 'La Coiffure Luxury Salon',
-  phone: '(555) 123-4567',
-  email: 'info@lacoiffure.com',
-  address: '123 Luxury Avenue, Beverly Hills, CA 90210',
+  salonName: '',
+  phone: '',
+  email: '',
+  address: '',
   openingTime: '09:00',
   closingTime: '20:00'
 };
 
 // Payment data storage
-let payments = [
-  {
-    id: 1,
-    transactionId: 'TXN_1705123456789',
-    amount: 150,
-    currency: 'USD',
-    method: 'card',
-    status: 'completed',
-    date: '2024-01-15T10:00:00Z',
-    clientId: 1,
-    appointmentId: 1,
-    service: 'Hair Cut & Style',
-    cardLast4: '1234',
-    cardBrand: 'Visa'
-  },
-  {
-    id: 2,
-    transactionId: 'TXN_1705034567890',
-    amount: 250,
-    currency: 'USD',
-    method: 'paypal',
-    status: 'completed',
-    date: '2024-01-10T14:00:00Z',
-    clientId: 2,
-    appointmentId: 2,
-    service: 'Color Treatment',
-    paypalEmail: 'client@example.com'
-  }
-];
+let payments = [];
 
-let giftCards = [
-  {
-    id: 1,
-    code: 'WELCOME50',
-    amount: 50,
-    remainingAmount: 50,
-    isActive: true,
-    expiryDate: '2024-12-31',
-    usedBy: null
-  },
-  {
-    id: 2,
-    code: 'LOYALTY25',
-    amount: 25,
-    remainingAmount: 25,
-    isActive: true,
-    expiryDate: '2024-12-31',
-    usedBy: null
-  }
-];
+let giftCards = [];
 
 // Payment validation functions
 const validateCardData = (cardData) => {
@@ -801,42 +377,44 @@ const getCardBrand = (cardNumber) => {
   return 'Unknown';
 };
 
+// Mock user data - in a real app, this would come from a database
+let users = [
+  {
+    id: 1,
+    firstName: 'John',
+    lastName: 'Doe',
+    email: 'john@example.com',
+    username: 'johndoe',
+    password: 'password123',
+    isActive: true,
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 2,
+    firstName: 'Jane',
+    lastName: 'Smith',
+    email: 'jane@example.com',
+    username: 'janesmith',
+    password: 'password123',
+    isActive: true,
+    createdAt: new Date().toISOString()
+  }
+];
+
 // Authentication endpoints
 app.post('/api/auth/login', (req, res) => {
-  const { email, password } = req.body;
+  const { email, username, password } = req.body;
   
-  // Mock user data
-  const users = [
-    {
-      id: 1,
-      name: 'John Doe',
-      email: 'user@example.com',
-      password: 'password123',
-      role: 'client'
-    },
-    {
-      id: 2,
-      name: 'Sarah Johnson',
-      email: 'sarah@example.com',
-      password: 'sarah123',
-      role: 'client'
-    },
-    {
-      id: 3,
-      name: 'Hannan',
-      email: 'shahista@lacoiffure.com',
-      password: 'shahi123',
-      role: 'client'
-    }
-  ];
-  
-  // Find user by email
-  const user = users.find(u => u.email === email);
+  // Find user by email OR username
+  const user = users.find(u => 
+    (u.email === email || u.email === username) || 
+    (u.username === email || u.username === username)
+  );
   
   if (!user) {
     return res.status(401).json({ 
       success: false, 
-      message: 'Email not found. Please check your email address.' 
+      message: 'Email or username not found. Please check your credentials.' 
     });
   }
   
@@ -851,9 +429,10 @@ app.post('/api/auth/login', (req, res) => {
     success: true,
     user: {
       id: user.id,
-      name: user.name,
+      firstName: user.firstName,
+      lastName: user.lastName,
       email: user.email,
-      role: user.role
+      username: user.username
     },
     token: 'mock-jwt-token'
   });
@@ -862,13 +441,37 @@ app.post('/api/auth/login', (req, res) => {
 app.post('/api/auth/register', (req, res) => {
   const userData = req.body;
   
-  // Mock registration
+  // Check if user already exists
+  const existingUser = users.find(u => 
+    u.email === userData.email || u.username === userData.username
+  );
+  
+  if (existingUser) {
+    return res.status(400).json({
+      success: false,
+      message: 'User with this email or username already exists'
+    });
+  }
+  
+  // Create new user
+  const newUser = {
+    id: Date.now(),
+    ...userData,
+    isActive: true,
+    createdAt: new Date().toISOString()
+  };
+  
+  // Add to users array
+  users.push(newUser);
+  
   res.json({
     success: true,
     user: {
-      id: Date.now(),
-      ...userData,
-      role: 'client'
+      id: newUser.id,
+      firstName: newUser.firstName,
+      lastName: newUser.lastName,
+      email: newUser.email,
+      username: newUser.username
     },
     token: 'mock-jwt-token'
   });
@@ -926,6 +529,8 @@ app.get('/api/admin/users', (req, res) => {
     username: admin.username,
     email: admin.email,
     role: admin.role,
+    branches: admin.branches || [],
+    isActive: admin.isActive !== false,
     createdAt: admin.createdAt,
     lastLogin: admin.lastLogin
   }));
@@ -933,39 +538,65 @@ app.get('/api/admin/users', (req, res) => {
 });
 
 app.post('/api/admin/users', (req, res) => {
-  const { username, password, email, role = 'admin' } = req.body;
-  
-  // Check if username already exists
-  if (admins.find(a => a.username === username)) {
-    return res.status(400).json({ success: false, message: 'Username already exists' });
-  }
-  
-  // Check if email already exists
-  if (admins.find(a => a.email === email)) {
-    return res.status(400).json({ success: false, message: 'Email already exists' });
-  }
-  
-  const newAdmin = {
-    id: Date.now(),
-    username,
-    password, // In production, this should be hashed
-    email,
-    role,
-    createdAt: new Date().toISOString(),
-    lastLogin: null
-  };
-  
-  admins.push(newAdmin);
-  res.json({
-    success: true,
-    user: {
-      id: newAdmin.id,
-      username: newAdmin.username,
-      email: newAdmin.email,
-      role: newAdmin.role,
-      createdAt: newAdmin.createdAt
+  try {
+    const { username, password, email, role = 'admin', branches = [] } = req.body;
+    
+    // Validate required fields
+    if (!username || !password || !email) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Username, password, and email are required' 
+      });
     }
-  });
+    
+    // Check if username already exists
+    if (admins.find(a => a.username === username)) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Username already exists' 
+      });
+    }
+    
+    // Check if email already exists
+    if (admins.find(a => a.email === email)) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Email already exists' 
+      });
+    }
+    
+    const newAdmin = {
+      id: Date.now(),
+      username,
+      password, // In production, this should be hashed
+      email,
+      role,
+      branches,
+      isActive: true,
+      createdAt: new Date().toISOString(),
+      lastLogin: null
+    };
+    
+    admins.push(newAdmin);
+    res.json({
+      success: true,
+      user: {
+        id: newAdmin.id,
+        username: newAdmin.username,
+        email: newAdmin.email,
+        role: newAdmin.role,
+        branches: newAdmin.branches,
+        isActive: newAdmin.isActive,
+        createdAt: newAdmin.createdAt
+      }
+    });
+  } catch (error) {
+    console.error('Error creating admin:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Internal server error' 
+    });
+  }
 });
 
 app.put('/api/admin/users/:id', (req, res) => {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'; 
 import Header from '../../components/ui/Header';
 import Footer from '../../components/ui/Footer';
 import Button from '../../components/ui/Button';
@@ -8,109 +8,65 @@ import ImageLightbox from './components/ImageLightbox';
 import { useGallery } from '../../contexts/GalleryContext';
 
 const GalleryPortfolio = () => {
-  const { galleryData } = useGallery();
+  const { galleryData, refreshGalleryData } = useGallery();
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [filteredImages, setFilteredImages] = useState([]);
+  const [displayImages, setDisplayImages] = useState([]);
 
-  // Fallback mock gallery data for demo purposes
-  const mockGalleryData = [
-    {
-      id: 1,
-      title: 'Elegant Updo',
-      category: 'bridal',
-      image: 'https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=600&h=800&fit=crop',
-      description: 'Sophisticated bridal updo with intricate braiding'
-    },
-    {
-      id: 2,
-      title: 'Modern Bob',
-      category: 'cuts',
-      image: 'https://images.unsplash.com/photo-1492106087820-71f1a00d2b11?w=600&h=800&fit=crop',
-      description: 'Contemporary bob cut with textured layers'
-    },
-    {
-      id: 3,
-      title: 'Balayage Highlights',
-      category: 'color',
-      image: 'https://images.unsplash.com/photo-1562322140-8baeececf3df?w=600&h=800&fit=crop',
-      description: 'Natural-looking balayage highlights'
-    },
-    {
-      id: 4,
-      title: 'Classic French Twist',
-      category: 'styling',
-      image: 'https://images.unsplash.com/photo-1523263685509-324b17c0c4c0?w=600&h=800&fit=crop',
-      description: 'Timeless French twist for formal occasions'
-    },
-    {
-      id: 5,
-      title: 'Pixie Cut',
-      category: 'cuts',
-      image: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=600&h=800&fit=crop',
-      description: 'Edgy pixie cut with texture'
-    },
-    {
-      id: 6,
-      title: 'Ombre Color',
-      category: 'color',
-      image: 'https://images.unsplash.com/photo-1552858725-2758b5fb1288?w=600&h=800&fit=crop',
-      description: 'Beautiful ombre color transition'
-    },
-    {
-      id: 7,
-      title: 'Bridal Braids',
-      category: 'bridal',
-      image: 'https://images.unsplash.com/photo-1519699047748-de8e457a634e?w=600&h=800&fit=crop',
-      description: 'Romantic bridal braids with flowers'
-    },
-    {
-      id: 8,
-      title: 'Beach Waves',
-      category: 'styling',
-      image: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=600&h=800&fit=crop',
-      description: 'Effortless beach waves styling'
-    },
-    {
-      id: 9,
-      title: 'Lob Cut',
-      category: 'cuts',
-      image: 'https://images.unsplash.com/photo-1492106087820-71f1a00d2b11?w=600&h=800&fit=crop',
-      description: 'Long bob with face-framing layers'
-    }
-  ];
+  // Refresh gallery data when component mounts
+  useEffect(() => {
+    refreshGalleryData();
+  }, [refreshGalleryData]);
+
+  // Gallery data is automatically updated from context
+
+  // No mock data - use only real gallery data from context
 
 
   useEffect(() => {
-    // Use context data if available, otherwise fall back to mock data
-    const dataToUse = galleryData && galleryData.length > 0 ? galleryData : mockGalleryData;
+    console.log('Gallery Portfolio - Raw galleryData:', galleryData);
+    // Use gallery data from context (supports both code-based and admin-uploaded images)
+    const dataToUse = galleryData || [];
+    console.log('Gallery Portfolio - dataToUse length:', dataToUse.length);
+    
+    // If no data, try to force refresh
+    if (!dataToUse || dataToUse.length === 0) {
+      console.log('Gallery Portfolio - No data, refreshing...');
+      refreshGalleryData();
+    }
     
     // Transform data to ensure consistent structure for rendering
-    const transformedData = dataToUse.map(item => {
-      // If item has media array, prioritize images over videos
+    const transformedData = dataToUse.map((item, index) => {
+      console.log(`Gallery Portfolio - Processing item ${index}:`, item);
+      // Force all items to be treated as images since we only have image files
       if (item.media && item.media.length > 0) {
         const firstImage = item.media.find(media => media.type?.startsWith('image/'));
-        const firstVideo = item.media.find(media => media.type?.startsWith('video/'));
-        const firstMedia = firstImage || firstVideo || item.media[0];
+        const firstMedia = firstImage || item.media[0];
+        console.log(`Gallery Portfolio - First media for item ${index}:`, firstMedia);
         
-        return {
+        const transformedItem = {
           ...item,
           image: firstMedia ? firstMedia.url : item.image || '/assets/images/no_image.png',
-          mediaType: firstMedia ? firstMedia.type : 'image',
-          altText: firstMedia ? firstMedia.altText || item.title : item.title
+          mediaType: 'image', // Force image type
+          altText: firstMedia ? firstMedia.altText || item.title || 'Gallery Image' : item.title || 'Gallery Image'
         };
+        console.log(`Gallery Portfolio - Transformed item ${index}:`, transformedItem);
+        return transformedItem;
       }
       // If item already has image property, use it as is
-      return {
+      const transformedItem = {
         ...item,
         image: item.image || '/assets/images/no_image.png',
-        mediaType: 'image',
-        altText: item.title
+        mediaType: 'image', // Force image type
+        altText: item.title || 'Gallery Image'
       };
+      console.log(`Gallery Portfolio - Transformed item ${index} (no media):`, transformedItem);
+      return transformedItem;
     });
     
-    setFilteredImages(transformedData);
-  }, [galleryData]);
+    console.log('Gallery Portfolio - Final transformedData:', transformedData);
+    setDisplayImages(transformedData);
+  }, [galleryData, refreshGalleryData]);
 
   const handleImageClick = (index) => {
     setCurrentImageIndex(index);
@@ -123,13 +79,13 @@ const GalleryPortfolio = () => {
 
   const handlePreviousImage = () => {
     setCurrentImageIndex((prev) => 
-      prev === 0 ? filteredImages.length - 1 : prev - 1
+      prev === 0 ? displayImages.length - 1 : prev - 1
     );
   };
 
   const handleNextImage = () => {
     setCurrentImageIndex((prev) => 
-      prev === filteredImages.length - 1 ? 0 : prev + 1
+      prev === displayImages.length - 1 ? 0 : prev + 1
     );
   };
 
@@ -181,53 +137,55 @@ const GalleryPortfolio = () => {
       {/* Gallery Grid */}
       <section className="py-10">
         <div className="container mx-auto px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5 lg:gap-6">
-            {filteredImages.map((item, index) => (
+          {displayImages.length === 0 ? (
+            <div className="text-center py-16">
+              <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+                <Icon name="Image" size={32} className="text-muted-foreground" />
+              </div>
+              <h3 className="font-heading text-xl font-semibold text-foreground mb-2">
+                No Images Found
+              </h3>
+              <p className="text-muted-foreground">
+                Gallery images are loading. Please check back in a moment.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5 lg:gap-6">
+              {displayImages.map((item, index) => (
               <div
                 key={item.id}
                 className="group cursor-pointer overflow-hidden rounded-lg shadow-luxury hover:shadow-luxury-hover transition-luxury"
                 onClick={() => handleImageClick(index)}
               >
                 <div className="relative aspect-[4/5] overflow-hidden">
-                  {item.mediaType && item.mediaType.startsWith('video/') ? (
-                    <video
-                      src={item.image}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-luxury-slow"
-                      controls
-                      muted
-                      loop
-                      playsInline
-                      preload="metadata"
-                    />
-                  ) : (
-                    <Image
-                      src={item.image}
-                      alt={item.altText || item.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-luxury-slow"
-                      onError={(e) => {
-                        e.target.src = '/assets/images/no_image.png';
-                      }}
-                    />
-                  )}
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-luxury" />
+                  <Image
+                    src={item.image}
+                    alt={item.altText || item.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-luxury-slow"
+                    onError={(e) => {
+                      console.error('Gallery Portfolio - Image failed to load:', item.image, 'Error:', e);
+                      e.target.src = '/assets/images/no_image.png';
+                    }}
+                    onLoad={() => {
+                      console.log('Gallery Portfolio - Image loaded successfully:', item.image);
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-luxury" />
                   
-                  {/* Overlay Content */}
-                  <div className="absolute inset-0 flex flex-col justify-end p-6 text-white opacity-0 group-hover:opacity-100 transition-luxury">
-                    <h3 className="font-heading font-semibold text-lg mb-2">
+                  {/* Overlay Content - Always visible at bottom */}
+                  <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+                    <h3 className="font-heading font-semibold text-sm mb-1 truncate">
                       {item.title}
                     </h3>
-                    <p className="text-sm opacity-90">
+                    <p className="text-xs opacity-90 line-clamp-2">
                       {item.description}
                     </p>
-                    <div className="mt-4 flex items-center space-x-2">
-                      <Icon name="Eye" size={16} />
-                      <span className="text-sm">Click to view</span>
-                    </div>
                   </div>
                 </div>
               </div>
             ))}
-          </div>
+            </div>
+          )}
         </div>
       </section>
 
@@ -267,7 +225,7 @@ const GalleryPortfolio = () => {
       <ImageLightbox
         isOpen={lightboxOpen}
         onClose={handleLightboxClose}
-        images={filteredImages}
+        images={displayImages}
         currentIndex={currentImageIndex}
         onPrevious={handlePreviousImage}
         onNext={handleNextImage}
