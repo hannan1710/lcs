@@ -10,14 +10,15 @@ const FeaturedServices = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const { services: contextServices, refreshServices } = useService();
 
-  // Use real service data from context
-  const services = contextServices || [];
+  // Filter only featured services
+  const services = contextServices?.filter(service => service.featured === true) || [];
 
   // Debug services loading
   useEffect(() => {
     console.log('FeaturedServices - contextServices:', contextServices);
-    console.log('FeaturedServices - services:', services);
-    console.log('FeaturedServices - services length:', services.length);
+    console.log('FeaturedServices - featured services:', services);
+    console.log('FeaturedServices - total services:', contextServices?.length || 0);
+    console.log('FeaturedServices - featured services count:', services.length);
   }, [contextServices, services]);
 
   // Refresh services when component mounts
@@ -70,8 +71,8 @@ const FeaturedServices = () => {
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
               {isAdmin 
-                ? 'No services available yet. Please add services through the admin panel or import them from Excel/CSV.'
-                : 'Services are being loaded. Please check back in a moment.'
+                ? 'No featured services available yet. Please mark some services as featured through the admin panel.'
+                : 'Featured services are being loaded. Please check back in a moment.'
               }
             </p>
             {isAdmin && (
@@ -79,7 +80,7 @@ const FeaturedServices = () => {
                 <Link to="/admin">
                   <Button variant="outline">
                     <Icon name="Settings" size={16} className="mr-2" />
-                    Manage Services
+                    Manage Featured Services
                   </Button>
                 </Link>
                 <Button 
@@ -93,6 +94,17 @@ const FeaturedServices = () => {
                 >
                   <Icon name="RotateCcw" size={16} className="mr-2" />
                   Refresh Services
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    console.log('Resetting to sample services');
+                    localStorage.removeItem('salon_services_data');
+                    window.location.reload();
+                  }}
+                >
+                  <Icon name="RefreshCw" size={16} className="mr-2" />
+                  Reset to Sample Services
                 </Button>
               </div>
             )}

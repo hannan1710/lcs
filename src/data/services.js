@@ -8,6 +8,7 @@ const services = [
     image: "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=400&h=300&fit=crop",
     duration: "90 min",
     description: "Premium precision cut with personalized styling consultation and luxury finishing.",
+    featured: true,
   },
   {
     id: 2,
@@ -16,6 +17,7 @@ const services = [
     image: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400&h=300&fit=crop",
     duration: "3-4 hours",
     description: "Hand-painted highlights for natural, sun-kissed dimension with premium color products.",
+    featured: true,
   },
   {
     id: 3,
@@ -24,6 +26,7 @@ const services = [
     image: "https://images.unsplash.com/photo-1457972729786-0411a3b2b626?w=400&h=300&fit=crop",
     duration: "4-5 hours",
     description: "Complete bridal beauty package with trial session and wedding day styling.",
+    featured: true,
   },
   {
     id: 4,
