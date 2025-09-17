@@ -18,8 +18,8 @@ const Register = () => {
   
     hairType: '',
     allergies: '',
-    agreeToTerms: false,
-    newsletter: true
+    
+  
   });
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);

@@ -4,11 +4,13 @@ import Input from '../../../components/ui/Input';
 import Select from '../../../components/ui/Select';
 import Icon from '../../../components/AppIcon';
 
-const WhatsAppTest = () => {
+const NotificationTest = () => {
   const [formData, setFormData] = useState({
+    email: '',
     phoneNumber: '',
     branch: 'powai',
-    message: ''
+    message: '',
+    notificationType: 'email'
   });
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState(null);
@@ -19,12 +21,31 @@ const WhatsAppTest = () => {
     setResult(null);
 
     try {
-      const response = await fetch('http://localhost:3001/api/whatsapp/test', {
+      let endpoint = '';
+      let payload = { ...formData };
+
+      if (formData.notificationType === 'email') {
+        endpoint = 'http://localhost:3001/api/email/test';
+        payload = {
+          email: formData.email,
+          branch: formData.branch,
+          message: formData.message
+        };
+      } else {
+        endpoint = 'http://localhost:3001/api/sms/test';
+        payload = {
+          phoneNumber: formData.phoneNumber,
+          branch: formData.branch,
+          message: formData.message
+        };
+      }
+
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
       const data = await response.json();
@@ -32,7 +53,7 @@ const WhatsAppTest = () => {
     } catch (error) {
       setResult({
         success: false,
-        error: 'Failed to send test message',
+        error: 'Failed to send test notification',
         details: error.message
       });
     } finally {
@@ -51,26 +72,47 @@ const WhatsAppTest = () => {
     <div className="max-w-2xl mx-auto space-y-6">
       <div className="bg-card rounded-lg border border-border p-6">
         <h3 className="text-xl font-heading font-semibold text-foreground mb-4">
-          WhatsApp Test
+          Notification Test
         </h3>
         
         <form onSubmit={handleSubmit} className="space-y-4">
-          <Input
-            label="Phone Number"
-            type="tel"
-            placeholder="+919876543210"
-            value={formData.phoneNumber}
-            onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
-            required
+          <Select
+            label="Notification Type"
+            value={formData.notificationType}
+            onChange={(e) => handleInputChange('notificationType', e.target.value)}
+            options={[
+              { value: 'email', label: 'Email Notification' },
+              { value: 'sms', label: 'SMS Notification' }
+            ]}
           />
+          
+          {formData.notificationType === 'email' ? (
+            <Input
+              label="Email Address"
+              type="email"
+              placeholder="test@example.com"
+              value={formData.email}
+              onChange={(e) => handleInputChange('email', e.target.value)}
+              required
+            />
+          ) : (
+            <Input
+              label="Phone Number"
+              type="tel"
+              placeholder="+919876543210"
+              value={formData.phoneNumber}
+              onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
+              required
+            />
+          )}
           
           <Select
             label="Branch"
             value={formData.branch}
             onChange={(e) => handleInputChange('branch', e.target.value)}
             options={[
-              { value: 'powai', label: 'Powai (+917400068615)' },
-              { value: 'thane', label: 'Thane (+919967002481)' }
+              { value: 'powai', label: 'Powai Branch' },
+              { value: 'thane', label: 'Thane Branch' }
             ]}
           />
           
@@ -94,8 +136,8 @@ const WhatsAppTest = () => {
               </>
             ) : (
               <>
-                <Icon name="MessageCircle" size={16} className="mr-2" />
-                Send Test Message
+                <Icon name={formData.notificationType === 'email' ? 'Mail' : 'MessageCircle'} size={16} className="mr-2" />
+                Send Test {formData.notificationType === 'email' ? 'Email' : 'SMS'}
               </>
             )}
           </Button>
@@ -148,7 +190,8 @@ const WhatsAppTest = () => {
   );
 };
 
-export default WhatsAppTest;
+export default NotificationTest;
+
 
 
 

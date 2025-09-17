@@ -1,22 +1,13 @@
 import React from 'react';
-import Image from '../../../components/AppImage';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 
 const BookingSummary = ({ 
-  selectedServices, 
-  selectedStylist, 
-  selectedDate, 
-  selectedTime, 
   formData,
   onConfirm,
   onEdit,
   isLoading 
 }) => {
-  const calculateTotal = () => {
-    return 0; // No pricing for services
-  };
-
   const formatDate = (date) => {
     return date?.toLocaleDateString('en-US', {
       weekday: 'long',
@@ -26,19 +17,26 @@ const BookingSummary = ({
     });
   };
 
-  const totalDuration = selectedServices?.reduce((total, service) => {
-    const minutes = parseInt(service?.duration?.replace(' min', ''));
-    return total + minutes;
-  }, 0);
-
-  const formatDuration = (minutes) => {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    if (hours > 0) {
-      return mins > 0 ? `${hours}h ${mins}min` : `${hours}h`;
-    }
-    return `${mins}min`;
+  // Branch contact information
+  const getBranchInfo = (branch) => {
+    const branches = {
+      powai: {
+        name: 'Powai Branch',
+        address: 'Galleria Mall, Powai, Mumbai',
+        phone: '+91 74000 68615',
+        whatsapp: '+91 74000 68615'
+      },
+      thane: {
+        name: 'Thane Branch', 
+        address: 'Anand Nagar, Thane, Mumbai',
+        phone: '+91 99670 02481',
+        whatsapp: '+91 99670 02481'
+      }
+    };
+    return branches[branch] || branches.powai;
   };
+
+  const branchInfo = getBranchInfo(formData?.branch);
 
   return (
     <div className="space-y-6">
@@ -50,112 +48,19 @@ const BookingSummary = ({
           Please review your appointment details
         </p>
       </div>
+
       <div className="bg-card rounded-lg border border-border overflow-hidden">
-        {/* Services */}
+        {/* Appointment Details */}
         <div className="p-6 border-b border-border">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-heading font-semibold text-lg text-foreground">
-              Selected Services
-            </h3>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onEdit('services')}
-              iconName="Edit2"
-              iconPosition="left"
-            >
-              Edit
-            </Button>
-          </div>
-          
-          <div className="space-y-3">
-            {selectedServices?.map((service) => (
-              <div key={service?.id} className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 rounded-lg overflow-hidden">
-                    <Image
-                      src={service?.image}
-                      alt={service?.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div>
-                    <p className="font-medium text-foreground">{service?.name}</p>
-                    <p className="text-sm text-muted-foreground">{service?.duration}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Stylist */}
-        <div className="p-6 border-b border-border">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-heading font-semibold text-lg text-foreground">
-              Your Stylist
-            </h3>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onEdit('stylist')}
-              iconName="Edit2"
-              iconPosition="left"
-            >
-              Edit
-            </Button>
-          </div>
-          
-          <div className="flex items-center space-x-4">
-            <div className="w-16 h-16 rounded-full overflow-hidden">
-              <Image
-                src={selectedStylist?.avatar}
-                alt={selectedStylist?.name}
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div>
-              <p className="font-semibold text-foreground">{selectedStylist?.name}</p>
-              <p className="text-sm text-accent">{selectedStylist?.title}</p>
-              <div className="flex items-center space-x-1 mt-1">
-                {[...Array(5)]?.map((_, i) => (
-                  <Icon
-                    key={i}
-                    name="Star"
-                    size={12}
-                    className={i < Math.floor(selectedStylist?.rating) ? 'text-accent fill-current' : 'text-muted-foreground'}
-                  />
-                ))}
-                <span className="text-xs text-muted-foreground ml-1">
-                  ({selectedStylist?.rating})
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Date & Time */}
-        <div className="p-6 border-b border-border">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-heading font-semibold text-lg text-foreground">
-              Appointment Details
-            </h3>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onEdit('datetime')}
-              iconName="Edit2"
-              iconPosition="left"
-            >
-              Edit
-            </Button>
-          </div>
+          <h3 className="font-heading font-semibold text-lg text-foreground mb-4">
+            Appointment Details
+          </h3>
           
           <div className="space-y-3">
             <div className="flex items-center space-x-3">
               <Icon name="Calendar" size={20} className="text-accent" />
               <div>
-                <p className="font-medium text-foreground">{formatDate(selectedDate)}</p>
+                <p className="font-medium text-foreground">{formatDate(formData?.selectedDate)}</p>
                 <p className="text-sm text-muted-foreground">Date</p>
               </div>
             </div>
@@ -163,10 +68,16 @@ const BookingSummary = ({
             <div className="flex items-center space-x-3">
               <Icon name="Clock" size={20} className="text-accent" />
               <div>
-                <p className="font-medium text-foreground">{selectedTime}</p>
-                <p className="text-sm text-muted-foreground">
-                  Estimated duration: {formatDuration(totalDuration)}
-                </p>
+                <p className="font-medium text-foreground">{formData?.selectedTime}</p>
+                <p className="text-sm text-muted-foreground">Time</p>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-3">
+              <Icon name="MapPin" size={20} className="text-accent" />
+              <div>
+                <p className="font-medium text-foreground">{branchInfo.name}</p>
+                <p className="text-sm text-muted-foreground">{branchInfo.address}</p>
               </div>
             </div>
           </div>
@@ -174,92 +85,98 @@ const BookingSummary = ({
 
         {/* Client Information */}
         <div className="p-6 border-b border-border">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-heading font-semibold text-lg text-foreground">
-              Contact Information
-            </h3>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onEdit('information')}
-              iconName="Edit2"
-              iconPosition="left"
-            >
-              Edit
-            </Button>
-          </div>
+          <h3 className="font-heading font-semibold text-lg text-foreground mb-4">
+            Your Information
+          </h3>
           
           <div className="space-y-2">
-            <p className="text-foreground">
-              {formData?.firstName} {formData?.lastName}
-            </p>
+            <p className="text-foreground font-medium">{formData?.fullName}</p>
             <p className="text-sm text-muted-foreground">{formData?.email}</p>
-            <p className="text-sm text-muted-foreground">{formData?.phone}</p>
-            {formData?.notes && (
-              <p className="text-sm text-muted-foreground mt-2">
-                <span className="font-medium">Notes:</span> {formData?.notes}
-              </p>
-            )}
+            <p className="text-sm text-muted-foreground">{formData?.mobileNumber}</p>
           </div>
         </div>
 
-        {/* Total */}
-        <div className="p-6 bg-muted/30">
-          <div className="flex items-center justify-between">
+        {/* Confirmation Method */}
+        <div className="p-6 border-b border-border">
+          <h3 className="font-heading font-semibold text-lg text-foreground mb-4">
+            Confirmation Method
+          </h3>
+          
+          <div className="flex items-center space-x-3">
+            <Icon 
+              name={formData?.confirmationMethod === 'whatsapp' ? "MessageCircle" : 
+                    formData?.confirmationMethod === 'email' ? "Mail" : "Phone"} 
+              size={20} 
+              className={formData?.confirmationMethod === 'whatsapp' ? "text-green-500" : 
+                        formData?.confirmationMethod === 'email' ? "text-blue-500" : "text-blue-500"} 
+            />
             <div>
-              <p className="text-lg font-heading font-semibold text-foreground">
-                Total Amount
+              <p className="font-medium text-foreground">
+                {formData?.confirmationMethod === 'whatsapp' ? 'WhatsApp' : 
+                 formData?.confirmationMethod === 'email' ? 'Email' : 'Phone Call'}
               </p>
               <p className="text-sm text-muted-foreground">
-                {selectedServices?.length} service{selectedServices?.length > 1 ? 's' : ''}
+                {formData?.confirmationMethod === 'whatsapp' ? 
+                  `You will receive a WhatsApp message at ${formData?.mobileNumber}` :
+                 formData?.confirmationMethod === 'email' ? 
+                  `You will receive an email at ${formData?.email}` :
+                  `We will call you at ${formData?.mobileNumber}`}
               </p>
             </div>
-            <p className="text-2xl font-heading font-bold text-accent">
-              ${calculateTotal()}
+          </div>
+        </div>
+
+        {/* Branch Contact Information */}
+        <div className="p-6 bg-muted/30">
+          <h3 className="font-heading font-semibold text-lg text-foreground mb-4">
+            Branch Contact Information
+          </h3>
+          
+          <div className="space-y-3">
+            <div className="flex items-center space-x-3">
+              <Icon name="Phone" size={16} className="text-accent" />
+              <div>
+                <p className="font-medium text-foreground">{branchInfo.phone}</p>
+                <p className="text-sm text-muted-foreground">Call us for any queries</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center space-x-3">
+              <Icon name="MessageCircle" size={16} className="text-green-500" />
+              <div>
+                <p className="font-medium text-foreground">{branchInfo.whatsapp}</p>
+                <p className="text-sm text-muted-foreground">WhatsApp us anytime</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Important Notice */}
+      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
+        <div className="flex items-start space-x-3">
+          <Icon name="Info" size={20} className="text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+          <div>
+            <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">
+              Important Notice
+            </h4>
+            <p className="text-sm text-blue-800 dark:text-blue-200">
+              Our team will contact you within 30 minutes to confirm your appointment. 
+              Please keep your phone nearby and check your email for confirmation details.
             </p>
           </div>
         </div>
       </div>
-      {/* Policies */}
-      <div className="bg-card rounded-lg border border-border p-6">
-        <h3 className="font-heading font-semibold text-lg text-foreground mb-4">
-          Booking Policies
-        </h3>
-        
-        <div className="space-y-3 text-sm text-muted-foreground">
-          <div className="flex items-start space-x-3">
-            <Icon name="Clock" size={16} className="text-accent mt-0.5 flex-shrink-0" />
-            <p>
-              <span className="font-medium text-foreground">Cancellation:</span> 
-              Free cancellation up to 24 hours before your appointment
-            </p>
-          </div>
-          
-          <div className="flex items-start space-x-3">
-            <Icon name="CreditCard" size={16} className="text-accent mt-0.5 flex-shrink-0" />
-            <p>
-              <span className="font-medium text-foreground">Payment:</span> 
-              Payment is due at the time of service. We accept all major credit cards
-            </p>
-          </div>
-          
-          <div className="flex items-start space-x-3">
-            <Icon name="MapPin" size={16} className="text-accent mt-0.5 flex-shrink-0" />
-            <p>
-              <span className="font-medium text-foreground">Location:</span> 
-              123 Luxury Avenue, Beverly Hills, CA 90210
-            </p>
-          </div>
-        </div>
-      </div>
-      {/* Confirm Button */}
+
+      {/* Action Buttons */}
       <div className="flex flex-col sm:flex-row gap-4">
         <Button
           variant="outline"
           size="lg"
-          onClick={() => onEdit('services')}
+          onClick={() => onEdit()}
           className="flex-1"
         >
+          <Icon name="ArrowLeft" size={16} className="mr-2" />
           Go Back
         </Button>
         
@@ -270,6 +187,7 @@ const BookingSummary = ({
           loading={isLoading}
           className="flex-1 bg-accent text-accent-foreground hover:bg-accent/90"
         >
+          <Icon name="Check" size={16} className="mr-2" />
           Confirm Booking
         </Button>
       </div>

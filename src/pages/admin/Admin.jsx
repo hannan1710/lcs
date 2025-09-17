@@ -14,7 +14,7 @@ import ProductManagement from './components/ProductManagement';
 import AppointmentManagement from './components/AppointmentManagement';
 import GalleryManagement from './components/GalleryManagement';
 import HomepageGallerySelector from './components/HomepageGallerySelector';
-import WhatsAppTest from './components/WhatsAppTest';
+import NotificationTest from './components/WhatsAppTest';
 import CategoryManagement from './components/CategoryManagement';
 import ErrorBoundary from '../../components/ErrorBoundary';
 import { useGallery } from '../../contexts/GalleryContext';
@@ -398,11 +398,11 @@ const Admin = () => {
             <CategoryManagement adminRole={adminRole} />
           )}
 
-          {/* WhatsApp Test Tab */}
+          {/* Notification Test Tab */}
           {activeTab === 'whatsapp' && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-heading font-semibold text-foreground">WhatsApp Test</h2>
+                <h2 className="text-2xl font-heading font-semibold text-foreground">Notification Test</h2>
               </div>
               {isLoading ? (
                 <div className="flex items-center justify-center py-8">
@@ -410,7 +410,7 @@ const Admin = () => {
                   <span>Loading...</span>
                 </div>
               ) : (
-                <WhatsAppTest />
+                <NotificationTest />
               )}
             </div>
           )}

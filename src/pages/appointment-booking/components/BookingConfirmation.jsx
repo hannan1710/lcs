@@ -114,13 +114,16 @@ const BookingConfirmation = ({ bookingData, onNewBooking, onGoHome }) => {
               
               <div className="flex items-center space-x-3">
                 <Icon 
-                  name={bookingData?.confirmationMethod === 'whatsapp' ? "MessageCircle" : "Phone"} 
+                  name={bookingData?.confirmationMethod === 'whatsapp' ? "MessageCircle" : 
+                        bookingData?.confirmationMethod === 'email' ? "Mail" : "Phone"} 
                   size={20} 
-                  className={bookingData?.confirmationMethod === 'whatsapp' ? "text-green-500" : "text-blue-500"} 
+                  className={bookingData?.confirmationMethod === 'whatsapp' ? "text-green-500" : 
+                            bookingData?.confirmationMethod === 'email' ? "text-blue-500" : "text-blue-500"} 
                 />
                 <div>
                   <p className="font-medium text-foreground">
-                    {bookingData?.confirmationMethod === 'whatsapp' ? 'WhatsApp' : 'Phone Call'}
+                    {bookingData?.confirmationMethod === 'whatsapp' ? 'WhatsApp' : 
+                     bookingData?.confirmationMethod === 'email' ? 'Email' : 'Phone Call'}
                   </p>
                   <p className="text-sm text-muted-foreground">Confirmation Method</p>
                 </div>

@@ -59,9 +59,6 @@ const FeaturedServices = () => {
 
   // Show fallback if no services
   if (!transformedServices || transformedServices.length === 0) {
-    // Check if we're in admin mode
-    const isAdmin = localStorage.getItem('admin');
-    
     return (
       <section className="py-16 lg:py-24 bg-background">
         <div className="container mx-auto px-6 lg:px-8">
@@ -69,51 +66,9 @@ const FeaturedServices = () => {
             <h2 className="font-heading text-3xl lg:text-4xl xl:text-5xl font-bold text-foreground mb-4">
               Featured Services
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
-              {isAdmin 
-                ? 'No featured services available yet. Please mark some services as featured through the admin panel.'
-                : 'Featured services are being loaded. Please check back in a moment.'
-              }
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              No available service
             </p>
-            {isAdmin && (
-              <div className="flex gap-4 justify-center">
-                <Link to="/admin">
-                  <Button variant="outline">
-                    <Icon name="Settings" size={16} className="mr-2" />
-                    Manage Featured Services
-                  </Button>
-                </Link>
-                <Button 
-                  variant="outline" 
-                  onClick={() => {
-                    console.log('Manual refresh triggered');
-                    refreshServices();
-                    // Force re-render
-                    window.location.reload();
-                  }}
-                >
-                  <Icon name="RotateCcw" size={16} className="mr-2" />
-                  Refresh Services
-                </Button>
-                <Button 
-                  variant="outline" 
-                  onClick={() => {
-                    console.log('Resetting to sample services');
-                    localStorage.removeItem('salon_services_data');
-                    window.location.reload();
-                  }}
-                >
-                  <Icon name="RefreshCw" size={16} className="mr-2" />
-                  Reset to Sample Services
-                </Button>
-              </div>
-            )}
-            {!isAdmin && (
-              <div className="flex items-center justify-center">
-                <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin mr-2"></div>
-                <span className="text-muted-foreground">Loading services...</span>
-              </div>
-            )}
           </div>
         </div>
       </section>

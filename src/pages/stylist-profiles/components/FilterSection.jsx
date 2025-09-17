@@ -12,18 +12,15 @@ const FilterSection = ({
 }) => {
   const specialties = [
     { value: 'all', label: 'All Specialties', icon: 'Scissors' },
-    { value: 'hair-color', label: 'Hair Color', icon: 'Palette' },
-    { value: 'hair-cuts', label: 'Hair Cuts', icon: 'Scissors' },
-    { value: 'extensions', label: 'Extensions', icon: 'Plus' },
-    { value: 'bridal', label: 'Bridal', icon: 'Heart' },
-    { value: 'treatments', label: 'Treatments', icon: 'Sparkles' }
+    { value: 'hair', label: 'Hair Services', icon: 'Scissors' },
+    { value: 'nail', label: 'Nail Services', icon: 'Heart' },
+    { value: 'facial', label: 'Facial Services', icon: 'Sparkles' }
   ];
 
   const experienceLevels = [
     { value: 'all', label: 'All Experience' },
-    { value: '5+', label: '5+ Years' },
-    { value: '10+', label: '10+ Years' },
-    { value: '15+', label: '15+ Years' }
+    { value: '5', label: '5+ Years' },
+    { value: '10', label: '10+ Years' }
   ];
 
   return (

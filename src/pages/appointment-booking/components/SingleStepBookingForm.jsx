@@ -8,6 +8,7 @@ const SingleStepBookingForm = ({ onSubmit, isLoading }) => {
   const [formData, setFormData] = useState({
     branch: '',
     fullName: '',
+    email: '',
     mobileNumber: '',
     selectedDate: null,
     selectedTime: '',
@@ -99,6 +100,7 @@ const SingleStepBookingForm = ({ onSubmit, isLoading }) => {
 
     if (!formData.branch) newErrors.branch = 'Please select a branch';
     if (!formData.fullName.trim()) newErrors.fullName = 'Name is required';
+   
     if (!formData.mobileNumber.trim()) {
       newErrors.mobileNumber = 'Mobile number is required';
     } else if (!/^[0-9]{10}$/.test(formData.mobileNumber.replace(/\D/g, ''))) {
@@ -185,6 +187,8 @@ const SingleStepBookingForm = ({ onSubmit, isLoading }) => {
             error={errors.fullName}
             required
           />
+          
+       
           
           <Input
             label="Mobile Number"

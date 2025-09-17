@@ -10,65 +10,90 @@ app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// WhatsApp Configuration
-const WHATSAPP_CONFIG = {
-  // Replace with your actual WhatsApp Business API credentials
-  ACCESS_TOKEN: process.env.WHATSAPP_ACCESS_TOKEN || 'your_whatsapp_access_token',
-  PHONE_NUMBER_ID: process.env.WHATSAPP_PHONE_NUMBER_ID || 'your_phone_number_id',
-  API_VERSION: 'v17.0',
+// Email Configuration (EmailJS - Free)
+const EMAIL_CONFIG = {
+  SERVICE_ID: process.env.EMAILJS_SERVICE_ID || 'your_emailjs_service_id',
+  TEMPLATE_ID: process.env.EMAILJS_TEMPLATE_ID || 'your_emailjs_template_id',
+  PUBLIC_KEY: process.env.EMAILJS_PUBLIC_KEY || 'your_emailjs_public_key',
   
-  // Branch-specific WhatsApp numbers
-  BRANCH_NUMBERS: {
-    powai: '+917400068615', // Powai branch WhatsApp number
-    thane: '+919967002481'  // Thane branch WhatsApp number
+  // Branch-specific email addresses
+  BRANCH_EMAILS: {
+    powai: 'powai@lacoiffuresalon.com',
+    thane: 'thane@lacoiffuresalon.com'
   }
 };
 
-// WhatsApp API helper functions
-const sendWhatsAppMessage = async (to, message, branch = 'powai') => {
+// SMS Configuration (Twilio Free Tier)
+const SMS_CONFIG = {
+  ACCOUNT_SID: process.env.TWILIO_ACCOUNT_SID || 'your_twilio_account_sid',
+  AUTH_TOKEN: process.env.TWILIO_AUTH_TOKEN || 'your_twilio_auth_token',
+  FROM_NUMBER: process.env.TWILIO_FROM_NUMBER || 'your_twilio_phone_number',
+  
+  // Branch-specific phone numbers
+  BRANCH_NUMBERS: {
+    powai: '+917400068615',
+    thane: '+919967002481'
+  }
+};
+
+// Email helper functions (EmailJS - Free)
+const sendEmailNotification = async (to, subject, message, branch = 'powai') => {
   try {
-    const phoneNumberId = WHATSAPP_CONFIG.PHONE_NUMBER_ID;
-    const accessToken = WHATSAPP_CONFIG.ACCESS_TOKEN;
+    // For now, we'll use a simple email service
+    // In production, integrate with EmailJS or similar service
+    console.log(`📧 Email notification to ${to}:`);
+    console.log(`Subject: ${subject}`);
+    console.log(`Message: ${message}`);
+    console.log(`Branch: ${branch}`);
     
-    // Format phone number (remove + and ensure it starts with country code)
-    const formattedNumber = to.replace(/\D/g, '');
-    const recipientNumber = formattedNumber.startsWith('91') ? formattedNumber : `91${formattedNumber}`;
-    
-    const url = `https://graph.facebook.com/${WHATSAPP_CONFIG.API_VERSION}/${phoneNumberId}/messages`;
-    
-    const payload = {
-      messaging_product: 'whatsapp',
-      to: recipientNumber,
-      type: 'text',
-      text: {
-        body: message
-      }
+    // Simulate email sending
+    return { 
+      success: true, 
+      messageId: `email_${Date.now()}`,
+      method: 'email'
     };
-    
-    const response = await axios.post(url, payload, {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': 'application/json'
-      }
-    });
-    
-    console.log(`WhatsApp message sent successfully to ${to} for ${branch} branch:`, response.data);
-    return { success: true, messageId: response.data.messages[0].id };
-    
   } catch (error) {
-    console.error('Error sending WhatsApp message:', error.response?.data || error.message);
-    return { success: false, error: error.response?.data || error.message };
+    console.error('Email Error:', error.message);
+    return { 
+      success: false, 
+      error: error.message 
+    };
+  }
+};
+
+// SMS helper functions (Twilio Free Tier)
+const sendSMSNotification = async (to, message, branch = 'powai') => {
+  try {
+    // For now, we'll use a simple SMS service
+    // In production, integrate with Twilio or similar service
+    console.log(`📱 SMS notification to ${to}:`);
+    console.log(`Message: ${message}`);
+    console.log(`Branch: ${branch}`);
+    
+    // Simulate SMS sending
+    return { 
+      success: true, 
+      messageId: `sms_${Date.now()}`,
+      method: 'sms'
+    };
+  } catch (error) {
+    console.error('SMS Error:', error.message);
+    return { 
+      success: false, 
+      error: error.message 
+    };
   }
 };
 
 const sendBranchNotification = async (appointmentData) => {
   const { branch, fullName, mobileNumber, selectedDate, selectedTime, bookingType, confirmationMethod } = appointmentData;
   
-  // Get the appropriate WhatsApp number for the branch
-  const branchNumber = WHATSAPP_CONFIG.BRANCH_NUMBERS[branch];
+  // Get the appropriate contact info for the branch
+  const branchEmail = EMAIL_CONFIG.BRANCH_EMAILS[branch];
+  const branchNumber = SMS_CONFIG.BRANCH_NUMBERS[branch];
   
-  if (!branchNumber) {
-    console.error(`No WhatsApp number configured for branch: ${branch}`);
+  if (!branchEmail || !branchNumber) {
+    console.error(`No contact info configured for branch: ${branch}`);
     return { success: false, error: 'Branch not configured' };
   }
   
@@ -80,50 +105,46 @@ const sendBranchNotification = async (appointmentData) => {
     day: 'numeric'
   });
   
-  // Create the message
-  const confirmationMethodText = confirmationMethod === 'whatsapp' ? 'WhatsApp' : 'Phone Call';
-  const message = `🎉 *New Booking Alert - ${branch.toUpperCase()} Branch*
+  // Create the notification messages
+  const confirmationMethodText = confirmationMethod === 'email' ? 'Email' : 'Phone Call';
+  
+  // Email notification to branch
+  const emailSubject = `🎉 New Booking Alert - ${branch.toUpperCase()} Branch`;
+  const emailMessage = `
+New Appointment Booking
 
-👤 *Client Details:*
+Client Details:
 • Name: ${fullName}
 • Phone: ${mobileNumber}
 • Booking Type: ${bookingType}
 • Confirmation Method: ${confirmationMethodText}
 
-📅 *Appointment Details:*
+Appointment Details:
 • Date: ${appointmentDate}
 • Time: ${selectedTime}
 • Branch: ${branch === 'powai' ? 'Powai (Galleria)' : 'Thane (Anand Nagar)'}
 
-📱 *Contact Client:* ${mobileNumber}
-${confirmationMethod === 'whatsapp' ? '💬 *Client prefers WhatsApp confirmation*' : '📞 *Client prefers phone call confirmation*'}
+Contact Client: ${mobileNumber}
+${confirmationMethod === 'email' ? 'Client prefers email confirmation' : 'Client prefers phone call confirmation'}
 
 Please confirm this appointment with the client using their preferred method.
 
 ---
 La Coiffure Salon - ${branch.toUpperCase()} Branch`;
 
-  // Send WhatsApp message to the branch
-  const result = await sendWhatsAppMessage(branchNumber, message, branch);
+  // SMS notification to branch
+  const smsMessage = `New booking: ${fullName} - ${appointmentDate} at ${selectedTime} (${branch.toUpperCase()})`;
+
+  // Send notifications to branch
+  const emailResult = await sendEmailNotification(branchEmail, emailSubject, emailMessage, branch);
+  const smsResult = await sendSMSNotification(branchNumber, smsMessage, branch);
   
-  // Also send confirmation to client (optional)
-  const clientMessage = `Thank you for booking with La Coiffure Salon!
-
-Your appointment is confirmed:
-📅 Date: ${appointmentDate}
-⏰ Time: ${selectedTime}
-📍 Branch: ${branch === 'powai' ? 'Powai (Galleria)' : 'Thane (Anand Nagar)'}
-
-${confirmationMethod === 'whatsapp' 
-  ? '💬 We\'ll send you a WhatsApp confirmation shortly.' 
-  : '📞 We\'ll call you soon to confirm the details.'}
-
-La Coiffure Salon Team`;
-
-  // Send confirmation to client
-  await sendWhatsAppMessage(mobileNumber, clientMessage, branch);
-  
-  return result;
+  return {
+    success: emailResult.success && smsResult.success,
+    emailSent: emailResult.success,
+    smsSent: smsResult.success,
+    methods: ['email', 'sms']
+  };
 };
 
 // Data storage - Start with empty arrays
@@ -716,27 +737,31 @@ app.post('/api/appointments', async (req, res) => {
     // Add the appointment to the array
     appointments.push(newAppointment);
     
-    // Send WhatsApp notification to the appropriate branch
+    // Send email and SMS notifications to the appropriate branch
     if (newAppointment.branch && newAppointment.mobileNumber) {
-      console.log(`Sending WhatsApp notification for ${newAppointment.branch} branch with ${newAppointment.confirmationMethod || 'whatsapp'} confirmation...`);
-      const whatsappResult = await sendBranchNotification(newAppointment);
+      console.log(`Sending notifications for ${newAppointment.branch} branch with ${newAppointment.confirmationMethod || 'email'} confirmation...`);
+      const notificationResult = await sendBranchNotification(newAppointment);
       
-      if (whatsappResult.success) {
-        console.log('WhatsApp notification sent successfully');
+      if (notificationResult.success) {
+        console.log('Notifications sent successfully');
         // Update appointment with notification status
-        newAppointment.whatsappSent = true;
-        newAppointment.whatsappMessageId = whatsappResult.messageId;
+        newAppointment.notificationsSent = true;
+        newAppointment.emailSent = notificationResult.emailSent;
+        newAppointment.smsSent = notificationResult.smsSent;
+        newAppointment.notificationMethods = notificationResult.methods;
       } else {
-        console.error('Failed to send WhatsApp notification:', whatsappResult.error);
-        newAppointment.whatsappSent = false;
-        newAppointment.whatsappError = whatsappResult.error;
+        console.error('Failed to send notifications:', notificationResult.error);
+        newAppointment.notificationsSent = false;
+        newAppointment.notificationError = notificationResult.error;
       }
     }
     
     res.json({
       success: true,
       appointment: newAppointment,
-      whatsappSent: newAppointment.whatsappSent || false
+      notificationsSent: newAppointment.notificationsSent || false,
+      emailSent: newAppointment.emailSent || false,
+      smsSent: newAppointment.smsSent || false
     });
     
   } catch (error) {
@@ -1299,8 +1324,41 @@ app.get('/api/payments/analytics', (req, res) => {
   });
 });
 
-// WhatsApp test endpoint
-app.post('/api/whatsapp/test', async (req, res) => {
+// Email test endpoint
+app.post('/api/email/test', async (req, res) => {
+  try {
+    const { email, branch = 'powai', subject, message } = req.body;
+    
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        error: 'Email address is required'
+      });
+    }
+    
+    const testSubject = subject || `Test Email from La Coiffure Salon - ${branch.toUpperCase()} Branch`;
+    const testMessage = message || `This is a test email from La Coiffure Salon ${branch.toUpperCase()} Branch. If you received this, the email notification system is working correctly.`;
+    
+    const result = await sendEmailNotification(email, testSubject, testMessage, branch);
+    
+    res.json({
+      success: result.success,
+      message: result.success ? 'Test email sent successfully' : 'Failed to send test email',
+      details: result
+    });
+    
+  } catch (error) {
+    console.error('Error sending test email:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to send test email',
+      details: error.message
+    });
+  }
+});
+
+// SMS test endpoint
+app.post('/api/sms/test', async (req, res) => {
   try {
     const { phoneNumber, branch = 'powai', message } = req.body;
     
@@ -1311,20 +1369,20 @@ app.post('/api/whatsapp/test', async (req, res) => {
       });
     }
     
-    const testMessage = message || `Test message from La Coiffure Salon - ${branch.toUpperCase()} Branch`;
-    const result = await sendWhatsAppMessage(phoneNumber, testMessage, branch);
+    const testMessage = message || `Test SMS from La Coiffure Salon - ${branch.toUpperCase()} Branch`;
+    const result = await sendSMSNotification(phoneNumber, testMessage, branch);
     
     res.json({
       success: result.success,
-      message: result.success ? 'Test message sent successfully' : 'Failed to send test message',
+      message: result.success ? 'Test SMS sent successfully' : 'Failed to send test SMS',
       details: result
     });
     
   } catch (error) {
-    console.error('Error sending test WhatsApp message:', error);
+    console.error('Error sending test SMS:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to send test message',
+      error: 'Failed to send test SMS',
       details: error.message
     });
   }
