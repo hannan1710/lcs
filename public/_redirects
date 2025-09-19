@@ -1,0 +1,5 @@
+# Redirect all admin routes to admin panel
+/admin/* /admin/index.html 200
+
+# Redirect all other routes to main app
+/* /index.html 200
